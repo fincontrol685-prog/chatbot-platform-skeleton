@@ -1,0 +1,9 @@
+/* Angular Material prebuilt theme variables: use indigo-pink as default */
+@import '~@angular/material/prebuilt-themes/indigo-pink.css';
+
+html, body {
+  height: 100%;
+  font-family: 'Roboto', sans-serif;
+}
+
+mat-card { margin: 8px; }

@@ -1,0 +1,524 @@
+Workspace extension with invalid name (defaultProject) found.
+****************************************************************************************
+This is a simple server for use in testing or debugging Angular applications locally.
+It hasn't been reviewed for security issues.
+
+DON'T USE IT FOR PRODUCTION!
+****************************************************************************************
+- Generating browser application bundles (phase: setup)...
+    TypeScript compiler options "target" and "useDefineForClassFields" are set to "ES2022" and "false" respectively by the Angular CLI. To control ECMA version and features use the Browerslist configuration. For more information, see https://angular.io/guide/build#configuring-browser-compatibility
+    NOTE: You can set the "target" to "ES2022" in the project's tsconfig to remove this warning.
+<i> [webpack-dev-server] [HPM] Proxy created: /api  -> http://localhost:8080
+    [webpack-dev-server] [HPM] Subscribed to http-proxy events: [ 'error', 'close' ]
+    [webpack.cache.PackFileCacheStrategy] No pack exists at /home/robertojr/chatbot-platform-skeleton/frontend/.angular/cache/16.2.0/angular-webpack/f80f89ffe3728d611dbf09556d0672e53e285969.pack: Error: ENOENT: no such file or directory, stat '/home/robertojr/chatbot-platform-skeleton/frontend/.angular/cache/16.2.0/angular-webpack/f80f89ffe3728d611dbf09556d0672e53e285969/index.pack'
+<t> [webpack.cache.PackFileCacheStrategy] restore cache container: 1148.45563 ms
+<i> [webpack-dev-server] Project is running at:
+<i> [webpack-dev-server] Loopback: http://localhost:4200/, http://127.0.0.1:4200/
+<i> [webpack-dev-server] 404s will fallback to '/index.html'
+<i> [webpack-dev-middleware] wait until bundle finished: /
+    [IdleFileCachePlugin] Initial cache was generated and cache will be persisted in 5s.
+✔ Browser application bundle generation complete.
+asset main.js 633 KiB {179} [cached] (name: main)
+asset styles.css 80.7 KiB {532} [cached] (name: styles)
+asset styles.js 70.8 KiB {532} [cached] (name: styles)
+asset index.html 37.3 KiB [cached]
+asset 3rdpartylicenses.txt 29.1 KiB [cached]
+asset 462.js 5.4 KiB {462} [cached] (name: features-bots-bots-module)
+asset runtime.js 2.71 KiB {666} [cached] (name: runtime)
+asset 998.js 2.62 KiB {998} [cached] (name: features-auth-auth-module)
+asset favicon.ico 0 bytes [cached] [from: src/favicon.ico] [copied]
+Entrypoint main = runtime.js main.js
+Entrypoint styles = runtime.js styles.css styles.js
+chunk {179} (runtime: runtime) main.js (main) 3.5 MiB [initial] [rendered]
+  dependent modules 3.24 MiB [dependent] 95 modules
+  ./node_modules/webpack-dev-server/client/index.js?protocol=auto%3A&username=&pas...(truncated) [866] 75.8 KiB {179} {532} [built] [code generated]
+    [no exports used]
+    ModuleConcatenation bailout: Cannot concat with ./node_modules/ansi-html-community/index.js: Module is not an ECMAScript module
+    ModuleConcatenation bailout: Cannot concat with ./node_modules/webpack-dev-server/client/clients/WebSocketClient.js: Module ./node_modules/webpack-dev-server/client/clients/WebSocketClient.js is referenced from these modules with unsupported syntax: ./node_modules/webpack-dev-server/client/socket.js (referenced with harmony import specifier, harmony side effect evaluation, provided)
+    ModuleConcatenation bailout: Cannot concat with ./node_modules/webpack-dev-server/client/utils/log.js: Module ./node_modules/webpack-dev-server/client/clients/WebSocketClient.js is referenced from these modules with unsupported syntax: ./node_modules/webpack-dev-server/client/socket.js (referenced with harmony import specifier, harmony side effect evaluation, provided)
+    ModuleConcatenation bailout: Cannot concat with ./node_modules/webpack/hot/emitter.js: Module is not an ECMAScript module
+    ModuleConcatenation bailout: Cannot concat with ./node_modules/webpack/hot/log.js: Module is not an ECMAScript module
+    entry /home/robertojr/chatbot-platform-skeleton/frontend/node_modules/webpack-dev-server/client/index.js?protocol=auto%3A&username=&password=&hostname=0.0.0.0&port=0&pathname=%2Fng-cli-ws&logging=info&overlay=%7B%22errors%22%3Atrue%2C%22warnings%22%3Afalse%2C%22runtimeErrors%22%3Afalse%7D&reconnect=10&hot=false&live-reload=true
+  ./src/main.ts + 6 modules [8609] 190 KiB {179} [built] [code generated]
+    [no exports used]
+    ModuleConcatenation bailout: Cannot concat with ./src/app/core/auth.service.ts: Module ./src/app/core/auth.service.ts is referenced from different chunks by these modules: ./src/app/features/auth/login/login.component.ts
+    ModuleConcatenation bailout: Cannot concat with ./src/app/material.module.ts: Module ./src/app/material.module.ts is referenced from different chunks by these modules: ./src/app/features/auth/auth.module.ts, ./src/app/features/bots/bots.module.ts
+    ModuleConcatenation bailout: Cannot concat with ./node_modules/@angular/animations/fesm2022/animations.mjs: Module ./node_modules/@angular/material/fesm2022/form-field.mjs is referenced from different chunks by these modules: ./src/app/features/auth/login/login.component.ts, ./src/app/features/bots/bot-create/bot-create.component.ts
+    ModuleConcatenation bailout: Cannot concat with ./node_modules/@angular/common/fesm2022/common.mjs: Module ./node_modules/@angular/common/fesm2022/common.mjs is referenced from different chunks by these modules: ./src/app/features/auth/auth.module.ts, ./src/app/features/auth/login/login.component.ts, ./src/app/features/bots/bot-create/bot-create.component.ts, ./src/app/features/bots/bots.module.ts
+    ModuleConcatenation bailout: Cannot concat with ./node_modules/@angular/common/fesm2022/http.mjs: Module ./node_modules/@angular/common/fesm2022/http.mjs is referenced from different chunks by these modules: ./src/app/features/bots/bot.service.ts
+    ModuleConcatenation bailout: Cannot concat with ./node_modules/@angular/core/fesm2022/core.mjs: Module ./node_modules/@angular/core/fesm2022/core.mjs is referenced from different chunks by these modules: ./src/app/features/auth/auth.module.ts, ./src/app/features/auth/login/login.component.ts, ./src/app/features/bots/bot-create/bot-create.component.ts, ./src/app/features/bots/bot-list/bot-list.component.ts, ./src/app/features/bots/bot.service.ts, ./src/app/features/bots/bots.module.ts
+    ModuleConcatenation bailout: Cannot concat with ./node_modules/@angular/forms/fesm2022/forms.mjs: Module ./node_modules/@angular/forms/fesm2022/forms.mjs is referenced from different chunks by these modules: ./src/app/features/auth/auth.module.ts, ./src/app/features/auth/login/login.component.ts, ./src/app/features/bots/bot-create/bot-create.component.ts, ./src/app/features/bots/bots.module.ts
+    ModuleConcatenation bailout: Cannot concat with ./node_modules/@angular/material/fesm2022/button.mjs: Module ./node_modules/@angular/material/fesm2022/button.mjs is referenced from different chunks by these modules: ./src/app/features/auth/login/login.component.ts, ./src/app/features/bots/bot-create/bot-create.component.ts, ./src/app/features/bots/bot-list/bot-list.component.ts
+    ModuleConcatenation bailout: Cannot concat with ./node_modules/@angular/material/fesm2022/toolbar.mjs: Module ./src/app/material.module.ts is referenced from different chunks by these modules: ./src/app/features/auth/auth.module.ts, ./src/app/features/bots/bots.module.ts
+    ModuleConcatenation bailout: Cannot concat with ./node_modules/@angular/platform-browser/fesm2022/platform-browser.mjs: Module ./src/app/material.module.ts is referenced from different chunks by these modules: ./src/app/features/auth/auth.module.ts, ./src/app/features/bots/bots.module.ts
+    ModuleConcatenation bailout: Cannot concat with ./node_modules/@angular/router/fesm2022/router.mjs: Module ./node_modules/@angular/router/fesm2022/router.mjs is referenced from different chunks by these modules: ./src/app/features/auth/auth.module.ts, ./src/app/features/auth/login/login.component.ts, ./src/app/features/bots/bot-create/bot-create.component.ts, ./src/app/features/bots/bots.module.ts
+    entry /home/robertojr/chatbot-platform-skeleton/frontend/src/main.ts main
+chunk {462} (runtime: runtime) 462.js (features-bots-bots-module) 12.6 KiB [rendered]
+  ./src/app/features/bots/bots.module.ts + 3 modules [8462] 12.6 KiB {462} [built] [code generated]
+    ModuleConcatenation bailout: Cannot concat with ./src/app/material.module.ts: Module ./src/app/material.module.ts is not in the same chunk(s) (expected in chunk(s) features-bots-bots-module, module is in chunk(s) )
+    ModuleConcatenation bailout: Cannot concat with ./src/environments/environment.ts: Module ./src/environments/environment.ts is not in the same chunk(s) (expected in chunk(s) features-bots-bots-module, module is in chunk(s) main)
+    ModuleConcatenation bailout: Cannot concat with ./node_modules/@angular/common/fesm2022/common.mjs: Module ./node_modules/@angular/common/fesm2022/common.mjs is not in the same chunk(s) (expected in chunk(s) features-bots-bots-module, module is in chunk(s) main)
+    ModuleConcatenation bailout: Cannot concat with ./node_modules/@angular/common/fesm2022/http.mjs: Module ./node_modules/@angular/common/fesm2022/http.mjs is not in the same chunk(s) (expected in chunk(s) features-bots-bots-module, module is in chunk(s) main)
+    ModuleConcatenation bailout: Cannot concat with ./node_modules/@angular/core/fesm2022/core.mjs: Module ./node_modules/@angular/core/fesm2022/core.mjs is not in the same chunk(s) (expected in chunk(s) features-bots-bots-module, module is in chunk(s) main)
+    ModuleConcatenation bailout: Cannot concat with ./node_modules/@angular/forms/fesm2022/forms.mjs: Module ./node_modules/@angular/forms/fesm2022/forms.mjs is not in the same chunk(s) (expected in chunk(s) features-bots-bots-module, module is in chunk(s) main)
+    ModuleConcatenation bailout: Cannot concat with ./node_modules/@angular/material/fesm2022/button.mjs: Module ./node_modules/@angular/material/fesm2022/button.mjs is not in the same chunk(s) (expected in chunk(s) features-bots-bots-module, module is in chunk(s) main)
+    ModuleConcatenation bailout: Cannot concat with ./node_modules/@angular/material/fesm2022/card.mjs: Module ./node_modules/@angular/material/fesm2022/card.mjs is not in the same chunk(s) (expected in chunk(s) features-bots-bots-module, module is in chunk(s) main)
+    ModuleConcatenation bailout: Cannot concat with ./node_modules/@angular/material/fesm2022/form-field.mjs: Module ./node_modules/@angular/material/fesm2022/form-field.mjs is not in the same chunk(s) (expected in chunk(s) features-bots-bots-module, module is in chunk(s) )
+    ModuleConcatenation bailout: Cannot concat with ./node_modules/@angular/material/fesm2022/input.mjs: Module ./node_modules/@angular/material/fesm2022/input.mjs is not in the same chunk(s) (expected in chunk(s) features-bots-bots-module, module is in chunk(s) )
+    ModuleConcatenation bailout: Cannot concat with ./node_modules/@angular/material/fesm2022/table.mjs: Module ./node_modules/@angular/material/fesm2022/table.mjs is not in the same chunk(s) (expected in chunk(s) features-bots-bots-module, module is in chunk(s) )
+    ModuleConcatenation bailout: Cannot concat with ./node_modules/@angular/router/fesm2022/router.mjs: Module ./node_modules/@angular/router/fesm2022/router.mjs is not in the same chunk(s) (expected in chunk(s) features-bots-bots-module, module is in chunk(s) )
+    import() ./features/bots/bots.module [8609] ./src/main.ts + 6 modules ./src/app/app.module.ts 22:22-59
+chunk {532} (runtime: runtime) styles.css, styles.js (styles) 129 KiB (javascript) 83.2 KiB (css/mini-extract) [initial] [rendered]
+  dependent modules 53.6 KiB (javascript) 83.2 KiB (css/mini-extract) [dependent] 9 modules
+  ./node_modules/webpack-dev-server/client/index.js?protocol=auto%3A&username=&pas...(truncated) [866] 75.8 KiB {179} {532} [built] [code generated]
+    [no exports used]
+    ModuleConcatenation bailout: Cannot concat with ./node_modules/ansi-html-community/index.js: Module is not an ECMAScript module
+    ModuleConcatenation bailout: Cannot concat with ./node_modules/webpack-dev-server/client/clients/WebSocketClient.js: Module ./node_modules/webpack-dev-server/client/clients/WebSocketClient.js is referenced from these modules with unsupported syntax: ./node_modules/webpack-dev-server/client/socket.js (referenced with harmony import specifier, harmony side effect evaluation, provided)
+    ModuleConcatenation bailout: Cannot concat with ./node_modules/webpack-dev-server/client/utils/log.js: Module ./node_modules/webpack-dev-server/client/clients/WebSocketClient.js is referenced from these modules with unsupported syntax: ./node_modules/webpack-dev-server/client/socket.js (referenced with harmony import specifier, harmony side effect evaluation, provided)
+    ModuleConcatenation bailout: Cannot concat with ./node_modules/webpack/hot/emitter.js: Module is not an ECMAScript module
+    ModuleConcatenation bailout: Cannot concat with ./node_modules/webpack/hot/log.js: Module is not an ECMAScript module
+    entry /home/robertojr/chatbot-platform-skeleton/frontend/node_modules/webpack-dev-server/client/index.js?protocol=auto%3A&username=&password=&hostname=0.0.0.0&port=0&pathname=%2Fng-cli-ws&logging=info&overlay=%7B%22errors%22%3Atrue%2C%22warnings%22%3Afalse%2C%22runtimeErrors%22%3Afalse%7D&reconnect=10&hot=false&live-reload=true
+  ./src/styles.css?ngGlobalStyle [1481] 50 bytes {532} [built] [code generated]
+    [no exports used]
+    entry /home/robertojr/chatbot-platform-skeleton/frontend/src/styles.css?ngGlobalStyle styles
+chunk {666} (runtime: runtime) runtime.js (runtime) 7.56 KiB [entry] [rendered]
+  runtime modules 7.56 KiB 15 modules
+chunk {998} (runtime: runtime) 998.js (features-auth-auth-module) 5.85 KiB [rendered]
+  ./src/app/features/auth/auth.module.ts + 1 modules [998] 5.85 KiB {998} [built] [code generated]
+    ModuleConcatenation bailout: Cannot concat with ./src/app/core/auth.service.ts: Module ./src/app/core/auth.service.ts is not in the same chunk(s) (expected in chunk(s) features-auth-auth-module, module is in chunk(s) main)
+    ModuleConcatenation bailout: Cannot concat with ./src/app/material.module.ts: Module ./src/app/material.module.ts is not in the same chunk(s) (expected in chunk(s) features-auth-auth-module, module is in chunk(s) )
+    ModuleConcatenation bailout: Cannot concat with ./node_modules/@angular/common/fesm2022/common.mjs: Module ./node_modules/@angular/common/fesm2022/common.mjs is not in the same chunk(s) (expected in chunk(s) features-auth-auth-module, module is in chunk(s) main)
+    ModuleConcatenation bailout: Cannot concat with ./node_modules/@angular/core/fesm2022/core.mjs: Module ./node_modules/@angular/core/fesm2022/core.mjs is not in the same chunk(s) (expected in chunk(s) features-auth-auth-module, module is in chunk(s) main)
+    ModuleConcatenation bailout: Cannot concat with ./node_modules/@angular/forms/fesm2022/forms.mjs: Module ./node_modules/@angular/forms/fesm2022/forms.mjs is not in the same chunk(s) (expected in chunk(s) features-auth-auth-module, module is in chunk(s) main)
+    ModuleConcatenation bailout: Cannot concat with ./node_modules/@angular/material/fesm2022/button.mjs: Module ./node_modules/@angular/material/fesm2022/button.mjs is not in the same chunk(s) (expected in chunk(s) features-auth-auth-module, module is in chunk(s) main)
+    ModuleConcatenation bailout: Cannot concat with ./node_modules/@angular/material/fesm2022/card.mjs: Module ./node_modules/@angular/material/fesm2022/card.mjs is not in the same chunk(s) (expected in chunk(s) features-auth-auth-module, module is in chunk(s) main)
+    ModuleConcatenation bailout: Cannot concat with ./node_modules/@angular/material/fesm2022/form-field.mjs: Module ./node_modules/@angular/material/fesm2022/form-field.mjs is not in the same chunk(s) (expected in chunk(s) features-auth-auth-module, module is in chunk(s) )
+    ModuleConcatenation bailout: Cannot concat with ./node_modules/@angular/material/fesm2022/input.mjs: Module ./node_modules/@angular/material/fesm2022/input.mjs is not in the same chunk(s) (expected in chunk(s) features-auth-auth-module, module is in chunk(s) )
+    ModuleConcatenation bailout: Cannot concat with ./node_modules/@angular/router/fesm2022/router.mjs: Module ./node_modules/@angular/router/fesm2022/router.mjs is not in the same chunk(s) (expected in chunk(s) features-auth-auth-module, module is in chunk(s) )
+    import() ./features/auth/auth.module [8609] ./src/main.ts + 6 modules ./src/app/app.module.ts 19:22-59
+  
+
+LOG from webpack.Compilation
+<t> runtime requirements.modules: 0.161565 ms
+<t> runtime requirements.chunks: 0.112372 ms
+<t> runtime requirements.entries: 0.981743 ms
+<t> compute affected modules: 0.001934 ms
+<t> finish modules: 17.240024 ms
+<t> report dependency errors and warnings: 9.865948 ms
+<t> optimize dependencies: 23.894301 ms
+<t> create chunks: 6.873641 ms
+<t> compute affected modules with chunk graph: 0.00507 ms
+<t> optimize: 69.482934 ms
+    102 modules hashed, 0 from cache (0.33 variants per module in average)
+<t> module hashing: 11.328188 ms
+    100% code generated (102 generated, 0 from cache)
+<t> code generation: 297.993692 ms
+<t> runtime requirements.modules: 0.346234 ms
+<t> runtime requirements.chunks: 0.107673 ms
+<t> runtime requirements.entries: 2.464421 ms
+<t> runtime requirements: 3.027633 ms
+<t> hashing: initialize hash: 0.006533 ms
+<t> hashing: hash errors: 0.002705 ms
+<t> hashing: sort chunks: 0.051156 ms
+<t> hashing: hash runtime modules: 3.049143 ms
+<t> hashing: hash chunks: 1.628714 ms
+<t> hashing: hash digest: 0.046618 ms
+<t> hashing: process full hash modules: 0.113394 ms
+<t> hashing: 5.01812 ms
+    100% code generated (15 generated, 0 from cache)
+<t> module assets: 0.181642 ms
+<t> create chunk assets: 4.384494 ms
+<t> process assets: 6364.345288 ms
+
+LOG from webpack.Compiler
+<t> make hook: 5963.614696 ms
+<t> finish make hook: 0.110278 ms
+<t> finish compilation: 27.148183 ms
+<t> seal compilation: 6788.955081 ms
+<t> afterCompile hook: 0.288264 ms
+
+LOG from webpack.ResolverCachePlugin
+    32% really resolved (651 real resolves with 0 cached but invalid, 1392 cached valid, 0 concurrent)
+
+LOG from webpack.FlagDependencyExportsPlugin
+<t> restore cached provided exports: 1.298831 ms
+<t> figure out provided exports: 10.254031 ms
+    96% of exports of modules have been determined (13 no declared exports, 296 not cached, 0 flagged uncacheable, 0 from cache, 0 from mem cache, 5 additional calculations due to dependencies)
+<t> store provided exports into cache: 1.998332 ms
+
+LOG from webpack.InnerGraphPlugin
+<t> infer dependency usage: 10.911003 ms
+
+LOG from webpack.SideEffectsFlagPlugin
+<t> update dependencies: 6.722216 ms
+
+LOG from webpack.FlagDependencyUsagePlugin
+<t> initialize exports usage: 0.650738 ms
+<t> trace exports usage in graph: 15.916547 ms
+
+LOG from webpack.buildChunkGraph
+<t> visitModules: prepare: 2.474 ms
+<t> visitModules: visiting: 3.906482 ms
+<t> visitModules: calculating available modules: 0.409784 ms
+<t> visitModules: merging available modules: 0.349941 ms
+<t> visitModules: check modules for revisit: 0.15897 ms
+<t> visitModules: prepare: 0.391069 ms
+<t> visitModules: visiting: 0.55641 ms
+    433 queue items processed (206 blocks)
+    2 chunk groups connected
+    2 chunk groups processed for merging (2 module sets, 0 forked, 0 + 0 modules forked, 0 + 0 modules merged into fork, 0 resulting modules)
+    2 chunk group info updated (0 already connected chunk groups reconnected)
+<t> visitModules: 5.495722 ms
+<t> connectChunkGroups: 0.18035 ms
+<t> cleanup: 0.003276 ms
+
+LOG from webpack.SplitChunksPlugin
+<t> prepare: 0.073359 ms
+<t> modules: 4.01674 ms
+<t> queue: 0.009819 ms
+<t> maxSize: 0.131087 ms
+
+LOG from webpack.ModuleConcatenationPlugin
+<t> select relevant modules: 1.637681 ms
+<t> sort relevant modules: 0.189909 ms
+<t> find modules to concatenate: 33.465084 ms
+<t> sort concat configurations: 0.10019 ms
+<t> create concatenated modules: 11.052037 ms
++ 3 hidden lines
+
+LOG from copy-webpack-plugin
+    starting to add additional assets...
+    starting to process a pattern from 'favicon.ico' using '/home/robertojr/chatbot-platform-skeleton/frontend/src/' context
+    starting to process a pattern from '**/*' using '/home/robertojr/chatbot-platform-skeleton/frontend/src/assets/' context
+    begin globbing '/home/robertojr/chatbot-platform-skeleton/frontend/src/assets/**/*'...
+    begin globbing '/home/robertojr/chatbot-platform-skeleton/frontend/src/favicon.ico'...
+    finished to process a pattern from '**/*' using '/home/robertojr/chatbot-platform-skeleton/frontend/src/assets/' context to 'assets/'
+    'to' option '.' determinated as 'dir'
+    determined that '/home/robertojr/chatbot-platform-skeleton/frontend/src/favicon.ico' should write to 'favicon.ico'
+    finished to process a pattern from 'favicon.ico' using '/home/robertojr/chatbot-platform-skeleton/frontend/src' context
+    writing 'favicon.ico' from '/home/robertojr/chatbot-platform-skeleton/frontend/src/favicon.ico' to compilation assets...
+    written 'favicon.ico' from '/home/robertojr/chatbot-platform-skeleton/frontend/src/favicon.ico' to compilation assets
+    finished to adding additional assets
++ 15 hidden lines
+
+LOG from build-angular.JavaScriptOptimizerPlugin
+<t> optimize asset: 998.js: 255.249306 ms
+<t> optimize asset: runtime.js: 293.696601 ms
+<t> optimize asset: 462.js: 343.119819 ms
+<t> optimize asset: styles.js: 668.48104 ms
+<t> optimize asset: main.js: 4379.365281 ms
+<t> optimize js assets: 4464.556617 ms
+
+LOG from build-angular.CssOptimizerPlugin
+<t> optimize asset: styles.css: 26.351706 ms
+<t> optimize css assets: 29.328744 ms
+
+LOG from webpack.FileSystemInfo
+    955 new snapshots created
+    0% root snapshot uncached (0 / 1392)
+    0% children snapshot uncached (0 / 0)
+    0 entries tested
+    File info in cache: 186 timestamps 36 hashes 36 timestamp hash combinations
+    File timestamp snapshot optimization: 32% (18/56) entries shared via 1 shared snapshots (1 times referenced)
+    File timestamp hash combination snapshot optimization: 94% (3959/4202) entries shared via 8 shared snapshots (659 times referenced)
+    Directory info in cache: 0 timestamps 0 hashes 0 timestamp hash combinations
+    Missing items snapshot optimization: 71% (682/959) entries shared via 19 shared snapshots (132 times referenced)
+    Managed items info in cache: 101 items
+    Managed items snapshot optimization: 25% (387/1535) entries shared via 21 shared snapshots (74 times referenced)
+    Managed files snapshot optimization: 78% (3646/4669) entries shared via 188 shared snapshots (842 times referenced)
+    Managed missing snapshot optimization: 83% (4012/4842) entries shared via 227 shared snapshots (697 times referenced)
+
+ERROR in error TS6053: File '/home/robertojr/chatbot-platform-skeleton/frontend/src/polyfills.ngtypecheck.ts' not found.
+  The file is in the program because:
+    Root file specified for compilation
+Error: error TS6053: File '/home/robertojr/chatbot-platform-skeleton/frontend/src/polyfills.ngtypecheck.ts' not found.
+  The file is in the program because:
+    Root file specified for compilation
+
+    at addError (/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@ngtools/webpack/src/ivy/diagnostics.js:31:29)
+    at /home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@ngtools/webpack/src/ivy/diagnostics.js:17:17
+    at AngularWebpackPlugin.updateAotProgram (/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@ngtools/webpack/src/ivy/plugin.js:357:9)
+    at AngularWebpackPlugin.setupCompilation (/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@ngtools/webpack/src/ivy/plugin.js:176:20)
+    at /home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@ngtools/webpack/src/ivy/plugin.js:103:22
+    at Hook.eval [as call] (eval at create (/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/tapable/lib/HookCodeFactory.js:19:10), <anonymous>:28:1)
+    at Hook.CALL_DELEGATE [as _call] (/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/tapable/lib/Hook.js:16:14)
+    at Compiler.newCompilation (/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/webpack/lib/Compiler.js:1125:30)
+    at /home/robertojr/chatbot-platform-skeleton/frontend/node_modules/webpack/lib/Compiler.js:1170:29
+    at eval (eval at create (/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/tapable/lib/HookCodeFactory.js:31:10), <anonymous>:31:1)
+
+ERROR in error TS6053: File '/home/robertojr/chatbot-platform-skeleton/frontend/src/polyfills.ts' not found.
+  The file is in the program because:
+    Root file specified for compilation
+Error: error TS6053: File '/home/robertojr/chatbot-platform-skeleton/frontend/src/polyfills.ts' not found.
+  The file is in the program because:
+    Root file specified for compilation
+
+    at addError (/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@ngtools/webpack/src/ivy/diagnostics.js:31:29)
+    at /home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@ngtools/webpack/src/ivy/diagnostics.js:17:17
+    at AngularWebpackPlugin.updateAotProgram (/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@ngtools/webpack/src/ivy/plugin.js:357:9)
+    at AngularWebpackPlugin.setupCompilation (/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@ngtools/webpack/src/ivy/plugin.js:176:20)
+    at /home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@ngtools/webpack/src/ivy/plugin.js:103:22
+    at Hook.eval [as call] (eval at create (/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/tapable/lib/HookCodeFactory.js:19:10), <anonymous>:28:1)
+    at Hook.CALL_DELEGATE [as _call] (/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/tapable/lib/Hook.js:16:14)
+    at Compiler.newCompilation (/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/webpack/lib/Compiler.js:1125:30)
+    at /home/robertojr/chatbot-platform-skeleton/frontend/node_modules/webpack/lib/Compiler.js:1170:29
+    at eval (eval at create (/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/tapable/lib/HookCodeFactory.js:31:10), <anonymous>:31:1)
+
+2026-01-29 17:05:15: webpack 5.88.2 compiled in 13775 ms (2c10d717261f9b65)
+
+Initial Chunk Files   | Names                     |  Raw Size | Estimated Transfer Size
+main.js               | main                      | 632.84 kB |               147.54 kB
+styles.css, styles.js | styles                    | 151.49 kB |                29.10 kB
+runtime.js            | runtime                   |   2.71 kB |                 1.27 kB
+
+| Initial Total             | 787.03 kB |               177.91 kB
+
+Lazy Chunk Files      | Names                     |  Raw Size | Estimated Transfer Size
+462.js                | features-bots-bots-module |   5.40 kB |                 1.73 kB
+998.js                | features-auth-auth-module |   2.62 kB |                 1.10 kB
+
+Build at: 2026-01-29T20:05:15.690Z - Hash: 2c10d717261f9b65 - Time: 13872ms
+
+Error: error TS6053: File '/home/robertojr/chatbot-platform-skeleton/frontend/src/polyfills.ngtypecheck.ts' not found.
+  The file is in the program because:
+    Root file specified for compilation
+
+
+Error: error TS6053: File '/home/robertojr/chatbot-platform-skeleton/frontend/src/polyfills.ts' not found.
+  The file is in the program because:
+    Root file specified for compilation
+
+
+
+
+** Angular Live Development Server is listening on localhost:4200, open your browser on http://localhost:4200/ **
+
+
+✖ Failed to compile.
+    [webpack-dev-middleware] Compilation finished
+    [webpack-dev-server] [connect-history-api-fallback] Rewriting GET / to /index.html
+    [webpack-dev-middleware] Compilation starting...
+    [IdleFileCachePlugin] Initial cache was generated and cache will be persisted in 5s.
+✔ Browser application bundle generation complete.
+    [MemoryWithGcCachePlugin] 755 active entries, 0 recently unused cached entries, 659 old unused cache entries removed e. g. FlagDependencyExportsPlugin|/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].rules[0].oneOf[0].use[1]!/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].rules[0].oneOf[0].use[2]!/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@angular/material/prebuilt-themes/indigo-pink.css
+asset main.js 633 KiB {179} [cached] (name: main)
+asset styles.css 80.7 KiB {532} [cached] (name: styles)
+asset styles.js 70.8 KiB {532} [cached] (name: styles)
+asset index.html 37.3 KiB [cached]
+asset 3rdpartylicenses.txt 29.1 KiB [cached]
+asset 462.js 5.4 KiB {462} [cached] (name: features-bots-bots-module)
+asset runtime.js 2.71 KiB {666} [cached] (name: runtime)
+asset 998.js 2.62 KiB {998} [cached] (name: features-auth-auth-module)
+asset favicon.ico 0 bytes [cached] [from: src/favicon.ico] [copied]
+Entrypoint main = runtime.js main.js
+Entrypoint styles = runtime.js styles.css styles.js
+chunk {179} (runtime: runtime) main.js (main) 3.5 MiB [initial]
+  cached modules 3.5 MiB [cached] 97 modules
+chunk {462} (runtime: runtime) 462.js (features-bots-bots-module) 12.6 KiB
+  cached modules 12.6 KiB [cached] 1 module
+chunk {532} (runtime: runtime) styles.css, styles.js (styles) 129 KiB (javascript) 83.2 KiB (css/mini-extract) [initial]
+  cached modules 129 KiB (javascript) 83.2 KiB (css/mini-extract) [cached] 11 modules
+chunk {666} (runtime: runtime) runtime.js (runtime) 7.63 KiB [entry]
+  cached modules 7.63 KiB [cached] 15 modules
+chunk {998} (runtime: runtime) 998.js (features-auth-auth-module) 5.85 KiB
+  cached modules 5.85 KiB [cached] 1 module
+  
+
+LOG from angular.watch-files-logs-plugin
+    Removed files:
+    /home/robertojr/chatbot-platform-skeleton/frontend/src/assets
+
+LOG from webpack.Compiler
+<t> make hook: 80.026301 ms
+<t> finish make hook: 0.011241 ms
+<t> finish compilation: 9.865867 ms
+<t> seal compilation: 1496.483718 ms
+<t> afterCompile hook: 0.16922 ms
+
+LOG from webpack.Compilation
+<t> compute affected modules: 0.0479 ms
+<t> finish modules: 5.509867 ms
+<t> report dependency errors and warnings: 4.265399 ms
+<t> optimize dependencies: 13.362265 ms
+<t> create chunks: 6.356164 ms
+<t> compute affected modules with chunk graph: 0.002755 ms
+<t> optimize: 36.407961 ms
+    102 modules hashed, 0 from cache (0.34 variants per module in average)
+<t> module hashing: 11.280246 ms
+    0% code generated (0 generated, 102 from cache)
+<t> code generation: 0.893646 ms
+<t> runtime requirements.modules: 0.343568 ms
+<t> runtime requirements.chunks: 0.373275 ms
+<t> runtime requirements.entries: 1.130844 ms
+<t> runtime requirements: 1.946503 ms
+<t> hashing: initialize hash: 0.007935 ms
+<t> hashing: hash errors: 0.004148 ms
+<t> hashing: sort chunks: 0.032641 ms
+<t> hashing: hash runtime modules: 0.908523 ms
+<t> hashing: hash chunks: 0.90592 ms
+<t> hashing: hash digest: 0.038212 ms
+<t> hashing: process full hash modules: 0.117101 ms
+<t> hashing: 2.216633 ms
+    0% code generated (0 generated, 15 from cache)
+<t> module assets: 0.103555 ms
+<t> create chunk assets: 0.988485 ms
+<t> process assets: 1421.173768 ms
+
+LOG from webpack.ResolverCachePlugin
+    0% really resolved (0 real resolves with 0 cached but invalid, 75 cached valid, 0 concurrent)
+
+LOG from webpack.FlagDependencyExportsPlugin
+<t> restore cached provided exports: 1.577046 ms
+<t> figure out provided exports: 2.042394 ms
+    2% of exports of modules have been determined (7 no declared exports, 5 not cached, 0 flagged uncacheable, 289 from cache, 0 from mem cache, 0 additional calculations due to dependencies)
+<t> store provided exports into cache: 0.008456 ms
+
+LOG from webpack.SideEffectsFlagPlugin
+<t> update dependencies: 4.372652 ms
+
+LOG from webpack.FlagDependencyUsagePlugin
+<t> initialize exports usage: 0.348427 ms
+<t> trace exports usage in graph: 8.285475 ms
+
+LOG from webpack.buildChunkGraph
+<t> visitModules: prepare: 3.077437 ms
+<t> visitModules: visiting: 4.148798 ms
+<t> visitModules: calculating available modules: 0.067538 ms
+<t> visitModules: merging available modules: 0.252226 ms
+<t> visitModules: check modules for revisit: 0.002605 ms
+<t> visitModules: prepare: 0.188827 ms
+<t> visitModules: visiting: 0.252667 ms
+    434 queue items processed (206 blocks)
+    2 chunk groups connected
+    2 chunk groups processed for merging (2 module sets, 0 forked, 0 + 0 modules forked, 0 + 0 modules merged into fork, 0 resulting modules)
+    2 chunk group info updated (0 already connected chunk groups reconnected)
+<t> visitModules: 4.812852 ms
+<t> connectChunkGroups: 0.016841 ms
+<t> cleanup: 0.003637 ms
+
+LOG from webpack.SplitChunksPlugin
+<t> prepare: 0.028784 ms
+<t> modules: 1.278864 ms
+<t> queue: 0.002114 ms
+<t> maxSize: 0.013916 ms
+
+LOG from webpack.ModuleConcatenationPlugin
+<t> select relevant modules: 0.770494 ms
+<t> sort relevant modules: 0.07373 ms
+<t> find modules to concatenate: 21.746575 ms
+<t> sort concat configurations: 0.010249 ms
+<t> create concatenated modules: 4.11754 ms
++ 3 hidden lines
+
+LOG from copy-webpack-plugin
+    starting to add additional assets...
+    starting to process a pattern from 'favicon.ico' using '/home/robertojr/chatbot-platform-skeleton/frontend/src/' context
+    starting to process a pattern from '**/*' using '/home/robertojr/chatbot-platform-skeleton/frontend/src/assets/' context
+    begin globbing '/home/robertojr/chatbot-platform-skeleton/frontend/src/favicon.ico'...
+    begin globbing '/home/robertojr/chatbot-platform-skeleton/frontend/src/assets/**/*'...
+    'to' option '.' determinated as 'dir'
+    determined that '/home/robertojr/chatbot-platform-skeleton/frontend/src/favicon.ico' should write to 'favicon.ico'
+    finished to process a pattern from 'favicon.ico' using '/home/robertojr/chatbot-platform-skeleton/frontend/src' context
+    finished to process a pattern from '**/*' using '/home/robertojr/chatbot-platform-skeleton/frontend/src/assets/' context to 'assets/'
+    writing 'favicon.ico' from '/home/robertojr/chatbot-platform-skeleton/frontend/src/favicon.ico' to compilation assets...
+    written 'favicon.ico' from '/home/robertojr/chatbot-platform-skeleton/frontend/src/favicon.ico' to compilation assets
+    finished to adding additional assets
++ 11 hidden lines
+
+LOG from build-angular.CssOptimizerPlugin
+<t> optimize css assets: 0.115017 ms
++ 1 hidden lines
+
+LOG from webpack.FileSystemInfo
+    0 new snapshots created
+    87% root snapshot uncached (328 / 375)
+    28% children snapshot uncached (27 / 95)
+    533 entries tested
+    File info in cache: 2739 timestamps 0 hashes 0 timestamp hash combinations
+    Directory info in cache: 990 timestamps 0 hashes 0 timestamp hash combinations
+    Managed items info in cache: 22 items
+
+ERROR in error TS6053: File '/home/robertojr/chatbot-platform-skeleton/frontend/src/polyfills.ngtypecheck.ts' not found.
+  The file is in the program because:
+    Root file specified for compilation
+Error: error TS6053: File '/home/robertojr/chatbot-platform-skeleton/frontend/src/polyfills.ngtypecheck.ts' not found.
+  The file is in the program because:
+    Root file specified for compilation
+
+    at addError (/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@ngtools/webpack/src/ivy/diagnostics.js:31:29)
+    at /home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@ngtools/webpack/src/ivy/diagnostics.js:17:17
+    at AngularWebpackPlugin.updateAotProgram (/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@ngtools/webpack/src/ivy/plugin.js:357:9)
+    at AngularWebpackPlugin.setupCompilation (/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@ngtools/webpack/src/ivy/plugin.js:176:20)
+    at /home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@ngtools/webpack/src/ivy/plugin.js:103:22
+    at Hook.eval [as call] (eval at create (/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/tapable/lib/HookCodeFactory.js:19:10), <anonymous>:28:1)
+    at Compiler.newCompilation (/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/webpack/lib/Compiler.js:1125:30)
+    at /home/robertojr/chatbot-platform-skeleton/frontend/node_modules/webpack/lib/Compiler.js:1170:29
+    at eval (eval at create (/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/tapable/lib/HookCodeFactory.js:31:10), <anonymous>:31:1)
+
+ERROR in error TS6053: File '/home/robertojr/chatbot-platform-skeleton/frontend/src/polyfills.ts' not found.
+  The file is in the program because:
+    Root file specified for compilation
+Error: error TS6053: File '/home/robertojr/chatbot-platform-skeleton/frontend/src/polyfills.ts' not found.
+  The file is in the program because:
+    Root file specified for compilation
+
+    at addError (/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@ngtools/webpack/src/ivy/diagnostics.js:31:29)
+    at /home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@ngtools/webpack/src/ivy/diagnostics.js:17:17
+    at AngularWebpackPlugin.updateAotProgram (/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@ngtools/webpack/src/ivy/plugin.js:357:9)
+    at AngularWebpackPlugin.setupCompilation (/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@ngtools/webpack/src/ivy/plugin.js:176:20)
+    at /home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@ngtools/webpack/src/ivy/plugin.js:103:22
+    at Hook.eval [as call] (eval at create (/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/tapable/lib/HookCodeFactory.js:19:10), <anonymous>:28:1)
+    at Compiler.newCompilation (/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/webpack/lib/Compiler.js:1125:30)
+    at /home/robertojr/chatbot-platform-skeleton/frontend/node_modules/webpack/lib/Compiler.js:1170:29
+    at eval (eval at create (/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/tapable/lib/HookCodeFactory.js:31:10), <anonymous>:31:1)
+
+2026-01-29 17:05:17: webpack 5.88.2 compiled in 1644 ms (2c10d717261f9b65)
+
+5 unchanged chunks
+
+Build at: 2026-01-29T20:05:17.526Z - Hash: 2c10d717261f9b65 - Time: 1661ms
+
+Error: error TS6053: File '/home/robertojr/chatbot-platform-skeleton/frontend/src/polyfills.ngtypecheck.ts' not found.
+  The file is in the program because:
+    Root file specified for compilation
+
+
+Error: error TS6053: File '/home/robertojr/chatbot-platform-skeleton/frontend/src/polyfills.ts' not found.
+  The file is in the program because:
+    Root file specified for compilation
+
+
+
+
+✖ Failed to compile.
+    [webpack-dev-middleware] Compilation finished
+    [webpack.cache.PackFileCacheStrategy] Pack got invalid because of write to: ResolverCachePlugin|normal|default|dependencyType=|esm|path=|/home/robertojr/chatbot-platform-skeleton/frontend|request=|/home/robertojr/chatbot-platform-skeleton/frontend/src/styles.css?ngGlobalStyle
+    [webpack.cache.PackFileCacheStrategy] Storing pack...
+    [webpack.cache.PackFileCacheStrategy] Capturing build dependencies... (/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/webpack/lib/, /home/robertojr/chatbot-platform-skeleton/frontend/node_modules/css-loader/dist/cjs.js, /home/robertojr/chatbot-platform-skeleton/frontend/node_modules/postcss-loader/dist/cjs.js, /home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@angular-devkit/build-angular/src/tools/babel/webpack-loader.js, /home/robertojr/chatbot-platform-skeleton/frontend/node_modules/mini-css-extract-plugin/dist/loader.js, /home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@ngtools/webpack/src/ivy/index.js)
+<t> [webpack.cache.PackFileCacheStrategy] resolve build dependencies: 856.570416 ms
+<t> [webpack.cache.PackFileCacheStrategy] snapshot build dependencies: 31.46877 ms
+    [webpack.cache.PackFileCacheStrategy] Captured build dependencies
+    [webpack.cache.PackFileCacheStrategy] 1408 fresh items in cache put into pack 0
+    [webpack.cache.PackFileCacheStrategy] Serialization of 'Compilation/modules|javascript/esm|/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@angular-devkit/build-angular/src/tools/babel/webpack-loader.js??ruleSet[1].rules[2].use[0]!/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@angular/platform-browser/fesm2022/platform-browser.mjs': 2.454441 ms
+    [webpack.cache.PackFileCacheStrategy] Serialization of 'Compilation/modules|javascript/esm|/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@angular-devkit/build-angular/src/tools/babel/webpack-loader.js??ruleSet[1].rules[2].use[0]!/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@angular/common/fesm2022/http.mjs': 1.063236 ms
+    [webpack.cache.PackFileCacheStrategy] Serialization of 'Compilation/modules|javascript/esm|/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@angular-devkit/build-angular/src/tools/babel/webpack-loader.js??ruleSet[1].rules[2].use[0]!/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@angular/router/fesm2022/router.mjs': 3.786725 ms
+    [webpack.cache.PackFileCacheStrategy] Serialization of 'Compilation/modules|javascript/esm|/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@angular-devkit/build-angular/src/tools/babel/webpack-loader.js??ruleSet[1].rules[2].use[0]!/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@angular/forms/fesm2022/forms.mjs': 2.486522 ms
+    [webpack.cache.PackFileCacheStrategy] Serialization of 'Compilation/modules|javascript/esm|/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@angular-devkit/build-angular/src/tools/babel/webpack-loader.js??ruleSet[1].rules[2].use[0]!/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@angular/core/fesm2022/core.mjs': 1.373432 ms
+    [webpack.cache.PackFileCacheStrategy] Serialization of 'Compilation/modules|javascript/esm|/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@angular-devkit/build-angular/src/tools/babel/webpack-loader.js??ruleSet[1].rules[2].use[0]!/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@angular/material/fesm2022/form-field.mjs': 2.456305 ms
+    [webpack.cache.PackFileCacheStrategy] Serialization of 'Compilation/modules|javascript/esm|/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@angular-devkit/build-angular/src/tools/babel/webpack-loader.js??ruleSet[1].rules[2].use[0]!/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@angular/material/fesm2022/card.mjs': 2.093491 ms
+    [webpack.cache.PackFileCacheStrategy] Serialization of 'Compilation/modules|javascript/esm|/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@angular-devkit/build-angular/src/tools/babel/webpack-loader.js??ruleSet[1].rules[2].use[0]!/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@angular/material/fesm2022/list.mjs': 1.309892 ms
+    [webpack.cache.PackFileCacheStrategy] Serialization of 'Compilation/modules|javascript/esm|/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@angular-devkit/build-angular/src/tools/babel/webpack-loader.js??ruleSet[1].rules[2].use[0]!/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@angular/common/fesm2022/common.mjs': 3.005552 ms
+    [webpack.cache.PackFileCacheStrategy] Serialization of 'Compilation/modules|/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@angular-devkit/build-angular/src/tools/babel/webpack-loader.js??ruleSet[1].rules[2].use[0]!/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/rxjs/dist/esm/index.js': 1.427072 ms
+    [webpack.cache.PackFileCacheStrategy] Serialization of 'Compilation/modules|javascript/esm|/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@angular-devkit/build-angular/src/tools/babel/webpack-loader.js??ruleSet[1].rules[2].use[0]!/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@angular/cdk/fesm2022/table.mjs': 3.797595 ms
+    [webpack.cache.PackFileCacheStrategy] Serialization of 'Compilation/modules|javascript/esm|/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@angular-devkit/build-angular/src/tools/babel/webpack-loader.js??ruleSet[1].rules[2].use[0]!/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@angular/cdk/fesm2022/a11y.mjs': 1.018322 ms
+    [webpack.cache.PackFileCacheStrategy] Serialization of 'Compilation/modules|/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@angular-devkit/build-angular/src/tools/babel/webpack-loader.js??ruleSet[1].rules[2].use[0]!/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/rxjs/dist/esm/internal/operators/combineLatestAll.js': 3.224104 ms
+    [webpack.cache.PackFileCacheStrategy] Serialization of 'Compilation/modules|/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@angular-devkit/build-angular/src/tools/babel/webpack-loader.js??ruleSet[1].rules[2].use[0]!/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/rxjs/dist/esm/internal/scheduled/scheduled.js': 8.182821 ms
+    [webpack.cache.PackFileCacheStrategy] Serialization of 'Compilation/codeGeneration|javascript/esm|/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@angular-devkit/build-angular/src/tools/babel/webpack-loader.js??ruleSet[1].rules[2].use[0]!/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@angular/forms/fesm2022/forms.mjs|runtime': 1.023671 ms
+    [webpack.cache.PackFileCacheStrategy] Serialization of 'Compilation/codeGeneration|javascript/esm|/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@angular-devkit/build-angular/src/tools/babel/webpack-loader.js??ruleSet[1].rules[2].use[0]!/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@angular/core/fesm2022/core.mjs|runtime': 4.215424 ms
+    [webpack.cache.PackFileCacheStrategy] Serialization of 'Compilation/codeGeneration|javascript/esm|/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@angular-devkit/build-angular/src/tools/babel/webpack-loader.js??ruleSet[1].rules[2].use[0]!/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@angular/material/fesm2022/table.mjs|f16688b0e6c62736|runtime': 1.287279 ms
+    [webpack.cache.PackFileCacheStrategy] Serialization of 'Compilation/codeGeneration|javascript/esm|/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@angular-devkit/build-angular/src/tools/babel/webpack-loader.js??ruleSet[1].rules[2].use[0]!/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@angular/router/fesm2022/router.mjs|6fbffb901d863cc4|runtime': 1.780139 ms
+    [webpack.cache.PackFileCacheStrategy] Serialization of 'Compilation/codeGeneration|/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@angular-devkit/build-angular/src/tools/babel/webpack-loader.js??ruleSet[1].rules[2].use[0]!/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@ngtools/webpack/src/ivy/index.js!/home/robertojr/chatbot-platform-skeleton/frontend/src/main.ts|c241cdf695a0806c|runtime': 1.1341 ms
+    [webpack.cache.PackFileCacheStrategy] Serialization of 'Compilation/codeGeneration|/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@angular-devkit/build-angular/src/tools/babel/webpack-loader.js??ruleSet[1].rules[2].use[0]!/home/robertojr/chatbot-platform-skeleton/frontend/node_modules/@ngtools/webpack/src/ivy/index.js!/home/robertojr/chatbot-platform-skeleton/frontend/src/app/material.module.ts|58442d0b36db2c91|runtime': 1.041716 ms
+    [webpack.cache.PackFileCacheStrategy] Serialization of 'Compilation/assets|chunk179': 8.266278 ms
+<t> [webpack.cache.PackFileCacheStrategy] store pack: 337.00081 ms
+    [webpack.cache.PackFileCacheStrategy] Stored pack (1408 items, 1 files, 44 MiB)

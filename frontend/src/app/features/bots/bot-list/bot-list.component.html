@@ -1,0 +1,39 @@
+<div style="max-width:900px;margin:20px auto;">
+  <mat-card>
+    <mat-card-title>Bots</mat-card-title>
+    <mat-card-content>
+      <div *ngIf="bots.length === 0; else botsTable">
+        <p>Nenhum bot encontrado</p>
+      </div>
+      <ng-template #botsTable>
+        <table mat-table [dataSource]="bots" class="mat-elevation-z1" style="width:100%">
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>Name</th>
+            <td mat-cell *matCellDef="let bot">{{bot.name}}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="key">
+            <th mat-header-cell *matHeaderCellDef>Key</th>
+            <td mat-cell *matCellDef="let bot">{{bot.key}}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="enabled">
+            <th mat-header-cell *matHeaderCellDef>Enabled</th>
+            <td mat-cell *matCellDef="let bot">{{bot.enabled ? 'Yes' : 'No'}}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let bot">
+              <button mat-button color="primary" (click)="toggle(bot)">{{bot.enabled ? 'Deactivate' : 'Activate'}}</button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </ng-template>
+    </mat-card-content>
+  </mat-card>
+</div>
+

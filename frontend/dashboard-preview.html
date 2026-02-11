@@ -1,0 +1,179 @@
+<!-- Teste de Dashboard -->
+<!-- Abra este arquivo no navegador para verificar a estrutura esperada -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Estrutura Esperada</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .toolbar {
+            background-color: #3f51b5;
+            color: white;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .toolbar a, .toolbar button {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            font-size: 14px;
+        }
+
+        .toolbar a:hover {
+            background-color: rgba(255,255,255,0.1);
+            border-radius: 4px;
+        }
+
+        .spacer {
+            flex: 1 1 auto;
+        }
+
+        .content {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 16px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 1px -1px rgba(0,0,0,0.2), 0 1px 1px 0 rgba(0,0,0,0.14);
+            margin-bottom: 20px;
+            padding: 20px;
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+
+        .card-content {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .card-content p {
+            margin-bottom: 16px;
+            color: #666;
+        }
+
+        .button {
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            margin-right: 10px;
+            margin-top: 20px;
+        }
+
+        .button-primary {
+            background-color: #3f51b5;
+            color: white;
+        }
+
+        .button-primary:hover {
+            background-color: #303f9f;
+        }
+
+        .button-secondary {
+            background-color: transparent;
+            color: #3f51b5;
+            border: 1px solid #3f51b5;
+        }
+
+        .button-secondary:hover {
+            background-color: #f5f5f5;
+        }
+
+        .button-icon {
+            margin-right: 8px;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+            line-height: 1.8;
+        }
+
+        ul li {
+            padding: 8px 0;
+        }
+
+        ul li:before {
+            content: "✓ ";
+            color: #4caf50;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Barra de ferramentas -->
+    <div class="toolbar">
+        <span style="cursor:pointer;">Chatbot Platform</span>
+        <span class="spacer"></span>
+        <a href="#">Bots</a>
+        <a href="#">Create Bot</a>
+        <a href="#">Login</a>
+    </div>
+
+    <!-- Conteúdo -->
+    <div class="content">
+        <!-- Card 1: Bem-vindo -->
+        <div class="card">
+            <div class="card-title">Bem-vindo à Plataforma de Chatbots</div>
+            <div class="card-content">
+                <p>Este é um aplicativo de gerenciamento de chatbots. Faça login para começar a criar e gerenciar seus bots.</p>
+                <button class="button button-primary">
+                    <span class="button-icon">🔐</span>Faça Login
+                </button>
+                <button class="button button-secondary">
+                    <span class="button-icon">📋</span>Ir para Bots
+                </button>
+            </div>
+        </div>
+
+        <!-- Card 2: Recursos -->
+        <div class="card">
+            <div class="card-title">Recursos</div>
+            <div class="card-content">
+                <ul>
+                    <li>Criar e gerenciar chatbots</li>
+                    <li>Ativar/desativar bots</li>
+                    <li>Configurar comportamento dos bots</li>
+                    <li>Monitorar performance dos bots</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('Dashboard estrutura de teste carregada com sucesso!');
+        alert('Este é o layout esperado do dashboard.\n\nSe você está vendo isto mas o dashboard real não aparece, pode ser um problema com:\n\n1. Lazy loading do módulo\n2. Cache do navegador\n3. Build do Angular\n\nTente:\n- Limpar cache (Ctrl+Shift+Delete)\n- Reiniciar ng serve\n- npm install');
+    </script>
+</body>
+</html>
+
