@@ -1,0 +1,125 @@
+<div class="container">
+  <div class="header">
+    <h1>Logs de Auditoria</h1>
+    <button mat-raised-button color="primary">
+      <mat-icon>download</mat-icon>
+      Exportar
+    </button>
+  </div>
+
+  <mat-card class="filters-card">
+    <mat-card-content>
+      <div class="filters-grid">
+        <mat-form-field appearance="outline">
+          <mat-label>Ação</mat-label>
+          <mat-select [(ngModel)]="filterAction" (change)="loadAuditLogs()">
+            <mat-option value="">Todas</mat-option>
+            <mat-option value="CREATE">Criar</mat-option>
+            <mat-option value="UPDATE">Atualizar</mat-option>
+            <mat-option value="DELETE">Deletar</mat-option>
+            <mat-option value="VIEW">Visualizar</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Tipo de Entidade</mat-label>
+          <mat-select [(ngModel)]="filterEntityType" (change)="loadAuditLogs()">
+            <mat-option value="">Todas</mat-option>
+            <mat-option value="BOT">Bot</mat-option>
+            <mat-option value="CONVERSATION">Conversa</mat-option>
+            <mat-option value="MESSAGE">Mensagem</mat-option>
+            <mat-option value="USER">Usuário</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Status</mat-label>
+          <mat-select [(ngModel)]="filterStatus" (change)="loadAuditLogs()">
+            <mat-option value="">Todos</mat-option>
+            <mat-option value="SUCCESS">Sucesso</mat-option>
+            <mat-option value="FAILED">Falha</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="logs-card">
+    <mat-card-content>
+      <table mat-table [dataSource]="auditLogs" class="full-width-table">
+        <!-- ID Column -->
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef>ID</th>
+          <td mat-cell *matCellDef="let element">{{ element.id }}</td>
+        </ng-container>
+
+        <!-- Username Column -->
+        <ng-container matColumnDef="username">
+          <th mat-header-cell *matHeaderCellDef>Usuário</th>
+          <td mat-cell *matCellDef="let element">{{ element.username }}</td>
+        </ng-container>
+
+        <!-- Action Column -->
+        <ng-container matColumnDef="action">
+          <th mat-header-cell *matHeaderCellDef>Ação</th>
+          <td mat-cell *matCellDef="let element">
+            <mat-chip [color]="getActionColor(element.action)" selected>
+              {{ element.action }}
+            </mat-chip>
+          </td>
+        </ng-container>
+
+        <!-- Entity Type Column -->
+        <ng-container matColumnDef="entityType">
+          <th mat-header-cell *matHeaderCellDef>Tipo</th>
+          <td mat-cell *matCellDef="let element">{{ element.entityType }}</td>
+        </ng-container>
+
+        <!-- Status Column -->
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <td mat-cell *matCellDef="let element">
+            <mat-chip [color]="getStatusColor(element.status)" selected>
+              {{ element.status }}
+            </mat-chip>
+          </td>
+        </ng-container>
+
+        <!-- IP Address Column -->
+        <ng-container matColumnDef="ipAddress">
+          <th mat-header-cell *matHeaderCellDef>IP</th>
+          <td mat-cell *matCellDef="let element">{{ element.ipAddress }}</td>
+        </ng-container>
+
+        <!-- Created At Column -->
+        <ng-container matColumnDef="createdAt">
+          <th mat-header-cell *matHeaderCellDef>Data</th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.createdAt | date: 'dd/MM/yyyy HH:mm:ss' }}
+          </td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Ações</th>
+          <td mat-cell *matCellDef="let element">
+            <button mat-icon-button color="primary" (click)="viewDetails(element)">
+              <mat-icon>visibility</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+
+      <mat-paginator
+        [pageSizeOptions]="[5, 10, 20, 50]"
+        [pageSize]="pageSize"
+        [length]="totalElements"
+        (page)="onPageChange($event)">
+      </mat-paginator>
+    </mat-card-content>
+  </mat-card>
+</div>
+

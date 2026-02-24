@@ -41,7 +41,6 @@
       }
     }
   },
-  "defaultProject": "frontend",
   "cli": {
     "analytics": "8ef6c799-5f25-4d45-b637-81cdf4623183"
   }

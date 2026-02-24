@@ -1,0 +1,67 @@
+.container {
+  padding: 20px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+
+  h1 {
+    margin: 0;
+  }
+}
+
+.filters-card {
+  margin-bottom: 20px;
+
+  mat-card-content {
+    padding: 16px;
+  }
+}
+
+.filters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.logs-card {
+  mat-card-content {
+    padding: 0;
+  }
+}
+
+.full-width-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th {
+    background-color: #f5f5f5;
+    font-weight: 600;
+  }
+
+  td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+  }
+
+  tr:hover {
+    background-color: #fafafa;
+  }
+}
+
+mat-chip {
+  cursor: default;
+  font-size: 12px;
+}
+
+mat-paginator {
+  border-top: 1px solid #ddd;
+}
+
+button {
+  margin-right: 8px;
+}
+

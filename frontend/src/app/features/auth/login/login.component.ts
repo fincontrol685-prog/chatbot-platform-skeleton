@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/auth.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -7,21 +7,42 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
   selector: 'app-login',
   templateUrl: './login.component.html'
 })
-export class LoginComponent {
-  form: FormGroup;
+export class LoginComponent implements OnInit {
+  form!: FormGroup;
   error = '';
+  loading = false;
 
-  constructor(private auth: AuthService, private router: Router, fb: FormBuilder) {
-    this.form = fb.group({ username: ['', Validators.required], password: ['', Validators.required] });
+  constructor(
+    private auth: AuthService,
+    private router: Router,
+    private fb: FormBuilder
+  ) {}
+
+  ngOnInit(): void {
+    this.form = this.fb.group({
+      username: ['', Validators.required],
+      password: ['', Validators.required]
+    });
   }
 
-  submit() {
+  submit(): void {
     this.error = '';
-    if (this.form.invalid) { this.error = 'Preencha usuário e senha'; return; }
+    if (this.form.invalid) {
+      this.error = 'Preencha usuário e senha';
+      return;
+    }
+    this.loading = true;
     const { username, password } = this.form.value;
     this.auth.login(username, password).subscribe({
-      next: () => this.router.navigate(['/bots']),
-      error: (err) => { this.error = 'Login failed'; console.error(err); }
+      next: () => {
+        this.loading = false;
+        this.router.navigate(['/bots']);
+      },
+      error: (err) => {
+        this.loading = false;
+        this.error = err?.error?.message || 'Falha ao fazer login. Verifique as credenciais.';
+        console.error('Login error:', err);
+      }
     });
   }
 }

@@ -7,9 +7,48 @@ import { MatListModule } from '@angular/material/list';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatMenuModule } from '@angular/material/menu';
 
 @NgModule({
-  imports: [MatToolbarModule, MatButtonModule, MatInputModule, MatFormFieldModule, MatListModule, MatCardModule, MatIconModule, MatTableModule],
-  exports: [MatToolbarModule, MatButtonModule, MatInputModule, MatFormFieldModule, MatListModule, MatCardModule, MatIconModule, MatTableModule]
+  imports: [
+    MatToolbarModule,
+    MatButtonModule,
+    MatInputModule,
+    MatFormFieldModule,
+    MatListModule,
+    MatCardModule,
+    MatIconModule,
+    MatTableModule,
+    MatProgressBarModule,
+    MatProgressSpinnerModule,
+    MatSelectModule,
+    MatSnackBarModule,
+    MatDialogModule,
+    MatTabsModule,
+    MatMenuModule
+  ],
+  exports: [
+    MatToolbarModule,
+    MatButtonModule,
+    MatInputModule,
+    MatFormFieldModule,
+    MatListModule,
+    MatCardModule,
+    MatIconModule,
+    MatTableModule,
+    MatProgressBarModule,
+    MatProgressSpinnerModule,
+    MatSelectModule,
+    MatSnackBarModule,
+    MatDialogModule,
+    MatTabsModule,
+    MatMenuModule
+  ]
 })
 export class MaterialModule { }

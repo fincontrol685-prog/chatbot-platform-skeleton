@@ -7,6 +7,14 @@ import { MaterialModule } from '../../material.module';
 
 @NgModule({
   declarations: [LoginComponent],
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, MaterialModule, RouterModule.forChild([{ path: '', component: LoginComponent }])]
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MaterialModule,
+    RouterModule.forChild([
+      { path: '', component: LoginComponent }
+    ])
+  ]
 })
 export class AuthModule { }

@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class AuthService {
   private apiBase = environment.apiUrl || '';
   private api = `${this.apiBase}/api/auth`;

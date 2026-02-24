@@ -1,25 +1,66 @@
-<div style="max-width:400px;margin:40px auto;">
-  <mat-card>
-    <mat-card-title>Login</mat-card-title>
+<div style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+  <mat-card style="width: 100%; max-width: 400px; box-shadow: 0 8px 32px rgba(0,0,0,0.1);">
+    <mat-card-header style="text-align: center; margin-bottom: 24px;">
+      <mat-card-title style="font-size: 28px; color: #333;">Chatbot Platform</mat-card-title>
+      <p style="color: #666; margin-top: 8px;">Faça login na sua conta</p>
+    </mat-card-header>
+
     <mat-card-content>
       <form [formGroup]="form" (ngSubmit)="submit()">
-        <mat-form-field appearance="fill" style="width:100%">
-          <mat-label>Username</mat-label>
-          <input matInput formControlName="username" />
-          <mat-error *ngIf="form.get('username')?.hasError('required')">Username é obrigatório</mat-error>
+        <!-- Username Field -->
+        <mat-form-field appearance="outline" style="width: 100%; margin-bottom: 16px;">
+          <mat-label>Usuário</mat-label>
+          <input matInput
+                 formControlName="username"
+                 placeholder="Digite seu usuário"
+                 [disabled]="loading"
+                 autocomplete="username" />
+          <mat-error *ngIf="form.get('username')?.hasError('required')">
+            Usuário é obrigatório
+          </mat-error>
         </mat-form-field>
 
-        <mat-form-field appearance="fill" style="width:100%">
-          <mat-label>Password</mat-label>
-          <input matInput type="password" formControlName="password" />
-          <mat-error *ngIf="form.get('password')?.hasError('required')">Password é obrigatório</mat-error>
+        <!-- Password Field -->
+        <mat-form-field appearance="outline" style="width: 100%; margin-bottom: 16px;">
+          <mat-label>Senha</mat-label>
+          <input matInput
+                 type="password"
+                 formControlName="password"
+                 placeholder="Digite sua senha"
+                 [disabled]="loading"
+                 autocomplete="current-password" />
+          <mat-error *ngIf="form.get('password')?.hasError('required')">
+            Senha é obrigatória
+          </mat-error>
         </mat-form-field>
 
-        <div style="margin-top:16px">
-          <button mat-raised-button color="primary" type="submit">Login</button>
+        <!-- Error Message -->
+        <div *ngIf="error" style="color: #d32f2f; margin-bottom: 16px; padding: 12px; background-color: #ffebee; border-radius: 4px; border-left: 4px solid #d32f2f;">
+          {{ error }}
         </div>
-        <div *ngIf="error" style="color:red;margin-top:8px">{{error}}</div>
+
+        <!-- Loading Indicator -->
+        <div *ngIf="loading" style="margin-bottom: 16px;">
+          <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        </div>
+
+        <!-- Submit Button -->
+        <button mat-raised-button
+                color="primary"
+                type="submit"
+                [disabled]="form.invalid || loading"
+                style="width: 100%; height: 44px; font-size: 16px;">
+          <span *ngIf="!loading">Entrar</span>
+          <span *ngIf="loading">Aguarde...</span>
+        </button>
       </form>
+
+      <!-- Footer Info -->
+      <div style="text-align: center; margin-top: 24px; padding-top: 16px; border-top: 1px solid #e0e0e0;">
+        <p style="color: #999; font-size: 12px;">
+          Demonstração: Use cualquier usuário para continuar
+        </p>
+      </div>
     </mat-card-content>
   </mat-card>
 </div>

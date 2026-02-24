@@ -1,37 +1,99 @@
-<div style="max-width:1000px;margin:40px auto;min-height:100vh;">
-  <mat-card style="margin-bottom:20px">
-    <mat-card-header>
-      <mat-card-title>Bem-vindo à Plataforma de Chatbots</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <p style="font-size: 16px; color: #666; margin: 16px 0;">
-        Este é um aplicativo de gerenciamento de chatbots. Faça login para começar a criar e gerenciar seus bots.
-      </p>
-      <div style="margin-top: 20px;">
-        <button mat-raised-button color="primary" routerLink="/login" style="margin-right: 10px;">
-          <mat-icon style="margin-right: 8px;">login</mat-icon>
-          Faça Login
-        </button>
-        <button mat-button routerLink="/bots">
-          <mat-icon style="margin-right: 8px;">list</mat-icon>
-          Ir para Bots
-        </button>
-      </div>
-    </mat-card-content>
-  </mat-card>
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <h1>Dashboard</h1>
+    <button mat-raised-button color="primary">Atualizar</button>
+  </div>
 
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>Recursos</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <ul style="line-height: 1.8;">
-        <li>✓ Criar e gerenciar chatbots</li>
-        <li>✓ Ativar/desativar bots</li>
-        <li>✓ Configurar comportamento dos bots</li>
-        <li>✓ Monitorar performance dos bots</li>
-      </ul>
-    </mat-card-content>
-  </mat-card>
+  <div *ngIf="loading" class="loading">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  </div>
+
+  <div *ngIf="!loading" class="stats-grid">
+    <!-- Total Bots Card -->
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-icon" style="background-color: #1976d2;">
+          <mat-icon>smart_toy</mat-icon>
+        </div>
+        <div class="stat-info">
+          <h3>Total de Bots</h3>
+          <p class="stat-value">{{ stats.botCount }}</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Active Conversations Card -->
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-icon" style="background-color: #388e3c;">
+          <mat-icon>chat_bubble</mat-icon>
+        </div>
+        <div class="stat-info">
+          <h3>Conversas Ativas</h3>
+          <p class="stat-value">{{ stats.activeConversationCount }}</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Total Messages Card -->
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-icon" style="background-color: #d32f2f;">
+          <mat-icon>message</mat-icon>
+        </div>
+        <div class="stat-info">
+          <h3>Total de Mensagens</h3>
+          <p class="stat-value">{{ stats.totalMessageCount }}</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Total Users Card -->
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-icon" style="background-color: #f57c00;">
+          <mat-icon>people</mat-icon>
+        </div>
+        <div class="stat-info">
+          <h3>Usuários</h3>
+          <p class="stat-value">{{ stats.userCount }}</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="charts-section">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Atividade Recente</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <p>Gráficos de atividade, volume de mensagens e análise de sentimento.</p>
+        <p><strong>Próximas melhorias:</strong> Integração com Chart.js, ngx-charts ou Angular Material Data Visualization.</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="quick-actions">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Ações Rápidas</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <button mat-stroked-button color="primary">
+          <mat-icon>add</mat-icon>
+          Criar Novo Bot
+        </button>
+        <button mat-stroked-button color="primary">
+          <mat-icon>chat_bubble</mat-icon>
+          Nova Conversa
+        </button>
+        <button mat-stroked-button color="primary">
+          <mat-icon>assessment</mat-icon>
+          Ver Relatórios
+        </button>
+      </mat-card-content>
+    </mat-card>
+  </div>
 </div>
 
