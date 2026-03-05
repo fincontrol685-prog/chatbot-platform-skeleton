@@ -2,6 +2,9 @@ package com.br.chatbotplatformskeleton.controller;
 
 import com.br.chatbotplatformskeleton.dto.AuthRequest;
 import com.br.chatbotplatformskeleton.dto.AuthResponse;
+import com.br.chatbotplatformskeleton.dto.RegisterRequest;
+import com.br.chatbotplatformskeleton.dto.ForgotPasswordRequest;
+import com.br.chatbotplatformskeleton.dto.ResetPasswordRequest;
 import com.br.chatbotplatformskeleton.service.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +23,24 @@ public class AuthController {
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
         AuthResponse response = authService.login(request.getUsername(), request.getPassword());
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
+        AuthResponse response = authService.register(request.getUsername(), request.getEmail(), request.getPassword());
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Void> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+        authService.requestPasswordReset(request.getEmail());
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<Void> resetPassword(@RequestBody ResetPasswordRequest request) {
+        authService.resetPassword(request.getToken(), request.getNewPassword());
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/refresh")

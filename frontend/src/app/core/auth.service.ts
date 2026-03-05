@@ -21,6 +21,24 @@ export class AuthService {
     );
   }
 
+  register(username: string, email: string, password: string) {
+    return this.http.post<any>(`${this.api}/register`, { username, email, password }).pipe(
+      tap(res => {
+        if (res && res.accessToken) {
+          localStorage.setItem(this.tokenKey, res.accessToken);
+        }
+      })
+    );
+  }
+
+  requestPasswordReset(email: string) {
+    return this.http.post<void>(`${this.api}/forgot-password`, { email });
+  }
+
+  resetPassword(token: string, newPassword: string) {
+    return this.http.post<void>(`${this.api}/reset-password`, { token, newPassword });
+  }
+
   logout() { localStorage.removeItem(this.tokenKey); }
 
   getToken(): string | null { return localStorage.getItem(this.tokenKey); }
