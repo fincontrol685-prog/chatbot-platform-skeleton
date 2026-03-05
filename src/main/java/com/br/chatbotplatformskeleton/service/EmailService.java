@@ -70,6 +70,20 @@ public class EmailService {
     }
 
     /**
+     * Envia email de redefinição de senha
+     */
+    public void sendPasswordResetEmail(String userEmail, String resetToken) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("userEmail", userEmail);
+        data.put("resetToken", resetToken);
+        data.put("subject", "Redefinição de senha - Chatbot Platform");
+        data.put("template", "password_reset");
+
+        sendEmail(data);
+        logger.info("Password reset token for {} → {}", userEmail, resetToken);
+    }
+
+    /**
      * Método genérico para envio de email
      * TODO: Implementar com JavaMailSender ou SendGrid
      */
