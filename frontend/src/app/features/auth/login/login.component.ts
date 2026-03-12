@@ -5,12 +5,14 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-login',
-  templateUrl: './login.component.html'
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
   form!: FormGroup;
   error = '';
   loading = false;
+  showPassword = false;
 
   constructor(
     private auth: AuthService,
@@ -44,5 +46,9 @@ export class LoginComponent implements OnInit {
         console.error('Login error:', err);
       }
     });
+  }
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
   }
 }

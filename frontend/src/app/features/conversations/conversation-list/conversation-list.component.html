@@ -1,7 +1,9 @@
 <div class="container">
   <div class="header">
     <h1>Conversas</h1>
-    <button mat-raised-button color="primary">Nova Conversa</button>
+    <button mat-raised-button color="primary" (click)="novaConversa()" [disabled]="!botId">
+      Nova Conversa
+    </button>
   </div>
 
   <mat-card>

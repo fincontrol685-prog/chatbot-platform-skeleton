@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface Conversation {
   id: number;
@@ -33,8 +34,9 @@ export interface ConversationMessage {
   providedIn: 'root'
 })
 export class ConversationService {
-  private apiUrl = '/api/conversations';
-  private messageUrl = '/api/messages';
+  private apiBase = environment.apiUrl || '';
+  private apiUrl = `${this.apiBase}/api/conversations`;
+  private messageUrl = `${this.apiBase}/api/messages`;
 
   constructor(private http: HttpClient) {}
 

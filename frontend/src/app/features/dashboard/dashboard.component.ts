@@ -8,8 +8,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTableModule } from '@angular/material/table';
-import { BotService } from '../bots/bot.service';
-import { ConversationService } from '../conversations/conversation.service';
+import { DashboardService, DashboardStatsResponse } from './dashboard.service';
 
 export interface DashboardStats {
   botCount: number;
@@ -45,8 +44,7 @@ export class DashboardComponent implements OnInit {
   loading = true;
 
   constructor(
-    private botService: BotService,
-    private conversationService: ConversationService
+    private dashboardService: DashboardService
   ) {}
 
   ngOnInit(): void {
@@ -54,21 +52,23 @@ export class DashboardComponent implements OnInit {
   }
 
   loadDashboardData(): void {
-    // Load bots count
-    this.botService.list().subscribe(
-      (data: any) => {
-        this.stats.botCount = data.length || 0;
+    this.loading = true;
+    this.dashboardService.getStats().subscribe({
+      next: (data: DashboardStatsResponse) => {
+        this.stats = {
+          botCount: data.botCount ?? 0,
+          activeConversationCount: data.activeConversationCount ?? 0,
+          totalMessageCount: data.totalMessageCount ?? 0,
+          userCount: data.userCount ?? 0
+        };
+        this.loading = false;
+      },
+      error: (err) => {
+        // eslint-disable-next-line no-console
+        console.error('Erro ao carregar estatísticas do dashboard', err);
+        this.loading = false;
       }
-    );
-
-    // Load conversations count
-    this.conversationService.listByBot(1, 0, 1000).subscribe(
-      (data: any) => {
-        this.stats.activeConversationCount = data.totalElements || 0;
-      }
-    );
-
-    this.loading = false;
+    });
   }
 
   getStatColor(stat: string): string {

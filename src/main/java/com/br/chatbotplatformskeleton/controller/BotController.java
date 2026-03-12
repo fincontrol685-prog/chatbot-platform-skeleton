@@ -26,7 +26,7 @@ public class BotController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN','GESTOR')")
+    @PreAuthorize("hasAnyRole('ADMIN','GESTOR','USUARIO')")
     public ResponseEntity<BotDto> create(@RequestBody BotDto dto) {
         BotDto created = botService.create(dto);
         return ResponseEntity.created(URI.create("/api/bots/" + created.getId())).body(created);
@@ -39,7 +39,7 @@ public class BotController {
     }
 
     @PatchMapping("/{id}/activate")
-    @PreAuthorize("hasAnyRole('ADMIN','GESTOR')")
+    @PreAuthorize("hasAnyRole('ADMIN','GESTOR','USUARIO')")
     public ResponseEntity<BotDto> activate(@PathVariable Long id, @RequestParam(value = "active", defaultValue = "true") boolean active) {
         return botService.activate(id, active).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }

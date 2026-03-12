@@ -17,6 +17,11 @@ const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
+    path: 'conversations',
+    loadChildren: () => import('./features/conversations/conversations.module').then(m => m.ConversationsModule),
+    canActivate: [AuthGuard]
+  },
+  {
     path: '',
     redirectTo: 'login',
     pathMatch: 'full'

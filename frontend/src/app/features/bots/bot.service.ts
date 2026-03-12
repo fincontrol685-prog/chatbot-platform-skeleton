@@ -5,7 +5,7 @@ import { environment } from '../../../environments/environment';
 
 export interface BotDto { id: number; name: string; key: string; enabled: boolean; config?: string }
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class BotService {
   private apiBase = environment.apiUrl || '';
   private api = `${this.apiBase}/api/bots`;

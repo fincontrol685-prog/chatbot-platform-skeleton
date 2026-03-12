@@ -12,7 +12,6 @@ import { MaterialModule } from '../../material.module';
   imports: [CommonModule, FormsModule, ReactiveFormsModule, MaterialModule, RouterModule.forChild([
     { path: '', component: BotListComponent },
     { path: 'create', component: BotCreateComponent }
-  ])],
-  providers: [BotService]
+  ])]
 })
 export class BotsModule { }

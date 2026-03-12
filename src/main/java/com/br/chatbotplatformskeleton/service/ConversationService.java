@@ -48,7 +48,11 @@ public class ConversationService {
         Conversation conversation = new Conversation();
         conversation.setBot(botOpt.get());
         conversation.setUser(userOpt.get());
-        conversation.setTitle(dto.getTitle() != null ? dto.getTitle() : "Conversation " + System.currentTimeMillis());
+        String title = dto.getTitle();
+        if (title == null || title.isBlank()) {
+            title = "Conversa " + System.currentTimeMillis();
+        }
+        conversation.setTitle(title);
         conversation.setStatus("ACTIVE");
         conversation.setMessageCount(0L);
         conversation.setMetadata(dto.getMetadata());

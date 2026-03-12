@@ -1,4 +1,4 @@
 export const environment = {
   production: false,
-  apiUrl: '' // empty means same origin (use proxy or same host)
+  apiUrl: 'http://localhost:8080' // backend Spring Boot
 };
