@@ -1,0 +1,94 @@
+<div class="charts-container">
+  <!-- Line Chart -->
+  <mat-card *ngIf="lineChartData.length > 0" class="chart-card">
+    <mat-card-header>
+      <mat-card-title>Gráfico de Linha - Evolução das Métricas</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <ngx-charts-line-chart
+        [view]="[900, 400]"
+        [scheme]="colorScheme"
+        [results]="lineChartData"
+        [xAxis]="true"
+        [yAxis]="true"
+        [legend]="true"
+        [showXAxisLabel]="true"
+        [showYAxisLabel]="true"
+        [xAxisLabel]="xAxisLabel"
+        [yAxisLabel]="yAxisLabel"
+        [autoScale]="true"
+      >
+      </ngx-charts-line-chart>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Bar Chart -->
+  <mat-card *ngIf="barChartData.length > 0" class="chart-card">
+    <mat-card-header>
+      <mat-card-title>Gráfico de Barras - Média por Métrica</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <ngx-charts-bar-horizontal
+        [view]="[900, 400]"
+        [scheme]="colorScheme"
+        [results]="barChartData"
+        [xAxis]="true"
+        [yAxis]="true"
+        [legend]="false"
+        [showXAxisLabel]="true"
+        [showYAxisLabel]="true"
+        [xAxisLabel]="xAxisLabel"
+        [yAxisLabel]="'Métrica'"
+      >
+      </ngx-charts-bar-horizontal>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Pie Chart -->
+  <mat-card *ngIf="pieChartData.length > 0" class="chart-card">
+    <mat-card-header>
+      <mat-card-title>Gráfico de Pizza - Distribuição Total</mat-card-title>
+    </mat-card-header>
+    <mat-card-content class="pie-chart-center">
+      <ngx-charts-pie-chart
+        [view]="[500, 400]"
+        [scheme]="colorScheme"
+        [results]="pieChartData"
+        [legend]="true"
+        [labels]="true"
+        [doughnut]="false"
+      >
+      </ngx-charts-pie-chart>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Area Chart -->
+  <mat-card *ngIf="areaChartData.length > 0" class="chart-card">
+    <mat-card-header>
+      <mat-card-title>Gráfico de Área - Tendências</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <ngx-charts-area-chart
+        [view]="[900, 400]"
+        [scheme]="colorScheme"
+        [results]="areaChartData"
+        [xAxis]="true"
+        [yAxis]="true"
+        [legend]="true"
+        [showXAxisLabel]="true"
+        [showYAxisLabel]="true"
+        [xAxisLabel]="xAxisLabel"
+        [yAxisLabel]="yAxisLabel"
+        [autoScale]="true"
+      >
+      </ngx-charts-area-chart>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Empty State -->
+  <div *ngIf="metrics.length === 0" class="empty-state">
+    <mat-icon>show_chart</mat-icon>
+    <p>Nenhum dado para visualizar</p>
+  </div>
+</div>
+

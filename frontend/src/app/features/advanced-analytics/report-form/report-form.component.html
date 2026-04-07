@@ -1,0 +1,75 @@
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Nome do Relatório</mat-label>
+    <input matInput formControlName="name" />
+    <mat-error *ngIf="form.get('name')?.hasError('required')">Nome é obrigatório</mat-error>
+    <mat-error *ngIf="form.get('name')?.hasError('minlength')">Mínimo 3 caracteres</mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Descrição</mat-label>
+    <textarea matInput formControlName="description" rows="2"></textarea>
+  </mat-form-field>
+
+  <div formGroupName="reportDefinition" class="form-section">
+    <h3>Definição do Relatório</h3>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Título</mat-label>
+      <input matInput formControlName="title" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Tipo de Relatório</mat-label>
+      <mat-select formControlName="type" (change)="onTypeChange()">
+        <mat-option *ngFor="let type of reportTypes" [value]="type">
+          {{ type }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Tipo de Gráfico</mat-label>
+      <mat-select formControlName="chartType">
+        <mat-option *ngFor="let chart of chartTypes" [value]="chart">
+          {{ chart }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Agrupar por</mat-label>
+      <mat-select formControlName="groupBy">
+        <mat-option *ngFor="let group of groupByOptions" [value]="group">
+          {{ group }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <div class="form-section">
+    <h3>Métricas</h3>
+    <mat-selection-list formControlName="metricTypes" class="metrics-list">
+      <mat-list-option *ngFor="let metric of metricOptions" [value]="metric">
+        {{ metric }}
+      </mat-list-option>
+    </mat-selection-list>
+    <mat-error *ngIf="form.get('metricTypes')?.hasError('required')">Selecione pelo menos uma métrica</mat-error>
+  </div>
+
+  <mat-checkbox formControlName="isPublic" class="full-width">
+    Compartilhar relatório (permitir que outros visualizem)
+  </mat-checkbox>
+
+  <mat-alert *ngIf="error" type="error">{{ error }}</mat-alert>
+
+  <div class="form-actions">
+    <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || loading">
+      <mat-icon *ngIf="!loading">save</mat-icon>
+      <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
+      {{ report ? 'Atualizar' : 'Criar' }}
+    </button>
+    <button mat-button type="button" (click)="cancel()">Cancelar</button>
+  </div>
+</form>
+

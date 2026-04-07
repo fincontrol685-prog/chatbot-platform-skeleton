@@ -1,0 +1,94 @@
+<div class="container">
+  <h2>Relatórios Customizados</h2>
+
+  <div class="toolbar">
+    <mat-form-field class="search-field">
+      <mat-label>Buscar Relatório</mat-label>
+      <input matInput [(ngModel)]="searchQuery" (keyup)="search()" />
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" (click)="openForm()">
+      <mat-icon>add</mat-icon> Novo Relatório
+    </button>
+
+    <button mat-stroked-button (click)="toggleViewMode()">
+      <mat-icon>{{ showAllReports ? 'person' : 'public' }}</mat-icon>
+      {{ showAllReports ? 'Meus Relatórios' : 'Todos Acessíveis' }}
+    </button>
+  </div>
+
+  <mat-alert *ngIf="error" type="error">{{ error }}</mat-alert>
+
+  <div *ngIf="loading" class="loading">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+
+  <!-- Reports Grid -->
+  <div *ngIf="!loading && filteredReports.length > 0" class="reports-grid">
+    <mat-card *ngFor="let report of filteredReports" class="report-card" (click)="selectReport(report)">
+      <mat-card-header>
+        <div mat-card-avatar>
+          <mat-icon>assessment</mat-icon>
+        </div>
+        <mat-card-title>{{ report.name }}</mat-card-title>
+        <mat-card-subtitle>{{ report.createdAt | date: 'dd/MM/yyyy' }}</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p>{{ report.description }}</p>
+        <div class="report-meta">
+          <span *ngIf="report.isPublic" class="public-badge">
+            <mat-icon>public</mat-icon> Público
+          </span>
+          <span *ngIf="!report.isPublic" class="private-badge">
+            <mat-icon>lock</mat-icon> Privado
+          </span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && filteredReports.length === 0" class="empty-state">
+    <mat-icon>assessment</mat-icon>
+    <p>Nenhum relatório encontrado</p>
+  </div>
+
+  <!-- Detail View -->
+  <mat-card *ngIf="selectedReport && !showForm" class="detail-card">
+    <mat-card-header>
+      <mat-card-title>{{ selectedReport.name }}</mat-card-title>
+      <mat-card-subtitle>Criado em {{ selectedReport.createdAt | date: 'dd/MM/yyyy HH:mm' }}</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <p><strong>Descrição:</strong> {{ selectedReport.description }}</p>
+      <p><strong>Tipo:</strong> {{ selectedReport.reportDefinition?.type }}</p>
+      <p *ngIf="selectedReport.reportDefinition?.chartType">
+        <strong>Gráfico:</strong> {{ selectedReport.reportDefinition.chartType }}
+      </p>
+      <p><strong>Métricas:</strong> {{ selectedReport.metricTypes?.join(', ') }}</p>
+      <p>
+        <strong>Compartilhamento:</strong>
+        {{ selectedReport.isPublic ? 'Público (qualquer pessoa com acesso pode visualizar)' : 'Privado (somente você)' }}
+      </p>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-button color="primary" (click)="openForm()">Editar</button>
+      <button mat-button color="warn" (click)="deleteReport(selectedReport!.id)">Deletar</button>
+    </mat-card-actions>
+  </mat-card>
+
+  <!-- Form -->
+  <mat-card *ngIf="showForm" class="form-card">
+    <mat-card-header>
+      <mat-card-title>{{ selectedReport ? 'Editar' : 'Novo' }} Relatório</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <app-report-form
+        [report]="selectedReport"
+        (saved)="onReportSaved($event)"
+        (cancelled)="closeForm()"
+      ></app-report-form>
+    </mat-card-content>
+  </mat-card>
+</div>
+

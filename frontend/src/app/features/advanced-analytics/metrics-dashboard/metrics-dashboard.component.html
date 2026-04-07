@@ -1,0 +1,132 @@
+<div class="container">
+  <h2>Dashboard de Métricas</h2>
+
+  <mat-alert *ngIf="error" type="error">{{ error }}</mat-alert>
+
+  <mat-card class="filter-card">
+    <mat-card-header>
+      <mat-card-title>Filtros</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="filterForm">
+        <div class="filter-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Filtrar por</mat-label>
+            <mat-select formControlName="filterType">
+              <mat-option value="bot">Bot</mat-option>
+              <mat-option value="team">Equipe</mat-option>
+              <mat-option value="department">Departamento</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>ID</mat-label>
+            <input matInput type="number" formControlName="filterId" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Data Inicial</mat-label>
+            <input matInput type="date" formControlName="startDate" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Data Final</mat-label>
+            <input matInput type="date" formControlName="endDate" />
+          </mat-form-field>
+        </div>
+
+        <div class="filter-actions">
+          <button mat-raised-button color="primary" (click)="loadMetrics()" [disabled]="loading">
+            <mat-icon>search</mat-icon> Buscar
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <div *ngIf="loading" class="loading">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+
+  <!-- Metrics Table -->
+  <mat-card *ngIf="!loading && metrics.length > 0" class="metrics-card">
+    <mat-card-header>
+      <mat-card-title>Resultados ({{ metrics.length }} métricas)</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="table-container">
+        <table mat-table [dataSource]="metrics" class="metrics-table">
+          <!-- Metric Type Column -->
+          <ng-container matColumnDef="metricType">
+            <th mat-header-cell *matHeaderCellDef>Tipo de Métrica</th>
+            <td mat-cell *matCellDef="let metric">
+              {{ getMetricLabel(metric.metricType) }}
+            </td>
+          </ng-container>
+
+          <!-- Metric Value Column -->
+          <ng-container matColumnDef="metricValue">
+            <th mat-header-cell *matHeaderCellDef>Valor</th>
+            <td mat-cell *matCellDef="let metric">
+              {{ metric.metricValue | number: '1.2-2' }}
+            </td>
+          </ng-container>
+
+          <!-- Bot ID Column -->
+          <ng-container matColumnDef="botId">
+            <th mat-header-cell *matHeaderCellDef>Bot ID</th>
+            <td mat-cell *matCellDef="let metric">
+              {{ metric.botId || '-' }}
+            </td>
+          </ng-container>
+
+          <!-- Team ID Column -->
+          <ng-container matColumnDef="teamId">
+            <th mat-header-cell *matHeaderCellDef>Equipe ID</th>
+            <td mat-cell *matCellDef="let metric">
+              {{ metric.teamId || '-' }}
+            </td>
+          </ng-container>
+
+          <!-- Period Date Column -->
+          <ng-container matColumnDef="periodDate">
+            <th mat-header-cell *matHeaderCellDef>Período</th>
+            <td mat-cell *matCellDef="let metric">
+              {{ metric.periodDate | date: 'dd/MM/yyyy' }}
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayColumns;"></tr>
+        </table>
+      </div>
+
+      <div class="export-actions">
+        <button mat-raised-button color="accent" (click)="exportToExcel()" [disabled]="loading">
+          <mat-icon>file_download</mat-icon> Exportar Excel
+        </button>
+        <button mat-raised-button color="accent" (click)="exportToCsv()" [disabled]="loading">
+          <mat-icon>file_download</mat-icon> Exportar CSV
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Charts Visualization -->
+  <mat-card *ngIf="!loading && metrics.length > 0" class="charts-card">
+    <mat-card-header>
+      <mat-card-title>Visualizações - Gráficos</mat-card-title>
+      <mat-card-subtitle>Análise visual das métricas coletadas</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <app-metrics-charts [metrics]="metrics" [chartType]="'line'"></app-metrics-charts>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && metrics.length === 0" class="empty-state">
+    <mat-icon>show_chart</mat-icon>
+    <p>Nenhuma métrica encontrada. Use os filtros acima para buscar dados.</p>
+  </div>
+</div>
+

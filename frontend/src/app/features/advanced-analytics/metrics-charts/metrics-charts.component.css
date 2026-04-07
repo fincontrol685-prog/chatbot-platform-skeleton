@@ -1,0 +1,61 @@
+.charts-container {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.chart-card {
+  margin-bottom: 20px;
+}
+
+.pie-chart-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #666;
+}
+
+.empty-state mat-icon {
+  font-size: 64px;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 15px;
+  opacity: 0.2;
+}
+
+ngx-charts-line-chart,
+ngx-charts-bar-horizontal,
+ngx-charts-pie-chart,
+ngx-charts-area-chart {
+  display: flex;
+  justify-content: center;
+}
+
+mat-card-header {
+  margin-bottom: 15px;
+}
+
+mat-card-title {
+  font-size: 16px;
+  color: #1976d2;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .chart-card {
+    margin-bottom: 15px;
+  }
+
+  ngx-charts-line-chart,
+  ngx-charts-area-chart {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+}
+

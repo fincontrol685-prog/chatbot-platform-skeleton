@@ -22,6 +22,21 @@ const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
+    path: 'professional',
+    loadChildren: () => import('./features/professional-management/professional-management.module').then(m => m.ProfessionalManagementModule),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'compliance',
+    loadChildren: () => import('./features/compliance-security/compliance-security.module').then(m => m.ComplianceSecurityModule),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'analytics-advanced',
+    loadChildren: () => import('./features/advanced-analytics/advanced-analytics.module').then(m => m.AdvancedAnalyticsModule),
+    canActivate: [AuthGuard]
+  },
+  {
     path: '',
     redirectTo: 'login',
     pathMatch: 'full'

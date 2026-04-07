@@ -1,0 +1,27 @@
+package com.br.chatbotplatformskeleton.repository;
+
+import com.br.chatbotplatformskeleton.domain.TeamRole;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface TeamRoleRepository extends JpaRepository<TeamRole, Long> {
+
+    List<TeamRole> findByTeamIdAndIsActiveTrue(Long teamId);
+
+    List<TeamRole> findByUserIdAndIsActiveTrue(Long userId);
+
+    Optional<TeamRole> findByTeamIdAndUserIdAndIsActiveTrue(Long teamId, Long userId);
+
+    @Query("SELECT tr FROM TeamRole tr WHERE tr.team.id = :teamId AND tr.role = :role AND tr.isActive = true")
+    Optional<TeamRole> findTeamLeadByTeamId(@Param("teamId") Long teamId, @Param("role") String role);
+
+    @Query("SELECT tr.user.id FROM TeamRole tr WHERE tr.team.id = :teamId AND tr.isActive = true")
+    List<Long> findMemberIdsByTeamId(@Param("teamId") Long teamId);
+}
+

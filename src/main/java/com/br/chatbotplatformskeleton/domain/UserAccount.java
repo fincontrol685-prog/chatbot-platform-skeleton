@@ -37,6 +37,12 @@ public class UserAccount {
         inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "USER_DEPARTMENT",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "department_id"))
+    private Set<Department> departments = new HashSet<>();
+
     // getters and setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -56,4 +62,7 @@ public class UserAccount {
     public void setCreatedAt(OffsetDateTime createdAt) { this.createdAt = createdAt; }
     public Set<Role> getRoles() { return roles; }
     public void setRoles(Set<Role> roles) { this.roles = roles; }
+
+    public Set<Department> getDepartments() { return departments; }
+    public void setDepartments(Set<Department> departments) { this.departments = departments; }
 }

@@ -1,0 +1,61 @@
+<div class="container">
+  <h2>Gerenciamento de Consentimento GDPR</h2>
+
+  <mat-alert *ngIf="error" type="error">{{ error }}</mat-alert>
+  <mat-alert *ngIf="success" type="success">{{ success }}</mat-alert>
+
+  <div *ngIf="loading" class="loading">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Seus Consentimentos</mat-card-title>
+      <mat-card-subtitle>Controle quais dados podemos processar</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content *ngIf="!loading">
+      <mat-selection-list [compareWith]="compareConsent">
+        <mat-list-option
+          *ngFor="let consentType of consentTypes"
+          [value]="consentType.id"
+          [selected]="isConsentGranted(consentType.id)"
+          (change)="toggleConsent(consentType.id)"
+        >
+          <div matListItemTitle>{{ consentType.label }}</div>
+          <div matListItemLine>{{ consentType.description }}</div>
+        </mat-list-option>
+      </mat-selection-list>
+
+      <div *ngIf="consents.length > 0" class="consent-history">
+        <h3>Histórico de Consentimentos</h3>
+        <mat-list>
+          <mat-list-item *ngFor="let consent of consents">
+            <mat-icon matListItemIcon [color]="consent.status === 'GRANTED' ? 'accent' : 'warn'">
+              {{ consent.status === 'GRANTED' ? 'check_circle' : 'cancel' }}
+            </mat-icon>
+            <div matListItemTitle>{{ getConsentLabel(consent.consentType) }}</div>
+            <div matListItemLine>
+              {{ consent.status === 'GRANTED' ? 'Concedido em' : 'Revogado em' }}
+              {{ (consent.status === 'GRANTED' ? consent.grantedAt : consent.revokedAt) | date: 'dd/MM/yyyy HH:mm' }}
+            </div>
+          </mat-list-item>
+        </mat-list>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="info-card">
+    <mat-card-header>
+      <mat-card-title>Seus Direitos GDPR</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <ul>
+        <li><strong>Direito de Acesso:</strong> Você pode solicitar uma cópia de seus dados</li>
+        <li><strong>Direito ao Esquecimento:</strong> Você pode solicitar a exclusão de seus dados</li>
+        <li><strong>Portabilidade:</strong> Você pode obter seus dados em formato estruturado</li>
+        <li><strong>Retificação:</strong> Você pode corrigir dados incorretos</li>
+      </ul>
+    </mat-card-content>
+  </mat-card>
+</div>
+

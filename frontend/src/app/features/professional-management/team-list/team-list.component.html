@@ -1,0 +1,71 @@
+<div class="container">
+  <h2>Gerenciamento de Equipes</h2>
+
+  <!-- Search Bar -->
+  <div class="search-section">
+    <mat-form-field class="search-field">
+      <mat-label>Buscar Equipe</mat-label>
+      <input matInput [(ngModel)]="searchQuery" (keyup)="search()" />
+    </mat-form-field>
+    <button mat-raised-button color="primary" (click)="openForm()">
+      <mat-icon>add</mat-icon> Nova Equipe
+    </button>
+  </div>
+
+  <!-- Error Message -->
+  <mat-alert *ngIf="error" type="error">{{ error }}</mat-alert>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+
+  <!-- Teams List -->
+  <mat-list *ngIf="!loading && filteredTeams.length > 0">
+    <mat-list-item *ngFor="let team of filteredTeams" (click)="selectTeam(team)">
+      <mat-icon matListItemIcon>group</mat-icon>
+      <div matListItemTitle>{{ team.name }}</div>
+      <div matListItemLine>{{ team.code }} - Departamento: #{{ team.departmentId }}</div>
+      <div matListItemLine class="text-secondary">{{ team.description }}</div>
+    </mat-list-item>
+  </mat-list>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && filteredTeams.length === 0" class="empty-state">
+    <mat-icon>groups_off</mat-icon>
+    <p>Nenhuma equipe encontrada</p>
+  </div>
+
+  <!-- Detail View -->
+  <mat-card *ngIf="selectedTeam && !showForm" class="detail-card">
+    <mat-card-header>
+      <mat-card-title>{{ selectedTeam.name }}</mat-card-title>
+      <mat-card-subtitle>{{ selectedTeam.code }}</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <p><strong>Descrição:</strong> {{ selectedTeam.description }}</p>
+      <p><strong>Departamento:</strong> #{{ selectedTeam.departmentId }}</p>
+      <p><strong>Máximo de Conversas/Usuário:</strong> {{ selectedTeam.maxConversationsPerUser }}</p>
+      <p><strong>Status:</strong> {{ selectedTeam.isActive ? 'Ativo' : 'Inativo' }}</p>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-button color="primary" (click)="openForm()">Editar</button>
+      <button mat-button color="warn" (click)="deleteTeam(selectedTeam!.id)">Desativar</button>
+    </mat-card-actions>
+  </mat-card>
+
+  <!-- Form -->
+  <mat-card *ngIf="showForm" class="form-card">
+    <mat-card-header>
+      <mat-card-title>{{ selectedTeam ? 'Editar' : 'Nova' }} Equipe</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <app-team-form
+        [team]="selectedTeam"
+        (saved)="onTeamSaved($event)"
+        (cancelled)="closeForm()"
+      ></app-team-form>
+    </mat-card-content>
+  </mat-card>
+</div>
+
