@@ -25,11 +25,24 @@ import { AdvancedAnalyticsService } from './advanced-analytics.service';
     NgxChartsModule,
     RouterModule.forChild([
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-      { path: 'dashboard', component: MetricsDashboardComponent },
-      { path: 'reports', component: ReportsListComponent }
+      {
+        path: 'dashboard',
+        component: MetricsDashboardComponent,
+        data: {
+          title: 'Central de monitoramento',
+          description: 'Veja desempenho por bot, conversas ativas e sinais operacionais.'
+        }
+      },
+      {
+        path: 'reports',
+        component: ReportsListComponent,
+        data: {
+          title: 'Relatorios analiticos',
+          description: 'Consulte e organize relatorios compartilhados e pessoais.'
+        }
+      }
     ])
   ],
   providers: [AdvancedAnalyticsService]
 })
 export class AdvancedAnalyticsModule { }
-

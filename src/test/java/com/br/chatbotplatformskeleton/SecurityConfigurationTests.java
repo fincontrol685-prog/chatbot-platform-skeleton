@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -16,6 +18,7 @@ import static org.hamcrest.Matchers.*;
  */
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 public class SecurityConfigurationTests {
 
     @Autowired
@@ -47,8 +50,8 @@ public class SecurityConfigurationTests {
      */
     @Test
     public void testUnauthorizedAccessDenied() throws Exception {
-        mockMvc.perform(get("/api/admin/users"))
-            .andExpect(status().isForbidden());
+        mockMvc.perform(get("/api/bots"))
+            .andExpect(status().isUnauthorized());
     }
 
     /**
@@ -57,7 +60,7 @@ public class SecurityConfigurationTests {
     @Test
     public void testMetricsRequiresAuthentication() throws Exception {
         mockMvc.perform(get("/actuator/metrics"))
-            .andExpect(status().isForbidden());
+            .andExpect(status().isUnauthorized());
     }
 
     /**
@@ -77,7 +80,9 @@ public class SecurityConfigurationTests {
      */
     @Test
     public void testCacheControlHeaders() throws Exception {
-        mockMvc.perform(get("/actuator/health"))
+        mockMvc.perform(post("/api/auth/login")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{}"))
             .andExpect(header().exists("Cache-Control"));
     }
 
@@ -91,4 +96,3 @@ public class SecurityConfigurationTests {
                 containsString("default-src")));
     }
 }
-

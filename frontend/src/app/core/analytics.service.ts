@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface BotAnalytics {
   totalConversations: number;
@@ -22,7 +23,8 @@ export interface DashboardStats {
   providedIn: 'root'
 })
 export class AnalyticsService {
-  private apiUrl = '/api/analytics';
+  private apiBase = environment.apiUrl || '';
+  private apiUrl = `${this.apiBase}/api/analytics`;
 
   constructor(private http: HttpClient) {}
 
@@ -46,4 +48,3 @@ export class AnalyticsService {
     return this.http.get<any>(`${this.apiUrl}/bots/${botId}/intent-distribution`);
   }
 }
-

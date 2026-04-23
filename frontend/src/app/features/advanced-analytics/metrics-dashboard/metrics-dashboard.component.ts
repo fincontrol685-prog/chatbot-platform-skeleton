@@ -1,250 +1,147 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
-import { AdvancedAnalyticsService } from '../advanced-analytics.service';
-import { AnalyticsMetricDto } from '../models/analytics.model';
+import { BotAnalytics, AnalyticsService } from '../../../core/analytics.service';
+import { BotDto, BotService } from '../../bots/bot.service';
+import { getApiErrorMessage } from '../../../core/api-error.util';
+
+interface MonitoringCard {
+  label: string;
+  value: string;
+  helper: string;
+  icon: string;
+}
 
 @Component({
   selector: 'app-metrics-dashboard',
   templateUrl: './metrics-dashboard.component.html',
-  styles: [`
-    .container {
-      padding: 20px;
-    }
-
-    h2 {
-      margin-bottom: 20px;
-      color: #1976d2;
-    }
-
-    .filter-card {
-      margin-bottom: 20px;
-    }
-
-    .filter-row {
-      display: flex;
-      gap: 15px;
-      margin-bottom: 15px;
-      flex-wrap: wrap;
-      align-items: flex-end;
-    }
-
-    mat-form-field {
-      min-width: 150px;
-    }
-
-    .filter-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 15px;
-    }
-
-    .loading {
-      display: flex;
-      justify-content: center;
-      padding: 40px 20px;
-    }
-
-    .metrics-card {
-      margin-bottom: 20px;
-    }
-
-    .charts-card {
-      margin-bottom: 20px;
-    }
-
-    .table-container {
-      overflow-x: auto;
-      max-height: 600px;
-      overflow-y: auto;
-    }
-
-    .metrics-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    table th {
-      background-color: #f5f5f5;
-      font-weight: 600;
-      color: #333;
-      position: sticky;
-      top: 0;
-    }
-
-    table td {
-      padding: 12px;
-      border-bottom: 1px solid #eee;
-    }
-
-    table tr:hover {
-      background-color: #f9f9f9;
-    }
-
-    .export-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 20px;
-      padding-top: 15px;
-      border-top: 1px solid #ddd;
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 60px 20px;
-      color: #666;
-    }
-
-    .empty-state mat-icon {
-      font-size: 64px;
-      width: 64px;
-      height: 64px;
-      margin-bottom: 15px;
-      opacity: 0.2;
-    }
-
-    p {
-      margin: 10px 0;
-      line-height: 1.6;
-    }
-  `]
+  styleUrls: ['./metrics-dashboard.component.css']
 })
 export class MetricsDashboardComponent implements OnInit {
-  filterForm!: FormGroup;
-  metrics: AnalyticsMetricDto[] = [];
-  loading = false;
-  error: string | null = null;
-
-  displayColumns = ['metricType', 'metricValue', 'botId', 'teamId', 'periodDate'];
+  bots: BotDto[] = [];
+  selectedBotId = 0;
+  loadingBots = false;
+  loadingMetrics = false;
+  error = '';
+  botAnalytics: BotAnalytics | null = null;
 
   constructor(
-    private fb: FormBuilder,
-    private service: AdvancedAnalyticsService
+    private readonly botService: BotService,
+    private readonly analyticsService: AnalyticsService
   ) {}
 
   ngOnInit(): void {
-    this.initForm();
+    this.loadAvailableBots();
   }
 
-  initForm(): void {
-    this.filterForm = this.fb.group({
-      filterType: ['bot'], // bot, team, department
-      filterId: [null],
-      startDate: [''],
-      endDate: ['']
+  get selectedBot(): BotDto | undefined {
+    return this.bots.find(bot => bot.id === this.selectedBotId);
+  }
+
+  get monitoringCards(): MonitoringCard[] {
+    return [
+      {
+        label: 'Conversas totais',
+        value: this.formatNumber(this.botAnalytics?.totalConversations ?? 0),
+        helper: 'Volume acumulado para o bot selecionado',
+        icon: 'chat'
+      },
+      {
+        label: 'Conversas ativas',
+        value: this.formatNumber(this.botAnalytics?.activeConversations ?? 0),
+        helper: 'Atendimentos em andamento agora',
+        icon: 'forum'
+      },
+      {
+        label: 'Mensagens',
+        value: this.formatNumber(this.botAnalytics?.totalMessages ?? 0),
+        helper: 'Mensagens registradas no historico',
+        icon: 'mark_chat_unread'
+      },
+      {
+        label: 'Tempo medio',
+        value: `${(this.botAnalytics?.averageResponseTime ?? 0).toFixed(0)} ms`,
+        helper: 'Media de resposta observada',
+        icon: 'timer'
+      }
+    ];
+  }
+
+  get sentimentLabel(): string {
+    const score = this.botAnalytics?.averageSentimentScore ?? 0;
+
+    if (score >= 0.75) {
+      return 'Experiencia positiva';
+    }
+
+    if (score >= 0.45) {
+      return 'Experiencia neutra';
+    }
+
+    return 'Experiencia com atencao';
+  }
+
+  loadAvailableBots(): void {
+    this.loadingBots = true;
+    this.error = '';
+
+    this.botService.list().subscribe({
+      next: (bots) => {
+        this.bots = bots.filter(bot => bot.enabled);
+        this.loadingBots = false;
+
+        if (this.bots.length === 0) {
+          this.botAnalytics = null;
+          return;
+        }
+
+        this.selectedBotId = this.bots[0].id;
+        this.loadMonitoring();
+      },
+      error: (err) => {
+        this.loadingBots = false;
+        this.error = getApiErrorMessage(err, 'Nao foi possivel carregar os bots para monitoramento.');
+      }
     });
   }
 
-  loadMetrics(): void {
-    const filterType = this.filterForm.get('filterType')?.value;
-    const filterId = this.filterForm.get('filterId')?.value;
-
-    if (!filterId) {
-      this.error = 'Selecione uma opção para filtrar';
+  onBotChange(botId: number): void {
+    if (this.selectedBotId === botId) {
       return;
     }
 
-    this.loading = true;
-    this.error = null;
-
-    const filters = {
-      dateRange: {
-        from: this.filterForm.get('startDate')?.value || '',
-        to: this.filterForm.get('endDate')?.value || ''
-      }
-    };
-
-    let request;
-    switch (filterType) {
-      case 'bot':
-        request = this.service.getBotMetrics(filterId, filters);
-        break;
-      case 'team':
-        request = this.service.getTeamMetrics(filterId, filters);
-        break;
-      case 'department':
-        request = this.service.getDepartmentMetrics(filterId, filters);
-        break;
-      default:
-        this.error = 'Tipo de filtro inválido';
-        this.loading = false;
-        return;
-    }
-
-    request.subscribe({
-      next: (data) => {
-        this.metrics = data;
-        this.loading = false;
-      },
-      error: (err) => {
-        this.error = 'Erro ao carregar métricas: ' + err.message;
-        this.loading = false;
-      }
-    });
+    this.selectedBotId = botId;
+    this.loadMonitoring();
   }
 
-  exportToExcel(): void {
-    if (this.metrics.length === 0) {
-      this.error = 'Nenhuma métrica para exportar';
+  loadMonitoring(): void {
+    if (!this.selectedBotId) {
+      this.botAnalytics = null;
       return;
     }
 
-    this.loading = true;
-    this.service.exportToExcel({ metrics: this.metrics }).subscribe({
-      next: (response) => {
-        this.downloadFile(response.downloadUrl, response.fileName);
-        this.loading = false;
+    this.loadingMetrics = true;
+    this.error = '';
+
+    this.analyticsService.getBotAnalytics(this.selectedBotId).subscribe({
+      next: (analytics) => {
+        this.botAnalytics = {
+          totalConversations: analytics.totalConversations ?? 0,
+          activeConversations: analytics.activeConversations ?? 0,
+          totalMessages: analytics.totalMessages ?? 0,
+          averageResponseTime: analytics.averageResponseTime ?? 0,
+          averageSentimentScore: analytics.averageSentimentScore ?? 0,
+          messageVolumeByDay: analytics.messageVolumeByDay ?? []
+        };
+        this.loadingMetrics = false;
       },
       error: (err) => {
-        this.error = 'Erro ao exportar: ' + err.message;
-        this.loading = false;
+        this.botAnalytics = null;
+        this.loadingMetrics = false;
+        this.error = getApiErrorMessage(err, 'Nao foi possivel carregar o monitoramento deste bot.');
       }
     });
   }
 
-  exportToCsv(): void {
-    if (this.metrics.length === 0) {
-      this.error = 'Nenhuma métrica para exportar';
-      return;
-    }
-
-    this.loading = true;
-    this.service.exportToCsv({ metrics: this.metrics }).subscribe({
-      next: (response) => {
-        this.downloadFile(response.downloadUrl, response.fileName);
-        this.loading = false;
-      },
-      error: (err) => {
-        this.error = 'Erro ao exportar: ' + err.message;
-        this.loading = false;
-      }
-    });
-  }
-
-  private downloadFile(url: string, fileName: string): void {
-    this.service.downloadExport(url).subscribe({
-      next: (blob) => {
-        const link = document.createElement('a');
-        link.href = window.URL.createObjectURL(blob);
-        link.download = fileName;
-        link.click();
-        window.URL.revokeObjectURL(link.href);
-      },
-      error: (err) => {
-        this.error = 'Erro ao baixar arquivo: ' + err.message;
-      }
-    });
-  }
-
-  getMetricLabel(type: string): string {
-    const labels: { [key: string]: string } = {
-      'CONVERSATION_COUNT': 'Contagem de Conversas',
-      'RESPONSE_TIME': 'Tempo de Resposta',
-      'SATISFACTION_SCORE': 'Score de Satisfação',
-      'RESOLUTION_TIME': 'Tempo de Resolução',
-      'BOT_INTERACTIONS': 'Interações de Bot',
-      'USER_RETENTION': 'Retenção de Usuários'
-    };
-    return labels[type] || type;
+  private formatNumber(value: number): string {
+    return new Intl.NumberFormat('pt-BR').format(value);
   }
 }
-

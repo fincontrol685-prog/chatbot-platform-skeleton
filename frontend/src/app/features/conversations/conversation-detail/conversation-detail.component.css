@@ -10,25 +10,25 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+}
 
-  h1 {
-    margin: 0 0 10px 0;
-  }
+.conversation-header h1 {
+  margin: 0 0 10px 0;
+}
 
-  mat-chip {
-    cursor: default;
-  }
+.conversation-header mat-chip {
+  cursor: default;
 }
 
 .header-actions {
   display: flex;
   align-items: center;
   gap: 10px;
+}
 
-  .message-count {
-    font-size: 14px;
-    color: #666;
-  }
+.header-actions .message-count {
+  font-size: 14px;
+  color: #666;
 }
 
 .messages-card {
@@ -45,93 +45,93 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
 
-  .message {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 10px;
-    animation: fadeIn 0.3s ease-in;
+.message {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+  animation: fadeIn 0.3s ease-in;
+}
 
-    &.user-message {
-      align-items: flex-end;
+.message.user-message {
+  align-items: flex-end;
+}
 
-      .message-header,
-      .message-content {
-        background-color: #1976d2;
-        color: white;
-        border-radius: 8px 8px 0 8px;
-      }
-    }
+.message.bot-message {
+  align-items: flex-start;
+}
 
-    &.bot-message {
-      align-items: flex-start;
+.message.user-message .message-header,
+.message.user-message .message-content {
+  background-color: #1976d2;
+  color: white;
+  border-radius: 8px 8px 0 8px;
+}
 
-      .message-header,
-      .message-content {
-        background-color: #f0f0f0;
-        color: #333;
-        border-radius: 8px 8px 8px 0;
-      }
-    }
+.message.bot-message .message-header,
+.message.bot-message .message-content {
+  background-color: #f0f0f0;
+  color: #333;
+  border-radius: 8px 8px 8px 0;
+}
 
-    .message-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      padding: 5px 10px;
+.message-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  padding: 5px 10px;
+}
 
-      .sender-name {
-        font-weight: bold;
-      }
+.sender-name {
+  font-weight: bold;
+}
 
-      .message-time {
-        color: #999;
-        font-size: 11px;
-      }
+.message-time {
+  color: #999;
+  font-size: 11px;
+}
 
-      .intent-badge {
-        background-color: #f0f0f0;
-        padding: 2px 6px;
-        border-radius: 4px;
-        font-size: 11px;
-      }
-    }
+.intent-badge {
+  background-color: #f0f0f0;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+}
 
-    .message-content {
-      padding: 10px;
-      max-width: 70%;
-      word-wrap: break-word;
-    }
+.message-content {
+  padding: 10px;
+  max-width: 70%;
+  word-wrap: break-word;
+}
 
-    .message-confidence {
-      font-size: 11px;
-      color: #999;
-      margin-top: 5px;
-      padding: 0 10px;
-    }
-  }
+.message-confidence {
+  font-size: 11px;
+  color: #999;
+  margin-top: 5px;
+  padding: 0 10px;
 }
 
 .message-input-container {
   padding: 15px;
   border-top: 1px solid #e0e0e0;
+}
 
-  form {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
+.message-input-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
 
-  .full-width {
-    width: 100%;
-  }
+.message-input-container .full-width {
+  width: 100%;
+}
 
-  .button-group {
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
-  }
+.message-input-container .button-group {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
 }
 
 @keyframes fadeIn {
@@ -157,9 +157,35 @@
 .messages-container::-webkit-scrollbar-thumb {
   background: #888;
   border-radius: 4px;
-
-  &:hover {
-    background: #555;
-  }
 }
 
+.messages-container::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.page-loading {
+  margin-bottom: 16px;
+  overflow: hidden;
+  border-radius: 999px;
+}
+
+.error-banner,
+.empty-state {
+  margin: 16px 20px 0;
+  padding: 14px 16px;
+  border-radius: 16px;
+}
+
+.error-banner {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: #fff1f2;
+  color: #be123c;
+  border: 1px solid #fecdd3;
+}
+
+.empty-state {
+  background: #f8fafc;
+  color: #475569;
+}

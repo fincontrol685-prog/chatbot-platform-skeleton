@@ -27,7 +27,7 @@ public class ConversationMessage {
     private String messageType; // USER, BOT, SYSTEM
 
     @Lob
-    @Column(name = "content", nullable = false)
+    @Column(name = "content", nullable = false, columnDefinition = "LONGTEXT")
     private String content;
 
     @Column(name = "sentiment_score")

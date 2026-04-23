@@ -1,15 +1,56 @@
-<div style="max-width:1100px;margin:20px auto;">
-  <mat-card>
-    <mat-card-title>Gerenciamento de Bots</mat-card-title>
+<div class="bots-page page-shell">
+  <section class="page-header">
+    <div>
+      <span class="page-header__eyebrow">Portfolio operacional</span>
+      <h1>Gestao de bots</h1>
+      <p>
+        Cadastre, ajuste e acompanhe o perfil operacional dos bots com leitura rapida de mensagens,
+        canal principal e prontidao para producao.
+      </p>
+    </div>
 
+    <a mat-raised-button color="primary" routerLink="/bots/create">
+      <mat-icon>add_circle</mat-icon>
+      <span>Criar bot</span>
+    </a>
+  </section>
+
+  <section class="summary-grid">
+    <mat-card class="summary-card">
+      <mat-card-content>
+        <span>Total</span>
+        <strong>{{ totalBots }}</strong>
+      </mat-card-content>
+    </mat-card>
+    <mat-card class="summary-card">
+      <mat-card-content>
+        <span>Ativos</span>
+        <strong>{{ enabledBots }}</strong>
+      </mat-card-content>
+    </mat-card>
+    <mat-card class="summary-card">
+      <mat-card-content>
+        <span>Canais configurados</span>
+        <strong>{{ configuredChannels }}</strong>
+      </mat-card-content>
+    </mat-card>
+    <mat-card class="summary-card">
+      <mat-card-content>
+        <span>Mensageria pronta</span>
+        <strong>{{ messageReadyBots }}</strong>
+      </mat-card-content>
+    </mat-card>
+  </section>
+
+  <mat-card class="filters-panel">
     <mat-card-content>
-      <div style="display:flex; flex-wrap:wrap; gap:16px; align-items:center; margin-bottom:16px;">
-        <mat-form-field appearance="outline" style="flex:1 1 240px; min-width:220px;">
-          <mat-label>Buscar por nome ou chave</mat-label>
-          <input matInput [(ngModel)]="filter" placeholder="Ex: atendimento, suporte, bot-key-01" />
+      <div class="filters-grid">
+        <mat-form-field appearance="outline">
+          <mat-label>Buscar por nome, chave, canal ou departamento</mat-label>
+          <input matInput [(ngModel)]="filter" placeholder="Ex: atendimento, whatsapp, suporte premium" />
         </mat-form-field>
 
-        <mat-form-field appearance="outline" style="width:200px;">
+        <mat-form-field appearance="outline">
           <mat-label>Status</mat-label>
           <mat-select [(ngModel)]="statusFilter">
             <mat-option value="ALL">Todos</mat-option>
@@ -17,59 +58,106 @@
             <mat-option value="DISABLED">Inativos</mat-option>
           </mat-select>
         </mat-form-field>
+      </div>
+    </mat-card-content>
+  </mat-card>
 
-        <span style="flex:1 1 auto;"></span>
+  <div *ngIf="loading" class="loading-band">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  </div>
 
-        <button mat-raised-button color="primary" routerLink="/bots/create">
-          <mat-icon>add</mat-icon>
-          <span>Novo Bot</span>
-        </button>
+  <div *ngIf="error" class="state-card state-card--error">
+    <strong>Falha ao carregar bots.</strong>
+    <p>{{ error }}</p>
+  </div>
+
+  <mat-card class="table-panel">
+    <mat-card-content>
+      <div class="panel-heading">
+        <div>
+          <span class="panel-label">Inventario profissional</span>
+          <h2>Bots cadastrados</h2>
+        </div>
+        <span class="panel-caption">{{ filteredBots.length }} item(ns) visiveis</span>
       </div>
 
-      <div *ngIf="filteredBots.length === 0; else botsTable">
-        <p>Nenhum bot encontrado com os filtros atuais.</p>
+      <div class="state-card state-card--empty" *ngIf="!loading && filteredBots.length === 0">
+        <strong>Nenhum bot encontrado.</strong>
+        <p>Ajuste os filtros atuais ou crie um novo bot para iniciar o catalogo.</p>
       </div>
 
-      <ng-template #botsTable>
-        <table mat-table [dataSource]="filteredBots" class="mat-elevation-z1" style="width:100%">
+      <div class="table-wrapper" *ngIf="!loading && filteredBots.length > 0">
+        <table mat-table [dataSource]="filteredBots" class="bots-table">
           <ng-container matColumnDef="name">
-            <th mat-header-cell *matHeaderCellDef>Nome</th>
+            <th mat-header-cell *matHeaderCellDef>Bot</th>
             <td mat-cell *matCellDef="let bot">
-              <div style="font-weight:500;">{{ bot.name }}</div>
-              <div style="font-size:12px; color:#666;">{{ bot.key }}</div>
+              <div class="bot-main">
+                <strong>{{ bot.name }}</strong>
+                <span>{{ bot.key }}</span>
+              </div>
             </td>
           </ng-container>
 
-          <ng-container matColumnDef="key">
-            <th mat-header-cell *matHeaderCellDef>Chave</th>
+          <ng-container matColumnDef="profile">
+            <th mat-header-cell *matHeaderCellDef>Perfil</th>
             <td mat-cell *matCellDef="let bot">
-              <code>{{ bot.key }}</code>
+              <div class="profile-stack">
+                <div class="pill-row">
+                  <span class="soft-pill">{{ bot.summary.primaryChannelLabel }}</span>
+                  <span class="soft-pill">{{ bot.summary.toneLabel }}</span>
+                </div>
+                <strong>{{ bot.summary.role }}</strong>
+                <span>{{ bot.summary.department }}</span>
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="messages">
+            <th mat-header-cell *matHeaderCellDef>Mensagens</th>
+            <td mat-cell *matCellDef="let bot">
+              <div class="message-stack">
+                <p>{{ bot.summary.welcomePreview }}</p>
+                <div class="message-meta">
+                  <span>{{ bot.summary.businessHours }}</span>
+                  <span>SLA {{ bot.summary.serviceLevel }}</span>
+                  <span>{{ bot.summary.messagePackComplete ? 'Pacote completo' : 'Pacote parcial' }}</span>
+                </div>
+              </div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="enabled">
             <th mat-header-cell *matHeaderCellDef>Status</th>
             <td mat-cell *matCellDef="let bot">
-              <mat-chip [color]="bot.enabled ? 'primary' : 'warn'" selected>
-                {{ bot.enabled ? 'Ativo' : 'Inativo' }}
-              </mat-chip>
+              <div class="status-stack">
+                <mat-chip [color]="bot.enabled ? 'primary' : 'warn'" selected>
+                  {{ bot.enabled ? 'Ativo' : 'Inativo' }}
+                </mat-chip>
+                <small>{{ bot.summary.signature }}</small>
+              </div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef style="text-align:right;">Ações</th>
-            <td mat-cell *matCellDef="let bot" style="text-align:right;">
-              <button mat-stroked-button color="primary" (click)="toggle(bot)">
-                <mat-icon>{{ bot.enabled ? 'pause_circle' : 'play_circle' }}</mat-icon>
-                <span>{{ bot.enabled ? 'Desativar' : 'Ativar' }}</span>
-              </button>
+            <th mat-header-cell *matHeaderCellDef class="align-right">Acoes</th>
+            <td mat-cell *matCellDef="let bot" class="align-right">
+              <div class="action-row">
+                <a mat-stroked-button color="primary" [routerLink]="['/bots', bot.id, 'edit']">
+                  <mat-icon>edit</mat-icon>
+                  <span>Editar</span>
+                </a>
+                <button mat-stroked-button color="primary" type="button" (click)="toggle(bot)">
+                  <mat-icon>{{ bot.enabled ? 'pause_circle' : 'play_circle' }}</mat-icon>
+                  <span>{{ bot.enabled ? 'Desativar' : 'Ativar' }}</span>
+                </button>
+              </div>
             </td>
           </ng-container>
 
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
           <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
         </table>
-      </ng-template>
+      </div>
     </mat-card-content>
   </mat-card>
 </div>

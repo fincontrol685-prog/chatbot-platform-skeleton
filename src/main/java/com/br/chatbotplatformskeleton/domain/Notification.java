@@ -26,7 +26,7 @@ public class Notification {
     private String title;
 
     @Lob
-    @Column(name = "message")
+    @Column(name = "message", columnDefinition = "LONGTEXT")
     private String message;
 
     @Column(name = "related_entity_type")

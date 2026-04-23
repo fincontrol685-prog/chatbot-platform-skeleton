@@ -1,5 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
+import { timeout } from 'rxjs';
 import { MatCardModule } from '@angular/material/card';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIconModule } from '@angular/material/icon';
@@ -8,13 +10,31 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTableModule } from '@angular/material/table';
+import { RouterModule } from '@angular/router';
 import { DashboardService, DashboardStatsResponse } from './dashboard.service';
+import { getApiErrorMessage } from '../../core/api-error.util';
 
 export interface DashboardStats {
   botCount: number;
   activeConversationCount: number;
   totalMessageCount: number;
   userCount: number;
+}
+
+interface DashboardMetricCard {
+  label: string;
+  description: string;
+  icon: string;
+  tone: 'brand' | 'sky' | 'accent' | 'success';
+  route: string;
+  value: number;
+}
+
+interface QuickAction {
+  label: string;
+  description: string;
+  icon: string;
+  route: string;
 }
 
 @Component({
@@ -29,12 +49,41 @@ export interface DashboardStats {
     MatTabsModule,
     MatProgressBarModule,
     MatChipsModule,
-    MatTableModule
+    MatTableModule,
+    RouterModule
   ],
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.css']
+  styleUrls: ['./dashboard.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DashboardComponent implements OnInit {
+  readonly quickActions: QuickAction[] = [
+    {
+      label: 'Criar novo bot',
+      description: 'Cadastre um bot com chave e configuracao inicial.',
+      icon: 'add_circle',
+      route: '/bots/create'
+    },
+    {
+      label: 'Acompanhar conversas',
+      description: 'Acesse fluxos em andamento e abra novas interacoes.',
+      icon: 'forum',
+      route: '/conversations'
+    },
+    {
+      label: 'Abrir monitoramento',
+      description: 'Veja a saude dos bots e indicadores de desempenho.',
+      icon: 'monitoring',
+      route: '/analytics-advanced/dashboard'
+    },
+    {
+      label: 'Ver auditoria',
+      description: 'Consulte eventos sensiveis e trilha operacional.',
+      icon: 'history_edu',
+      route: '/audit-logs'
+    }
+  ];
+
   stats: DashboardStats = {
     botCount: 0,
     activeConversationCount: 0,
@@ -42,6 +91,10 @@ export class DashboardComponent implements OnInit {
     userCount: 0
   };
   loading = true;
+  error = '';
+  lastUpdated: Date | null = null;
+
+  private readonly destroyRef = inject(DestroyRef);
 
   constructor(
     private dashboardService: DashboardService
@@ -53,32 +106,90 @@ export class DashboardComponent implements OnInit {
 
   loadDashboardData(): void {
     this.loading = true;
-    this.dashboardService.getStats().subscribe({
-      next: (data: DashboardStatsResponse) => {
-        this.stats = {
-          botCount: data.botCount ?? 0,
-          activeConversationCount: data.activeConversationCount ?? 0,
-          totalMessageCount: data.totalMessageCount ?? 0,
-          userCount: data.userCount ?? 0
-        };
-        this.loading = false;
-      },
-      error: (err) => {
-        // eslint-disable-next-line no-console
-        console.error('Erro ao carregar estatísticas do dashboard', err);
-        this.loading = false;
-      }
-    });
+    this.error = '';
+    this.dashboardService.getStats()
+      .pipe(
+        timeout(8000),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: (data: DashboardStatsResponse) => {
+          this.stats = {
+            botCount: data.botCount ?? 0,
+            activeConversationCount: data.activeConversationCount ?? 0,
+            totalMessageCount: data.totalMessageCount ?? 0,
+            userCount: data.userCount ?? 0
+          };
+          this.lastUpdated = new Date();
+          this.loading = false;
+        },
+        error: (err) => {
+          // eslint-disable-next-line no-console
+          console.error('Erro ao carregar estatísticas do dashboard', err);
+          this.error = getApiErrorMessage(err, 'Nao foi possivel carregar as estatisticas do dashboard.');
+          this.loading = false;
+        }
+      });
   }
 
-  getStatColor(stat: string): string {
-    const colors: { [key: string]: string } = {
-      'bots': '#1976d2',
-      'conversations': '#388e3c',
-      'messages': '#d32f2f',
-      'users': '#f57c00'
-    };
-    return colors[stat] || '#1976d2';
+  get metricCards(): DashboardMetricCard[] {
+    return [
+      {
+        label: 'Bots',
+        description: 'Inventario ativo e disponivel para operacao.',
+        icon: 'smart_toy',
+        tone: 'brand',
+        route: '/bots',
+        value: this.stats.botCount
+      },
+      {
+        label: 'Conversas ativas',
+        description: 'Interacoes em andamento no momento.',
+        icon: 'forum',
+        tone: 'sky',
+        route: '/conversations',
+        value: this.stats.activeConversationCount
+      },
+      {
+        label: 'Mensagens',
+        description: 'Volume total processado pela plataforma.',
+        icon: 'chat',
+        tone: 'accent',
+        route: '/analytics-advanced/dashboard',
+        value: this.stats.totalMessageCount
+      },
+      {
+        label: 'Usuarios',
+        description: 'Operadores e stakeholders cadastrados.',
+        icon: 'groups',
+        tone: 'success',
+        route: '/professional/departments',
+        value: this.stats.userCount
+      }
+    ];
+  }
+
+  get averageMessagesPerConversation(): string {
+    if (this.stats.activeConversationCount === 0) {
+      return '0';
+    }
+
+    return (this.stats.totalMessageCount / this.stats.activeConversationCount).toFixed(1);
+  }
+
+  get activityHeadline(): string {
+    if (this.stats.botCount === 0) {
+      return 'Configure o primeiro bot para iniciar a operacao.';
+    }
+
+    if (this.stats.activeConversationCount === 0) {
+      return 'O ambiente esta pronto e sem conversas em andamento agora.';
+    }
+
+    return 'A operacao esta ativa e o monitoramento centralizado esta em dia.';
+  }
+
+  get lastUpdatedLabel(): string {
+    return this.lastUpdated ? this.lastUpdated.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '--:--';
   }
 }
-

@@ -18,6 +18,7 @@ public class Bot {
     private Boolean enabled = true;
 
     @Lob
+    @Column(name = "config", columnDefinition = "LONGTEXT")
     private String config;
 
     // getters and setters

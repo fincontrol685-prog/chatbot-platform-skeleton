@@ -2,6 +2,7 @@ package com.br.chatbotplatformskeleton.controller;
 
 import com.br.chatbotplatformskeleton.dto.BotDto;
 import com.br.chatbotplatformskeleton.service.BotService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +28,7 @@ public class BotController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN','GESTOR','USUARIO')")
-    public ResponseEntity<BotDto> create(@RequestBody BotDto dto) {
+    public ResponseEntity<BotDto> create(@Valid @RequestBody BotDto dto) {
         BotDto created = botService.create(dto);
         return ResponseEntity.created(URI.create("/api/bots/" + created.getId())).body(created);
     }
@@ -36,6 +37,12 @@ public class BotController {
     @PreAuthorize("hasAnyRole('ADMIN','GESTOR','USUARIO')")
     public ResponseEntity<BotDto> get(@PathVariable Long id) {
         return botService.findById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','GESTOR','USUARIO')")
+    public ResponseEntity<BotDto> update(@PathVariable Long id, @Valid @RequestBody BotDto dto) {
+        return botService.update(id, dto).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
     @PatchMapping("/{id}/activate")

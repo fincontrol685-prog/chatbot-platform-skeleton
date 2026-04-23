@@ -1,7 +1,12 @@
 package com.br.chatbotplatformskeleton.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class AuthRequest {
+    @NotBlank(message = "Usuario ou email e obrigatorio")
     private String username;
+
+    @NotBlank(message = "Senha e obrigatoria")
     private String password;
 
     public String getUsername() { return username; }

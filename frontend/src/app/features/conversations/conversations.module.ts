@@ -5,8 +5,22 @@ import { ConversationListComponent } from './conversation-list/conversation-list
 import { ConversationDetailComponent } from './conversation-detail/conversation-detail.component';
 
 const routes: Routes = [
-  { path: '', component: ConversationListComponent },
-  { path: ':id', component: ConversationDetailComponent }
+  {
+    path: '',
+    component: ConversationListComponent,
+    data: {
+      title: 'Central de conversas',
+      description: 'Supervisione interacoes em andamento e inicie novos atendimentos.'
+    }
+  },
+  {
+    path: ':id',
+    component: ConversationDetailComponent,
+    data: {
+      title: 'Conversa ativa',
+      description: 'Acompanhe mensagens, responda usuarios e conclua o atendimento.'
+    }
+  }
 ];
 
 @NgModule({
@@ -16,4 +30,3 @@ const routes: Routes = [
   ]
 })
 export class ConversationsModule { }
-

@@ -13,6 +13,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule } from '@angular/router';
+import { AuditLogService } from './audit-log.service';
+import { getApiErrorMessage } from '../../core/api-error.util';
 
 export interface AuditLog {
   id: number;
@@ -55,12 +57,17 @@ export class AuditLogsComponent implements OnInit {
   totalElements = 0;
   pageSize = 10;
   currentPage = 0;
+  loading = false;
+  error = '';
 
   filterAction = '';
   filterEntityType = '';
   filterStatus = '';
 
-  constructor(private route: ActivatedRoute) {}
+  constructor(
+    private route: ActivatedRoute,
+    private auditLogService: AuditLogService
+  ) {}
 
   ngOnInit(): void {
     // Placeholder for loading audit logs
@@ -68,11 +75,27 @@ export class AuditLogsComponent implements OnInit {
   }
 
   loadAuditLogs(): void {
-    // Call to AuditService when available
-    console.log('Loading audit logs with filters:', {
+    this.loading = true;
+    this.error = '';
+
+    this.auditLogService.list({
       action: this.filterAction,
       entityType: this.filterEntityType,
-      status: this.filterStatus
+      status: this.filterStatus,
+      page: this.currentPage,
+      size: this.pageSize
+    }).subscribe({
+      next: (response) => {
+        this.auditLogs = response.content ?? [];
+        this.totalElements = response.totalElements ?? 0;
+        this.loading = false;
+      },
+      error: (err) => {
+        this.auditLogs = [];
+        this.totalElements = 0;
+        this.error = getApiErrorMessage(err, 'Nao foi possivel carregar os logs de auditoria.');
+        this.loading = false;
+      }
     });
   }
 
@@ -83,12 +106,10 @@ export class AuditLogsComponent implements OnInit {
   }
 
   viewDetails(log: AuditLog): void {
-    // Show detailed change information
-    const oldValue = log.oldValue ? JSON.parse(log.oldValue) : null;
-    const newValue = log.newValue ? JSON.parse(log.newValue) : null;
+    const oldValue = this.parseJsonSafely(log.oldValue);
+    const newValue = this.parseJsonSafely(log.newValue);
     console.log('Old Value:', oldValue);
     console.log('New Value:', newValue);
-    // Show modal or side panel with details
   }
 
   getActionColor(action: string): string {
@@ -104,5 +125,16 @@ export class AuditLogsComponent implements OnInit {
   getStatusColor(status: string): string {
     return status === 'SUCCESS' ? 'accent' : 'warn';
   }
-}
 
+  private parseJsonSafely(value: string): unknown {
+    if (!value) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(value);
+    } catch {
+      return value;
+    }
+  }
+}

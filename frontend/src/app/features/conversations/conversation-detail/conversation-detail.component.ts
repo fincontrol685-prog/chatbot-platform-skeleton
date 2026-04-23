@@ -10,8 +10,10 @@ import { MatListModule } from '@angular/material/list';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ConversationService, Conversation, ConversationMessage } from '../conversation.service';
+import { getApiErrorMessage } from '../../../core/api-error.util';
 
 @Component({
   selector: 'app-conversation-detail',
@@ -29,6 +31,7 @@ import { ConversationService, Conversation, ConversationMessage } from '../conve
     MatProgressBarModule,
     MatChipsModule,
     MatDividerModule,
+    MatTooltipModule,
     RouterModule
   ],
   templateUrl: './conversation-detail.component.html',
@@ -41,7 +44,9 @@ export class ConversationDetailComponent implements OnInit {
   messages: ConversationMessage[] = [];
   messageForm: FormGroup;
   loading = false;
+  loadingConversation = true;
   conversationId: number = 0;
+  error = '';
 
   constructor(
     private conversationService: ConversationService,
@@ -56,7 +61,8 @@ export class ConversationDetailComponent implements OnInit {
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       if (params['id']) {
-        this.conversationId = params['id'];
+        this.conversationId = Number(params['id']);
+        this.error = '';
         this.loadConversation();
         this.loadMessages();
       }
@@ -64,17 +70,30 @@ export class ConversationDetailComponent implements OnInit {
   }
 
   loadConversation(): void {
+    this.loadingConversation = true;
     this.conversationService.getConversation(this.conversationId)
-      .subscribe(data => {
-        this.conversation = data;
+      .subscribe({
+        next: data => {
+          this.conversation = data;
+          this.loadingConversation = false;
+        },
+        error: err => {
+          this.error = getApiErrorMessage(err, 'Nao foi possivel abrir a conversa.');
+          this.loadingConversation = false;
+        }
       });
   }
 
   loadMessages(): void {
     this.conversationService.getConversationHistory(this.conversationId)
-      .subscribe(data => {
-        this.messages = data;
-        this.scrollToBottom();
+      .subscribe({
+        next: data => {
+          this.messages = data;
+          this.scrollToBottom();
+        },
+        error: err => {
+          this.error = getApiErrorMessage(err, 'Nao foi possivel carregar as mensagens da conversa.');
+        }
       });
   }
 
@@ -106,6 +125,7 @@ export class ConversationDetailComponent implements OnInit {
         },
         (error) => {
           console.error('Erro ao enviar mensagem:', error);
+          this.error = getApiErrorMessage(error, 'Nao foi possivel enviar a mensagem.');
           this.loading = false;
         }
       );
@@ -158,4 +178,3 @@ export class ConversationDetailComponent implements OnInit {
     return message.messageType === 'USER' ? 'user-message' : 'bot-message';
   }
 }
-

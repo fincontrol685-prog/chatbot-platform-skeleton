@@ -43,11 +43,13 @@ public class AnalyticsService {
 
         long totalConversations = conversationRepository.countByBotId(botId);
         long activeConversations = conversationRepository.countActiveByBotId(botId);
+        long totalMessages = messageRepository.countByBotId(botId);
         Double avgResponseTime = messageRepository.getAverageResponseTime(botId);
         Double avgSentimentScore = messageRepository.getAverageSentimentScore(botId);
 
         analytics.put("totalConversations", totalConversations);
         analytics.put("activeConversations", activeConversations);
+        analytics.put("totalMessages", totalMessages);
         analytics.put("averageResponseTime", avgResponseTime != null ? avgResponseTime : 0.0);
         analytics.put("averageSentimentScore", avgSentimentScore != null ? avgSentimentScore : 0.0);
 
@@ -80,4 +82,3 @@ public class AnalyticsService {
         return metrics;
     }
 }
-

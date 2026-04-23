@@ -1,0 +1,371 @@
+<div class="bot-create-page page-shell">
+  <section class="page-header">
+    <div>
+      <span class="page-header__eyebrow">{{ pageEyebrow }}</span>
+      <h1>{{ pageTitle }}</h1>
+      <p>{{ pageDescription }}</p>
+    </div>
+
+    <button mat-stroked-button type="button" routerLink="/bots">
+      <mat-icon>arrow_back</mat-icon>
+      <span>Voltar para bots</span>
+    </button>
+  </section>
+
+  <div *ngIf="loadingBot" class="loading-band">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  </div>
+
+  <div class="create-layout">
+    <form class="create-form" [formGroup]="form" (ngSubmit)="submit()">
+      <mat-card class="create-form-card">
+        <mat-card-content>
+          <div class="form-heading">
+            <span class="panel-label">Identidade do bot</span>
+            <h2>Base operacional</h2>
+            <p>Defina nome, chave tecnica e status de disponibilidade.</p>
+          </div>
+
+          <div formGroupName="identity" class="section-grid section-grid--identity">
+            <mat-form-field appearance="outline" class="field-span-2">
+              <mat-label>Nome do bot</mat-label>
+              <input matInput formControlName="name" placeholder="Ex: Atendimento Prime" />
+              <mat-error *ngIf="identityGroup.controls.name.hasError('required') && identityGroup.controls.name.touched">
+                Informe o nome do bot.
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Chave tecnica</mat-label>
+              <input matInput formControlName="key" placeholder="atendimento-prime" />
+              <mat-hint>Use letras, numeros, "_" ou "-".</mat-hint>
+              <mat-error *ngIf="identityGroup.controls.key.hasError('required') && identityGroup.controls.key.touched">
+                Informe a chave do bot.
+              </mat-error>
+              <mat-error *ngIf="identityGroup.controls.key.hasError('pattern') && identityGroup.controls.key.touched">
+                A chave aceita apenas letras, numeros, "_" ou "-".
+              </mat-error>
+            </mat-form-field>
+
+            <div class="toggle-card">
+              <span class="toggle-card__label">Disponibilidade</span>
+              <mat-slide-toggle color="primary" formControlName="enabled">
+                {{ identityGroup.controls.enabled.value ? 'Bot ativo' : 'Bot inativo' }}
+              </mat-slide-toggle>
+              <small>Use para tirar o bot de circulacao sem remover a configuracao.</small>
+            </div>
+          </div>
+
+          <div class="inline-actions">
+            <button mat-button color="primary" type="button" (click)="suggestKey()">
+              <mat-icon>auto_fix_high</mat-icon>
+              <span>Gerar chave a partir do nome</span>
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="create-form-card">
+        <mat-card-content>
+          <div class="form-heading">
+            <span class="panel-label">Perfil profissional</span>
+            <h2>Posicionamento do assistente</h2>
+            <p>Configure como o bot se apresenta, qual canal atende e qual estilo de resposta usa.</p>
+          </div>
+
+          <div formGroupName="profile" class="section-grid section-grid--profile">
+            <mat-form-field appearance="outline" class="field-span-2">
+              <mat-label>Papel do assistente</mat-label>
+              <input matInput formControlName="assistantRole" placeholder="Ex: Analista virtual de suporte" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Departamento</mat-label>
+              <input matInput formControlName="department" placeholder="Ex: Suporte premium" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Publico-alvo</mat-label>
+              <input matInput formControlName="targetAudience" placeholder="Ex: Clientes enterprise" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Idioma principal</mat-label>
+              <input matInput formControlName="language" placeholder="pt-BR" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Canal principal</mat-label>
+              <mat-select formControlName="primaryChannel">
+                <mat-option *ngFor="let option of channelOptions" [value]="option.value">
+                  {{ option.label }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Tom de atendimento</mat-label>
+              <mat-select formControlName="tone">
+                <mat-option *ngFor="let option of toneOptions" [value]="option.value">
+                  {{ option.label }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Profundidade da resposta</mat-label>
+              <mat-select formControlName="responseStyle">
+                <mat-option *ngFor="let option of responseStyleOptions" [value]="option.value">
+                  {{ option.label }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="create-form-card">
+        <mat-card-content>
+          <div class="form-heading">
+            <span class="panel-label">Mensagens</span>
+            <h2>Biblioteca de comunicacao</h2>
+            <p>Defina as mensagens principais para boas-vindas, fallback, transferencia e encerramento.</p>
+          </div>
+
+          <div formGroupName="messages" class="section-grid section-grid--messages">
+            <mat-form-field appearance="outline">
+              <mat-label>Mensagem de boas-vindas</mat-label>
+              <textarea matInput rows="5" formControlName="welcome"></textarea>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Mensagem de fallback</mat-label>
+              <textarea matInput rows="5" formControlName="fallback"></textarea>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Mensagem de transferencia</mat-label>
+              <textarea matInput rows="5" formControlName="escalation"></textarea>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Mensagem de encerramento</mat-label>
+              <textarea matInput rows="5" formControlName="closing"></textarea>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Mensagem fora do horario</mat-label>
+              <textarea matInput rows="5" formControlName="offline"></textarea>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Assinatura exibida</mat-label>
+              <input matInput formControlName="signature" placeholder="Ex: Central de suporte premium" />
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="create-form-card">
+        <mat-card-content>
+          <div class="form-heading">
+            <span class="panel-label">Politicas</span>
+            <h2>Regras de atendimento</h2>
+            <p>Controle horario, SLA e comportamentos padrao para deixar a operacao mais previsivel.</p>
+          </div>
+
+          <div formGroupName="guidelines" class="section-grid section-grid--guidelines">
+            <mat-form-field appearance="outline">
+              <mat-label>Horario de atendimento</mat-label>
+              <input matInput formControlName="businessHours" placeholder="Seg a Sex, 08:00 as 18:00" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>SLA inicial (minutos)</mat-label>
+              <input matInput type="number" min="0" max="1440" formControlName="firstResponseSlaMinutes" />
+            </mat-form-field>
+
+            <div class="toggle-grid field-span-2">
+              <div class="toggle-card">
+                <span class="toggle-card__label">Captura de lead</span>
+                <mat-slide-toggle color="primary" formControlName="collectLead">
+                  {{ guidelinesGroup.controls.collectLead.value ? 'Ativada' : 'Desativada' }}
+                </mat-slide-toggle>
+                <small>Solicita dados basicos do contato para continuidade comercial ou operacional.</small>
+              </div>
+
+              <div class="toggle-card">
+                <span class="toggle-card__label">Protocolo automatico</span>
+                <mat-slide-toggle color="primary" formControlName="requestProtocol">
+                  {{ guidelinesGroup.controls.requestProtocol.value ? 'Ativado' : 'Desativado' }}
+                </mat-slide-toggle>
+                <small>Gera ou solicita protocolo para facilitar rastreabilidade do atendimento.</small>
+              </div>
+
+              <div class="toggle-card">
+                <span class="toggle-card__label">Escalada de casos sensiveis</span>
+                <mat-slide-toggle color="primary" formControlName="escalateSensitiveCases">
+                  {{ guidelinesGroup.controls.escalateSensitiveCases.value ? 'Ativada' : 'Desativada' }}
+                </mat-slide-toggle>
+                <small>Prioriza transferencia para humano quando houver risco, reclamacao ou contexto critico.</small>
+              </div>
+
+              <div class="toggle-card">
+                <span class="toggle-card__label">Uso de emojis</span>
+                <mat-slide-toggle color="primary" formControlName="allowEmoji">
+                  {{ guidelinesGroup.controls.allowEmoji.value ? 'Permitido' : 'Bloqueado' }}
+                </mat-slide-toggle>
+                <small>Mantenha desligado para fluxos com linguagem mais corporativa e institucional.</small>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="create-form-card">
+        <mat-card-content>
+          <div class="form-heading">
+            <span class="panel-label">Conhecimento</span>
+            <h2>Escopo e restricoes</h2>
+            <p>Registre o que o bot pode atender, o que nao pode prometer e como medir uma boa resposta.</p>
+          </div>
+
+          <div formGroupName="knowledge" class="section-grid section-grid--knowledge">
+            <mat-form-field appearance="outline">
+              <mat-label>Escopo de atendimento</mat-label>
+              <textarea matInput rows="5" formControlName="scope"></textarea>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Restricoes e cuidados</mat-label>
+              <textarea matInput rows="5" formControlName="restrictions"></textarea>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="field-span-2">
+              <mat-label>Criterios de sucesso</mat-label>
+              <textarea matInput rows="4" formControlName="successCriteria"></textarea>
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="create-form-card">
+        <mat-card-content>
+          <div class="form-heading">
+            <span class="panel-label">Observacoes</span>
+            <h2>Notas adicionais</h2>
+            <p>Espaco livre para alinhamentos internos, contexto de rollout ou orientacoes especificas.</p>
+          </div>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Notas para o time</mat-label>
+            <textarea matInput rows="5" formControlName="notes"></textarea>
+          </mat-form-field>
+
+          <div *ngIf="error" class="form-error">
+            {{ error }}
+          </div>
+
+          <div class="form-actions">
+            <button mat-stroked-button type="button" routerLink="/bots">Cancelar</button>
+            <button mat-raised-button color="primary" type="submit" [disabled]="loading || loadingBot || form.invalid">
+              <mat-icon>{{ loading ? 'hourglass_top' : 'save' }}</mat-icon>
+              <span>{{ loading ? 'Salvando...' : submitLabel }}</span>
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </form>
+
+    <aside class="create-aside">
+      <mat-card>
+        <mat-card-content>
+          <div class="form-heading form-heading--compact">
+            <span class="panel-label">Presets</span>
+            <h2>Modelos prontos</h2>
+            <p>Aplique uma base profissional e ajuste apenas os pontos especificos da sua operacao.</p>
+          </div>
+
+          <div class="preset-list">
+            <button
+              mat-stroked-button
+              type="button"
+              class="preset-card"
+              *ngFor="let preset of presets"
+              (click)="applyPreset(preset.id)">
+              <div class="preset-card__header">
+                <strong>{{ preset.label }}</strong>
+                <span>{{ preset.badge }}</span>
+              </div>
+              <p>{{ preset.description }}</p>
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="preview-card">
+        <mat-card-content>
+          <div class="form-heading form-heading--compact">
+            <span class="panel-label">Preview</span>
+            <h2>Resumo executivo</h2>
+            <p>Visualizacao rapida do posicionamento e das mensagens principais do bot.</p>
+          </div>
+
+          <div class="preview-chip-row">
+            <mat-chip color="primary" selected>{{ previewSummary.primaryChannelLabel }}</mat-chip>
+            <mat-chip selected>{{ previewSummary.toneLabel }}</mat-chip>
+            <mat-chip selected>{{ previewSummary.responseStyleLabel }}</mat-chip>
+          </div>
+
+          <div class="preview-identity">
+            <strong>{{ profileGroup.controls.assistantRole.value || 'Assistente virtual' }}</strong>
+            <span>{{ profileGroup.controls.department.value || 'Departamento nao informado' }}</span>
+          </div>
+
+          <div class="conversation-preview">
+            <div class="message-bubble message-bubble--bot">
+              {{ previewConfig.messages.welcome }}
+            </div>
+            <div class="message-bubble message-bubble--meta">
+              {{ previewConfig.messages.escalation }}
+            </div>
+            <div class="message-bubble message-bubble--closing">
+              {{ previewConfig.messages.closing }}
+            </div>
+          </div>
+
+          <div class="preview-metadata">
+            <div>
+              <span>Horario</span>
+              <strong>{{ previewSummary.businessHours }}</strong>
+            </div>
+            <div>
+              <span>SLA</span>
+              <strong>{{ previewSummary.serviceLevel }}</strong>
+            </div>
+            <div>
+              <span>Assinatura</span>
+              <strong>{{ previewSummary.signature }}</strong>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card>
+        <mat-card-content>
+          <div class="form-heading form-heading--compact">
+            <span class="panel-label">Checklist</span>
+            <h2>Padrao profissional</h2>
+          </div>
+
+          <ul class="checklist">
+            <li>Padronize boas-vindas, fallback e encerramento para evitar respostas inconsistentes.</li>
+            <li>Defina horario e SLA para dar previsibilidade ao atendimento e ao time.</li>
+            <li>Documente restricoes para reduzir risco de promessas indevidas ou excecoes.</li>
+            <li>Use assinatura e departamento para reforcar ownership da operacao.</li>
+          </ul>
+        </mat-card-content>
+      </mat-card>
+    </aside>
+  </div>
+</div>

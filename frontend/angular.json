@@ -10,6 +10,7 @@
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
+          "defaultConfiguration": "production",
           "options": {
             "outputPath": "dist/frontend",
             "index": "src/index.html",
@@ -30,12 +31,22 @@
           "configurations": {
             "production": {
               "fileReplacements": [],
-              "optimization": true
+              "optimization": {
+                "scripts": true,
+                "styles": {
+                  "minify": true,
+                  "inlineCritical": true
+                },
+                "fonts": {
+                  "inline": false
+                }
+              }
             }
           }
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
+          "defaultConfiguration": "production",
           "options": {
             "browserTarget": "frontend:build"
           },

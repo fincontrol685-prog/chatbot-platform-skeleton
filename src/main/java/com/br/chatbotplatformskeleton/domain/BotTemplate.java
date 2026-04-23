@@ -21,7 +21,7 @@ public class BotTemplate {
     private String description;
 
     @Lob
-    @Column(name = "config", nullable = false)
+    @Column(name = "config", nullable = false, columnDefinition = "LONGTEXT")
     private String config; // JSON configuration
 
     @Column(name = "category")

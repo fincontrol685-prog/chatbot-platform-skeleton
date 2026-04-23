@@ -1,6 +1,11 @@
 package com.br.chatbotplatformskeleton.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+
 public class ForgotPasswordRequest {
+    @NotBlank(message = "Email e obrigatorio")
+    @Email(message = "Email invalido")
     private String email;
 
     public String getEmail() {
@@ -11,4 +16,3 @@ public class ForgotPasswordRequest {
         this.email = email;
     }
 }
-

@@ -7,10 +7,15 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+}
 
-  h1 {
-    margin: 0;
-  }
+.header h1 {
+  margin: 0;
+}
+
+.subtitle {
+  margin: 6px 0 0;
+  color: #64748b;
 }
 
 .full-width-table {
@@ -25,3 +30,67 @@ mat-chip {
   cursor: default;
 }
 
+.error-banner {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: #fff1f2;
+  color: #be123c;
+  border: 1px solid #fecdd3;
+}
+
+.bot-selector-card {
+  margin-top: 0;
+}
+
+.bot-selector-header h2 {
+  margin: 0 0 6px;
+}
+
+.bot-selector-header p {
+  margin: 0 0 16px;
+  color: #64748b;
+}
+
+.bot-selector-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.bot-option {
+  min-width: 220px;
+  min-height: 72px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  border-radius: 16px;
+}
+
+.bot-option--active {
+  border-color: #0f766e;
+  background: #f0fdfa;
+}
+
+.bot-option__name {
+  font-weight: 600;
+}
+
+.bot-option__key {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.empty-state {
+  padding: 24px 8px;
+  text-align: center;
+  color: #475569;
+}
+
+.empty-state p {
+  margin: 0 0 12px;
+}

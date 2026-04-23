@@ -1,14 +1,61 @@
 <div class="container">
   <div class="header">
-    <h1>Conversas</h1>
-    <button mat-raised-button color="primary" (click)="novaConversa()" [disabled]="!botId">
-      Nova Conversa
+    <div>
+      <h1>Conversas</h1>
+      <p class="subtitle" *ngIf="selectedBot">Bot em uso: <strong>{{ selectedBot.name }}</strong></p>
+    </div>
+    <button mat-raised-button color="primary" (click)="novaConversa()" [disabled]="!botId || creatingConversation">
+      {{ creatingConversation ? 'Criando...' : 'Nova Conversa' }}
     </button>
   </div>
 
+  <div *ngIf="error" class="error-banner">
+    <strong>Falha na operacao.</strong>
+    <span>{{ error }}</span>
+  </div>
+
+  <mat-card class="bot-selector-card">
+    <mat-card-content>
+      <div class="bot-selector-header">
+        <div>
+          <h2>Bots disponiveis</h2>
+          <p>Escolha um bot ativo para listar e iniciar conversas.</p>
+        </div>
+      </div>
+
+      <div *ngIf="loadingBots" class="empty-state">
+        <p>Carregando bots ativos...</p>
+      </div>
+
+      <div *ngIf="!loadingBots && bots.length === 0" class="empty-state">
+        <p>Nenhum bot ativo disponivel.</p>
+        <p>Ative um bot em Bots para iniciar conversas por aqui.</p>
+      </div>
+
+      <div *ngIf="!loadingBots && bots.length > 0" class="bot-selector-grid">
+        <button
+          *ngFor="let bot of bots"
+          mat-stroked-button
+          class="bot-option"
+          [class.bot-option--active]="bot.id === botId"
+          (click)="selectBot(bot.id)">
+          <span class="bot-option__name">{{ bot.name }}</span>
+          <span class="bot-option__key">{{ bot.key }}</span>
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
   <mat-card>
     <mat-card-content>
-      <table mat-table [dataSource]="conversations" class="full-width-table">
+      <div *ngIf="botId && conversations.length === 0" class="empty-state">
+        <p>Esse bot ainda nao tem conversas.</p>
+        <button mat-raised-button color="primary" (click)="novaConversa()" [disabled]="creatingConversation">
+          Criar primeira conversa
+        </button>
+      </div>
+
+      <table mat-table [dataSource]="conversations" class="full-width-table" *ngIf="conversations.length > 0">
         <!-- ID Column -->
         <ng-container matColumnDef="id">
           <th mat-header-cell *matHeaderCellDef>ID</th>
@@ -64,6 +111,7 @@
       </table>
 
       <mat-paginator
+        *ngIf="conversations.length > 0"
         [pageSizeOptions]="[5, 10, 20, 50]"
         [pageSize]="pageSize"
         [length]="totalElements"
@@ -72,4 +120,3 @@
     </mat-card-content>
   </mat-card>
 </div>
-

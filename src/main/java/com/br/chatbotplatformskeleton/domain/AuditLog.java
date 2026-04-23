@@ -28,13 +28,13 @@ public class AuditLog {
     @Column(name = "entity_id", nullable = false)
     private Long entityId;
 
-    @Lob
-    @Column(name = "old_value")
-    private String oldValue;
+     @Lob
+     @Column(name = "old_value", columnDefinition = "LONGTEXT")
+     private String oldValue;
 
-    @Lob
-    @Column(name = "new_value")
-    private String newValue;
+     @Lob
+     @Column(name = "new_value", columnDefinition = "LONGTEXT")
+     private String newValue;
 
     @Column(name = "ip_address")
     private String ipAddress;
@@ -43,7 +43,7 @@ public class AuditLog {
     private String status; // SUCCESS, FAILED
 
     @Lob
-    @Column(name = "error_message")
+    @Column(name = "error_message", columnDefinition = "LONGTEXT")
     private String errorMessage;
 
     @Column(name = "created_at", nullable = false, updatable = false)

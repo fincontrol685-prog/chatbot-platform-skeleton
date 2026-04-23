@@ -1,79 +1,108 @@
-<ng-container *ngIf="auth.isAuthenticated(); else publicLayout">
-  <mat-sidenav-container class="app-shell">
-    <mat-sidenav mode="side" opened class="app-sidenav">
-      <div class="sidenav-header">
-        <mat-icon class="sidenav-logo">smart_toy</mat-icon>
-        <div class="sidenav-title">Chatbot Platform</div>
-      </div>
+<ng-container *ngIf="session$ | async as session">
+  <ng-container *ngIf="session.isAuthenticated; else publicLayout">
+    <mat-sidenav-container class="shell-layout">
+      <mat-sidenav
+        #drawer
+        [mode]="isCompact ? 'over' : 'side'"
+        [opened]="drawerOpened"
+        class="shell-sidenav">
+        <div class="brand-panel">
+          <div class="brand-badge">Control Center</div>
+          <div class="brand-mark">
+            <div class="brand-icon">
+              <mat-icon>mode_comment</mat-icon>
+            </div>
+            <div>
+              <h1>Chatbot Platform</h1>
+              <p>Operacao, governanca e analytics em um unico workspace.</p>
+            </div>
+          </div>
+        </div>
 
-      <mat-nav-list>
-        <a mat-list-item routerLink="/dashboard" routerLinkActive="active">
-          <mat-icon matListIcon>dashboard</mat-icon>
-          <span matLine>Dashboard</span>
-        </a>
-        <a mat-list-item routerLink="/bots" routerLinkActive="active">
-          <mat-icon matListIcon>smart_toy</mat-icon>
-          <span matLine>Bots</span>
-        </a>
-        <a mat-list-item routerLink="/bots/create" routerLinkActive="active">
-          <mat-icon matListIcon>add_circle</mat-icon>
-          <span matLine>Criar Bot</span>
-        </a>
-        <a mat-list-item routerLink="/conversations" routerLinkActive="active">
-          <mat-icon matListIcon>chat</mat-icon>
-          <span matLine>Conversas</span>
-        </a>
+        <div class="identity-card">
+          <div class="identity-avatar">{{ session.initials }}</div>
+          <div class="identity-copy">
+            <strong>{{ session.displayName }}</strong>
+            <span>{{ session.username }}</span>
+          </div>
+        </div>
 
-        <!-- Novos Módulos -->
-        <mat-divider></mat-divider>
-        <mat-subheader>Funcionalidades Avançadas</mat-subheader>
+        <div class="nav-sections">
+          <section class="nav-section" *ngFor="let section of navigation">
+            <p class="nav-section-label">{{ section.label }}</p>
+            <div class="nav-links">
+              <a
+                class="nav-link"
+                *ngFor="let item of section.items"
+                [routerLink]="item.route"
+                routerLinkActive="is-active"
+                [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+                (click)="closeNavigation()">
+                <mat-icon class="nav-link-icon">{{ item.icon }}</mat-icon>
+                <div class="nav-link-copy">
+                  <span class="nav-link-label">{{ item.label }}</span>
+                  <span class="nav-link-caption">{{ item.caption }}</span>
+                </div>
+              </a>
+            </div>
+          </section>
+        </div>
 
-        <a mat-list-item routerLink="/professional" routerLinkActive="active">
-          <mat-icon matListIcon>business</mat-icon>
-          <span matLine>Gerenciamento Profissional</span>
-        </a>
-        <a mat-list-item routerLink="/compliance" routerLinkActive="active">
-          <mat-icon matListIcon>security</mat-icon>
-          <span matLine>Compliance & Segurança</span>
-        </a>
-        <a mat-list-item routerLink="/analytics-advanced" routerLinkActive="active">
-          <mat-icon matListIcon>analytics</mat-icon>
-          <span matLine>Analytics Avançado</span>
-        </a>
+        <div class="sidenav-footer">
+          <div class="status-pill">
+            <mat-icon>verified</mat-icon>
+            <span>Ambiente protegido</span>
+          </div>
+          <p>Workspace profissional para times de atendimento e produto.</p>
+          <small>&copy; {{ currentYear }} Chatbot Platform</small>
+        </div>
+      </mat-sidenav>
 
-        <mat-divider></mat-divider>
-        <a mat-list-item routerLink="/audit-logs" routerLinkActive="active">
-          <mat-icon matListIcon>history</mat-icon>
-          <span matLine>Audit Logs</span>
-        </a>
-      </mat-nav-list>
-    </mat-sidenav>
+      <mat-sidenav-content class="shell-content">
+        <mat-toolbar class="shell-toolbar">
+          <div class="toolbar-start">
+            <button
+              mat-icon-button
+              type="button"
+              class="toolbar-toggle"
+              *ngIf="isCompact"
+              (click)="toggleNavigation()"
+              aria-label="Abrir navegacao">
+              <mat-icon>menu</mat-icon>
+            </button>
+            <div class="toolbar-copy">
+              <span class="toolbar-eyebrow">Workspace ativo</span>
+              <div class="toolbar-title-row">
+                <h2>{{ pageTitle }}</h2>
+                <span class="toolbar-chip">Online</span>
+              </div>
+              <p>{{ pageDescription }}</p>
+            </div>
+          </div>
 
-    <mat-sidenav-content>
-      <mat-toolbar color="primary" class="app-toolbar">
-        <span class="toolbar-title">Chatbot Platform</span>
-        <span class="spacer"></span>
-        <button mat-button (click)="logout()">
-          <mat-icon>logout</mat-icon>
-          <span>Sair</span>
-        </button>
-      </mat-toolbar>
+          <div class="toolbar-actions">
+            <div class="toolbar-signal">
+              <mat-icon>shield</mat-icon>
+              <span>Seguranca monitorada</span>
+            </div>
 
-      <div class="app-content">
-        <router-outlet></router-outlet>
-      </div>
-    </mat-sidenav-content>
-  </mat-sidenav-container>
+            <button mat-stroked-button class="logout-button" type="button" (click)="logout()">
+              <mat-icon>logout</mat-icon>
+              <span>Sair</span>
+            </button>
+          </div>
+        </mat-toolbar>
+
+        <main class="shell-main">
+          <router-outlet></router-outlet>
+        </main>
+      </mat-sidenav-content>
+    </mat-sidenav-container>
+  </ng-container>
 </ng-container>
 
 <ng-template #publicLayout>
-  <mat-toolbar color="primary" class="public-toolbar">
-    <span class="toolbar-title">Chatbot Platform</span>
-    <span class="spacer"></span>
-    <a mat-button routerLink="/login">Login</a>
-  </mat-toolbar>
-  <div class="public-content">
+  <div class="public-layout">
     <router-outlet></router-outlet>
   </div>
 </ng-template>
-

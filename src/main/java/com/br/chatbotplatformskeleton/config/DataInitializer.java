@@ -4,6 +4,8 @@ import com.br.chatbotplatformskeleton.domain.Role;
 import com.br.chatbotplatformskeleton.domain.UserAccount;
 import com.br.chatbotplatformskeleton.repository.RoleRepository;
 import com.br.chatbotplatformskeleton.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -15,6 +17,8 @@ import java.util.Set;
  */
 @Component
 public class DataInitializer implements CommandLineRunner {
+
+    private static final Logger log = LoggerFactory.getLogger(DataInitializer.class);
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -28,53 +32,39 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // Create default admin user if it doesn't exist
-        if (userRepository.findByUsername("admin").isEmpty()) {
-            // Get or create ADMIN role
-            Role adminRole = roleRepository.findByName("ADMIN")
-                    .orElseGet(() -> {
-                        Role role = new Role();
-                        role.setName("ADMIN");
-                        role.setDescription("Administrador do sistema");
-                        return roleRepository.save(role);
-                    });
+        Role adminRole = ensureRole("ADMIN", "Administrador do sistema");
+        ensureRole("GESTOR", "Gestor");
+        Role userRole = ensureRole("USUARIO", "Usuario padrao");
 
-            // Create admin user
-            UserAccount adminUser = new UserAccount();
-            adminUser.setUsername("admin");
-            adminUser.setEmail("admin@chatbot.local");
-            adminUser.setPasswordHash(passwordEncoder.encode("admin123"));
-            adminUser.setEnabled(true);
-            adminUser.setRoles(Set.of(adminRole));
+        ensureUser("admin", "admin@chatbot.local", "admin123", adminRole);
+        ensureUser("user", "user@chatbot.local", "user12345", userRole);
 
-            userRepository.save(adminUser);
-            System.out.println("✓ Default admin user created: username=admin, password=admin123");
+        log.info("Application data initialized successfully");
+    }
+
+    private Role ensureRole(String name, String description) {
+        return roleRepository.findByName(name)
+            .orElseGet(() -> {
+                Role role = new Role();
+                role.setName(name);
+                role.setDescription(description);
+                return roleRepository.save(role);
+            });
+    }
+
+    private void ensureUser(String username, String email, String rawPassword, Role role) {
+        if (userRepository.findByUsernameIgnoreCase(username).isPresent()) {
+            return;
         }
 
-        // Create default test user if it doesn't exist
-        if (userRepository.findByUsername("user").isEmpty()) {
-            // Get or create USER role
-            Role userRole = roleRepository.findByName("USUARIO")
-                    .orElseGet(() -> {
-                        Role role = new Role();
-                        role.setName("USUARIO");
-                        role.setDescription("Usuário padrão");
-                        return roleRepository.save(role);
-                    });
+        UserAccount user = new UserAccount();
+        user.setUsername(username);
+        user.setEmail(email);
+        user.setPasswordHash(passwordEncoder.encode(rawPassword));
+        user.setEnabled(true);
+        user.setRoles(Set.of(role));
 
-            // Create test user
-            UserAccount testUser = new UserAccount();
-            testUser.setUsername("user");
-            testUser.setEmail("user@chatbot.local");
-            testUser.setPasswordHash(passwordEncoder.encode("user123"));
-            testUser.setEnabled(true);
-            testUser.setRoles(Set.of(userRole));
-
-            userRepository.save(testUser);
-            System.out.println("✓ Default test user created: username=user, password=user123");
-        }
-
-        System.out.println("✓ Application initialized successfully!");
+        userRepository.save(user);
+        log.info("Default user created: username={}", username);
     }
 }
-

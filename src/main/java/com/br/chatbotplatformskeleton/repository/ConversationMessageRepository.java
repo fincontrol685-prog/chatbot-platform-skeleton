@@ -23,6 +23,9 @@ public interface ConversationMessageRepository extends JpaRepository<Conversatio
     
     @Query("SELECT COUNT(m) FROM ConversationMessage m WHERE m.conversation.id = :conversationId")
     long countByConversationId(@Param("conversationId") Long conversationId);
+
+    @Query("SELECT COUNT(m) FROM ConversationMessage m WHERE m.conversation.bot.id = :botId")
+    long countByBotId(@Param("botId") Long botId);
     
     @Query("SELECT COUNT(m) FROM ConversationMessage m WHERE m.conversation.bot.id = :botId AND m.createdAt >= :startDate AND m.createdAt <= :endDate")
     long countMessagesByBotAndDateRange(@Param("botId") Long botId,
@@ -38,4 +41,3 @@ public interface ConversationMessageRepository extends JpaRepository<Conversatio
     @Query("SELECT AVG(m.sentimentScore) FROM ConversationMessage m WHERE m.conversation.bot.id = :botId")
     Double getAverageSentimentScore(@Param("botId") Long botId);
 }
-

@@ -1,101 +1,145 @@
-<div class="dashboard-container">
-  <div class="dashboard-header">
-    <h1>Dashboard</h1>
-    <button mat-raised-button color="primary" (click)="loadDashboardData()">
-      Atualizar
-    </button>
-  </div>
+<div class="dashboard-page page-shell">
+  <section class="dashboard-hero">
+    <div class="hero-copy">
+      <span class="page-header__eyebrow">Visao operacional</span>
+      <h1>{{ activityHeadline }}</h1>
+      <p>
+        Use este painel para acompanhar capacidade, engajamento e cobertura da operacao.
+        Os atalhos abaixo levam direto para os fluxos mais sensiveis do workspace.
+      </p>
 
-  <div *ngIf="loading" class="loading">
+      <div class="hero-actions">
+        <a mat-raised-button color="primary" routerLink="/bots/create">
+          <mat-icon>add_circle</mat-icon>
+          <span>Novo bot</span>
+        </a>
+
+        <a mat-stroked-button routerLink="/conversations">
+          <mat-icon>forum</mat-icon>
+          <span>Ver conversas</span>
+        </a>
+
+        <button mat-stroked-button type="button" (click)="loadDashboardData()" [disabled]="loading">
+          <mat-icon>refresh</mat-icon>
+          <span>Atualizar</span>
+        </button>
+      </div>
+    </div>
+
+    <mat-card class="hero-panel">
+      <mat-card-content>
+        <div class="hero-panel__row">
+          <span>Ultima atualizacao</span>
+          <strong>{{ lastUpdatedLabel }}</strong>
+        </div>
+        <div class="hero-panel__row">
+          <span>Mensagens por conversa ativa</span>
+          <strong>{{ averageMessagesPerConversation }}</strong>
+        </div>
+        <div class="hero-panel__divider"></div>
+        <div class="hero-panel__summary">
+          <article>
+            <span>Bots disponiveis</span>
+            <strong>{{ stats.botCount }}</strong>
+          </article>
+          <article>
+            <span>Usuarios mapeados</span>
+            <strong>{{ stats.userCount }}</strong>
+          </article>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </section>
+
+  <div *ngIf="loading" class="loading-band">
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
   </div>
 
-  <div *ngIf="!loading" class="stats-grid">
-    <!-- Total Bots Card -->
-    <mat-card class="stat-card">
-      <mat-card-content>
-        <div class="stat-icon" style="background-color: #1976d2;">
-          <mat-icon>smart_toy</mat-icon>
-        </div>
-        <div class="stat-info">
-          <h3>Total de Bots</h3>
-          <p class="stat-value">{{ stats.botCount }}</p>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Active Conversations Card -->
-    <mat-card class="stat-card">
-      <mat-card-content>
-        <div class="stat-icon" style="background-color: #388e3c;">
-          <mat-icon>chat_bubble</mat-icon>
-        </div>
-        <div class="stat-info">
-          <h3>Conversas Ativas</h3>
-          <p class="stat-value">{{ stats.activeConversationCount }}</p>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Total Messages Card -->
-    <mat-card class="stat-card">
-      <mat-card-content>
-        <div class="stat-icon" style="background-color: #d32f2f;">
-          <mat-icon>message</mat-icon>
-        </div>
-        <div class="stat-info">
-          <h3>Total de Mensagens</h3>
-          <p class="stat-value">{{ stats.totalMessageCount }}</p>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Total Users Card -->
-    <mat-card class="stat-card">
-      <mat-card-content>
-        <div class="stat-icon" style="background-color: #f57c00;">
-          <mat-icon>people</mat-icon>
-        </div>
-        <div class="stat-info">
-          <h3>Usuários</h3>
-          <p class="stat-value">{{ stats.userCount }}</p>
-        </div>
-      </mat-card-content>
-    </mat-card>
+  <div *ngIf="error" class="state-card state-card--error">
+    <strong>Falha ao carregar dados.</strong>
+    <p>{{ error }}</p>
   </div>
 
-  <div class="charts-section">
-    <mat-card>
-      <mat-card-header>
-        <mat-card-title>Atividade Recente</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <p>Gráficos de atividade, volume de mensagens e análise de sentimento.</p>
-        <p><strong>Próximas melhorias:</strong> Integração com Chart.js, ngx-charts ou Angular Material Data Visualization.</p>
-      </mat-card-content>
-    </mat-card>
-  </div>
+  <section *ngIf="!loading" class="metrics-grid">
+    <a
+      class="metric-card"
+      *ngFor="let card of metricCards"
+      [routerLink]="card.route"
+      [attr.data-tone]="card.tone">
+      <mat-card>
+        <mat-card-content>
+          <div class="metric-card__icon">
+            <mat-icon>{{ card.icon }}</mat-icon>
+          </div>
+          <div class="metric-card__copy">
+            <span>{{ card.label }}</span>
+            <strong>{{ card.value }}</strong>
+            <p>{{ card.description }}</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </a>
+  </section>
 
-  <div class="quick-actions">
-    <mat-card>
-      <mat-card-header>
-        <mat-card-title>Ações Rápidas</mat-card-title>
-      </mat-card-header>
+  <section class="dashboard-grid" *ngIf="!loading">
+    <mat-card class="dashboard-panel">
       <mat-card-content>
-        <button mat-stroked-button color="primary">
-          <mat-icon>add</mat-icon>
-          Criar Novo Bot
-        </button>
-        <button mat-stroked-button color="primary">
-          <mat-icon>chat_bubble</mat-icon>
-          Nova Conversa
-        </button>
-        <button mat-stroked-button color="primary">
-          <mat-icon>assessment</mat-icon>
-          Ver Relatórios
-        </button>
+        <div class="panel-heading">
+          <div>
+            <span class="panel-label">Sinal operacional</span>
+            <h2>Resumo do ambiente</h2>
+          </div>
+          <mat-chip color="primary" selected>Ativo</mat-chip>
+        </div>
+
+        <div class="insight-list">
+          <article>
+            <mat-icon>hub</mat-icon>
+            <div>
+              <strong>Capacidade distribuida</strong>
+              <p>{{ stats.botCount }} bots e {{ stats.userCount }} usuarios estao cadastrados no ambiente.</p>
+            </div>
+          </article>
+          <article>
+            <mat-icon>mark_chat_unread</mat-icon>
+            <div>
+              <strong>Atendimento monitorado</strong>
+              <p>{{ stats.activeConversationCount }} conversas estao ativas e {{ stats.totalMessageCount }} mensagens ja foram processadas.</p>
+            </div>
+          </article>
+          <article>
+            <mat-icon>manage_search</mat-icon>
+            <div>
+              <strong>Leituras recomendadas</strong>
+              <p>Use analytics e auditoria para verificar gargalos, risco operacional e rastreabilidade.</p>
+            </div>
+          </article>
+        </div>
       </mat-card-content>
     </mat-card>
-  </div>
+
+    <mat-card class="dashboard-panel">
+      <mat-card-content>
+        <div class="panel-heading">
+          <div>
+            <span class="panel-label">Acoes rapidas</span>
+            <h2>Movimentos frequentes</h2>
+          </div>
+        </div>
+
+        <div class="action-list">
+          <a class="action-link" *ngFor="let action of quickActions" [routerLink]="action.route">
+            <div class="action-link__icon">
+              <mat-icon>{{ action.icon }}</mat-icon>
+            </div>
+            <div class="action-link__copy">
+              <strong>{{ action.label }}</strong>
+              <p>{{ action.description }}</p>
+            </div>
+            <mat-icon class="action-link__arrow">north_east</mat-icon>
+          </a>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </section>
 </div>
-

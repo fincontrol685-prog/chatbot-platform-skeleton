@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../core/auth.service';
+import { getApiErrorMessage } from '../../../core/api-error.util';
 
 @Component({
   selector: 'app-reset-password',
@@ -22,7 +23,7 @@ export class ResetPasswordComponent implements OnInit {
     private auth: AuthService
   ) {
     this.form = this.fb.group({
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      password: ['', [Validators.required, Validators.minLength(8)]],
       confirmPassword: ['', Validators.required]
     });
   }
@@ -60,11 +61,10 @@ export class ResetPasswordComponent implements OnInit {
       },
       error: (err) => {
         this.loading = false;
-        this.error = err?.error?.message || 'Token inválido ou expirado.';
+        this.error = getApiErrorMessage(err, 'Token invalido ou expirado.');
         // eslint-disable-next-line no-console
         console.error('Reset password error:', err);
       }
     });
   }
 }
-

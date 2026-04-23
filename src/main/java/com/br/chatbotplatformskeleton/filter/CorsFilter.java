@@ -21,9 +21,9 @@ public class CorsFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String origin = request.getHeader("Origin");
-        
-        // Check if origin is allowed
-        if (origin != null && isOriginAllowed(origin)) {
+        boolean allowedOrigin = origin != null && isOriginAllowed(origin);
+
+        if (allowedOrigin) {
             response.setHeader("Access-Control-Allow-Origin", origin);
             response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD");
             response.setHeader("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization, X-Requested-With, X-CSRF-Token");
@@ -32,9 +32,8 @@ public class CorsFilter extends OncePerRequestFilter {
             response.setHeader("Access-Control-Expose-Headers", "Authorization, Content-Type");
         }
 
-        // Handle preflight request
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
-            response.setStatus(HttpServletResponse.SC_OK);
+            response.setStatus(allowedOrigin ? HttpServletResponse.SC_OK : HttpServletResponse.SC_FORBIDDEN);
             return;
         }
 
@@ -51,4 +50,3 @@ public class CorsFilter extends OncePerRequestFilter {
         return false;
     }
 }
-

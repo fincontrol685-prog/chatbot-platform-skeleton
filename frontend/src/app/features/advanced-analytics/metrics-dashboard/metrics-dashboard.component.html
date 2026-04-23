@@ -1,132 +1,153 @@
-<div class="container">
-  <h2>Dashboard de Métricas</h2>
+<div class="monitoring-page">
+  <section class="monitoring-hero">
+    <div>
+      <p class="page-kicker">Monitoramento</p>
+      <h1>Acompanhe a saude dos bots sem depender de filtros tecnicos.</h1>
+      <p>
+        Selecione um bot ativo para ver o volume de conversas, mensagens, tempo medio de resposta e sinal de sentimento.
+      </p>
+    </div>
 
-  <mat-alert *ngIf="error" type="error">{{ error }}</mat-alert>
+    <div class="hero-actions">
+      <a mat-stroked-button routerLink="/conversations">
+        <mat-icon>forum</mat-icon>
+        Ir para conversas
+      </a>
+      <a mat-stroked-button routerLink="/bots">
+        <mat-icon>smart_toy</mat-icon>
+        Ver bots
+      </a>
+      <button mat-raised-button color="primary" type="button" (click)="loadMonitoring()" [disabled]="!selectedBotId || loadingMetrics">
+        <mat-icon>refresh</mat-icon>
+        Atualizar
+      </button>
+    </div>
+  </section>
 
-  <mat-card class="filter-card">
-    <mat-card-header>
-      <mat-card-title>Filtros</mat-card-title>
-    </mat-card-header>
+  <mat-card class="selector-card">
     <mat-card-content>
-      <form [formGroup]="filterForm">
-        <div class="filter-row">
-          <mat-form-field appearance="outline">
-            <mat-label>Filtrar por</mat-label>
-            <mat-select formControlName="filterType">
-              <mat-option value="bot">Bot</mat-option>
-              <mat-option value="team">Equipe</mat-option>
-              <mat-option value="department">Departamento</mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>ID</mat-label>
-            <input matInput type="number" formControlName="filterId" />
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Data Inicial</mat-label>
-            <input matInput type="date" formControlName="startDate" />
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Data Final</mat-label>
-            <input matInput type="date" formControlName="endDate" />
-          </mat-form-field>
+      <div class="selector-row">
+        <div>
+          <h2>Bot monitorado</h2>
+          <p>Use apenas bots ativos para acompanhar a operacao em tempo real.</p>
         </div>
 
-        <div class="filter-actions">
-          <button mat-raised-button color="primary" (click)="loadMetrics()" [disabled]="loading">
-            <mat-icon>search</mat-icon> Buscar
-          </button>
-        </div>
-      </form>
-    </mat-card-content>
-  </mat-card>
-
-  <div *ngIf="loading" class="loading">
-    <mat-spinner diameter="40"></mat-spinner>
-  </div>
-
-  <!-- Metrics Table -->
-  <mat-card *ngIf="!loading && metrics.length > 0" class="metrics-card">
-    <mat-card-header>
-      <mat-card-title>Resultados ({{ metrics.length }} métricas)</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <div class="table-container">
-        <table mat-table [dataSource]="metrics" class="metrics-table">
-          <!-- Metric Type Column -->
-          <ng-container matColumnDef="metricType">
-            <th mat-header-cell *matHeaderCellDef>Tipo de Métrica</th>
-            <td mat-cell *matCellDef="let metric">
-              {{ getMetricLabel(metric.metricType) }}
-            </td>
-          </ng-container>
-
-          <!-- Metric Value Column -->
-          <ng-container matColumnDef="metricValue">
-            <th mat-header-cell *matHeaderCellDef>Valor</th>
-            <td mat-cell *matCellDef="let metric">
-              {{ metric.metricValue | number: '1.2-2' }}
-            </td>
-          </ng-container>
-
-          <!-- Bot ID Column -->
-          <ng-container matColumnDef="botId">
-            <th mat-header-cell *matHeaderCellDef>Bot ID</th>
-            <td mat-cell *matCellDef="let metric">
-              {{ metric.botId || '-' }}
-            </td>
-          </ng-container>
-
-          <!-- Team ID Column -->
-          <ng-container matColumnDef="teamId">
-            <th mat-header-cell *matHeaderCellDef>Equipe ID</th>
-            <td mat-cell *matCellDef="let metric">
-              {{ metric.teamId || '-' }}
-            </td>
-          </ng-container>
-
-          <!-- Period Date Column -->
-          <ng-container matColumnDef="periodDate">
-            <th mat-header-cell *matHeaderCellDef>Período</th>
-            <td mat-cell *matCellDef="let metric">
-              {{ metric.periodDate | date: 'dd/MM/yyyy' }}
-            </td>
-          </ng-container>
-
-          <tr mat-header-row *matHeaderRowDef="displayColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayColumns;"></tr>
-        </table>
+        <mat-form-field appearance="outline" class="selector-field" *ngIf="bots.length > 0">
+          <mat-label>Selecionar bot</mat-label>
+          <mat-select [value]="selectedBotId" (selectionChange)="onBotChange($event.value)">
+            <mat-option *ngFor="let bot of bots" [value]="bot.id">{{ bot.name }}</mat-option>
+          </mat-select>
+        </mat-form-field>
       </div>
 
-      <div class="export-actions">
-        <button mat-raised-button color="accent" (click)="exportToExcel()" [disabled]="loading">
-          <mat-icon>file_download</mat-icon> Exportar Excel
-        </button>
-        <button mat-raised-button color="accent" (click)="exportToCsv()" [disabled]="loading">
-          <mat-icon>file_download</mat-icon> Exportar CSV
-        </button>
+      <div *ngIf="loadingBots" class="empty-state">
+        <p>Carregando bots ativos para monitoramento...</p>
+      </div>
+
+      <div *ngIf="!loadingBots && bots.length === 0" class="empty-state">
+        <mat-icon>monitoring</mat-icon>
+        <p>Nenhum bot ativo disponivel para monitorar.</p>
+        <p>Ative um bot no catalogo para liberar esta area.</p>
       </div>
     </mat-card-content>
   </mat-card>
 
-  <!-- Charts Visualization -->
-  <mat-card *ngIf="!loading && metrics.length > 0" class="charts-card">
-    <mat-card-header>
-      <mat-card-title>Visualizações - Gráficos</mat-card-title>
-      <mat-card-subtitle>Análise visual das métricas coletadas</mat-card-subtitle>
-    </mat-card-header>
-    <mat-card-content>
-      <app-metrics-charts [metrics]="metrics" [chartType]="'line'"></app-metrics-charts>
-    </mat-card-content>
-  </mat-card>
-
-  <!-- Empty State -->
-  <div *ngIf="!loading && metrics.length === 0" class="empty-state">
-    <mat-icon>show_chart</mat-icon>
-    <p>Nenhuma métrica encontrada. Use os filtros acima para buscar dados.</p>
+  <div *ngIf="loadingMetrics" class="loading-band">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
   </div>
+
+  <div *ngIf="error" class="state-card state-card--error">
+    <strong>Falha ao carregar o monitoramento.</strong>
+    <p>{{ error }}</p>
+  </div>
+
+  <ng-container *ngIf="!loadingBots && selectedBot && botAnalytics">
+    <section class="metrics-grid">
+      <mat-card class="metric-card" *ngFor="let card of monitoringCards">
+        <mat-card-content>
+          <div class="metric-icon">
+            <mat-icon>{{ card.icon }}</mat-icon>
+          </div>
+          <div>
+            <span>{{ card.label }}</span>
+            <strong>{{ card.value }}</strong>
+            <p>{{ card.helper }}</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </section>
+
+    <section class="monitoring-grid">
+      <mat-card class="monitor-card">
+        <mat-card-content>
+          <div class="panel-heading">
+            <div>
+              <span class="panel-label">Bot selecionado</span>
+              <h2>{{ selectedBot.name }}</h2>
+            </div>
+            <mat-chip color="primary" selected>{{ selectedBot.key }}</mat-chip>
+          </div>
+
+          <div class="insight-list">
+            <article>
+              <mat-icon>insights</mat-icon>
+              <div>
+                <strong>Atividade do bot</strong>
+                <p>{{ botAnalytics.activeConversations }} conversas seguem ativas dentro de {{ botAnalytics.totalConversations }} interacoes registradas.</p>
+              </div>
+            </article>
+            <article>
+              <mat-icon>timer</mat-icon>
+              <div>
+                <strong>Tempo medio de resposta</strong>
+                <p>{{ botAnalytics.averageResponseTime | number: '1.0-0' }} ms de media para responder usuarios.</p>
+              </div>
+            </article>
+            <article>
+              <mat-icon>sentiment_satisfied</mat-icon>
+              <div>
+                <strong>Sinal de sentimento</strong>
+                <p>{{ sentimentLabel }} com score medio de {{ botAnalytics.averageSentimentScore | number: '1.2-2' }}.</p>
+              </div>
+            </article>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="monitor-card">
+        <mat-card-content>
+          <div class="panel-heading">
+            <div>
+              <span class="panel-label">Proximos passos</span>
+              <h2>Acoes recomendadas</h2>
+            </div>
+          </div>
+
+          <div class="action-list">
+            <a class="action-link" routerLink="/conversations">
+              <mat-icon>forum</mat-icon>
+              <div>
+                <strong>Abrir conversas</strong>
+                <p>Entre na fila operacional para acompanhar e iniciar atendimentos.</p>
+              </div>
+            </a>
+            <a class="action-link" routerLink="/audit-logs">
+              <mat-icon>history_edu</mat-icon>
+              <div>
+                <strong>Revisar trilha de auditoria</strong>
+                <p>Investigue eventos criticos e alteracoes recentes do ambiente.</p>
+              </div>
+            </a>
+            <a class="action-link" routerLink="/bots">
+              <mat-icon>settings_suggest</mat-icon>
+              <div>
+                <strong>Ajustar bot</strong>
+                <p>Volte ao catalogo para revisar status, chave e configuracao.</p>
+              </div>
+            </a>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </section>
+  </ng-container>
 </div>
-

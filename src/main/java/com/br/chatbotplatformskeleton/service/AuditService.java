@@ -69,6 +69,26 @@ public class AuditService {
         return auditLogRepository.findByUserId(userId, pageable).map(this::toDto);
     }
 
+    public Page<AuditLogDto> search(String action, String entityType, String status, Pageable pageable) {
+        if (action != null && !action.isBlank()) {
+            return auditLogRepository.findByAction(action, pageable).map(this::toDto);
+        }
+
+        if (entityType != null && !entityType.isBlank()) {
+            return auditLogRepository.findByEntityType(entityType, pageable).map(this::toDto);
+        }
+
+        if (status != null && !status.isBlank()) {
+            if ("FAILED".equalsIgnoreCase(status)) {
+                return auditLogRepository.findFailedAuditLogs(pageable).map(this::toDto);
+            }
+
+            return auditLogRepository.findByStatus(status, pageable).map(this::toDto);
+        }
+
+        return auditLogRepository.findAllByOrderByCreatedAtDesc(pageable).map(this::toDto);
+    }
+
     public Page<AuditLogDto> findByEntityType(String entityType, Pageable pageable) {
         return auditLogRepository.findByEntityType(entityType, pageable).map(this::toDto);
     }
@@ -122,4 +142,3 @@ public class AuditService {
         return dto;
     }
 }
-

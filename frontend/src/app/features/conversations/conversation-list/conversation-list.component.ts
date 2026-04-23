@@ -9,6 +9,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { Router, RouterModule } from '@angular/router';
 import { ConversationService, Conversation } from '../conversation.service';
 import { BotService, BotDto } from '../../bots/bot.service';
+import { getApiErrorMessage } from '../../../core/api-error.util';
 
 @Component({
   selector: 'app-conversation-list',
@@ -34,6 +35,9 @@ export class ConversationListComponent implements OnInit {
   currentPage = 0;
   botId = 0;
   bots: BotDto[] = [];
+  loadingBots = false;
+  creatingConversation = false;
+  error = '';
 
   constructor(
     private conversationService: ConversationService,
@@ -42,16 +46,29 @@ export class ConversationListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.loadingBots = true;
     this.botService.list().subscribe({
       next: bots => {
-        this.bots = bots;
+        this.bots = bots.filter(bot => bot.enabled);
         if (this.bots.length > 0) {
           this.botId = this.bots[0].id;
           this.loadConversations();
+        } else {
+          this.conversations = [];
+          this.totalElements = 0;
         }
+        this.loadingBots = false;
       },
-      error: err => console.error('Erro ao carregar bots para conversas', err)
+      error: err => {
+        console.error('Erro ao carregar bots para conversas', err);
+        this.error = getApiErrorMessage(err, 'Nao foi possivel carregar os bots ativos.');
+        this.loadingBots = false;
+      }
     });
+  }
+
+  get selectedBot(): BotDto | undefined {
+    return this.bots.find(bot => bot.id === this.botId);
   }
 
   loadConversations(): void {
@@ -62,10 +79,27 @@ export class ConversationListComponent implements OnInit {
     }
 
     this.conversationService.listByBot(this.botId, this.currentPage, this.pageSize)
-      .subscribe(data => {
-        this.conversations = data.content;
-        this.totalElements = data.totalElements;
+      .subscribe({
+        next: data => {
+          this.conversations = data.content;
+          this.totalElements = data.totalElements;
+        },
+        error: err => {
+          this.error = getApiErrorMessage(err, 'Nao foi possivel carregar as conversas do bot selecionado.');
+          this.conversations = [];
+          this.totalElements = 0;
+        }
       });
+  }
+
+  selectBot(botId: number): void {
+    if (this.botId === botId) {
+      return;
+    }
+
+    this.botId = botId;
+    this.currentPage = 0;
+    this.loadConversations();
   }
 
   onPageChange(event: PageEvent): void {
@@ -75,22 +109,38 @@ export class ConversationListComponent implements OnInit {
   }
 
   novaConversa(): void {
-    if (!this.botId) {
+    if (!this.botId || this.creatingConversation) {
       return;
     }
+
+    this.creatingConversation = true;
+    this.error = '';
+
     const nova: Conversation = {
       id: 0,
       botId: this.botId,
       userId: 0,
-      title: '',
+      title: this.selectedBot ? `Conversa com ${this.selectedBot.name}` : '',
       status: 'ACTIVE',
       messageCount: 0,
       createdAt: '',
       updatedAt: ''
     };
     this.conversationService.createConversation(nova).subscribe({
-      next: conv => this.router.navigate(['/conversations', conv.id]),
-      error: err => console.error('Erro ao criar conversa', err)
+      next: conv => {
+        this.creatingConversation = false;
+        if (!conv?.id) {
+          this.error = 'A conversa foi criada, mas nao retornou um identificador valido.';
+          this.loadConversations();
+          return;
+        }
+        void this.router.navigate(['/conversations', conv.id]);
+      },
+      error: err => {
+        console.error('Erro ao criar conversa', err);
+        this.error = getApiErrorMessage(err, 'Nao foi possivel criar a conversa.');
+        this.creatingConversation = false;
+      }
     });
   }
 
@@ -113,4 +163,3 @@ export class ConversationListComponent implements OnInit {
     }
   }
 }
-

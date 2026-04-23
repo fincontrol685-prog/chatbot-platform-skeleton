@@ -1,3 +1,12 @@
+<div *ngIf="loadingConversation" class="page-loading">
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+</div>
+
+<div *ngIf="error" class="error-banner">
+  <strong>Falha ao abrir a conversa.</strong>
+  <span>{{ error }}</span>
+</div>
+
 <div class="conversation-container" *ngIf="conversation">
   <div class="conversation-header">
     <div>
@@ -8,7 +17,7 @@
     </div>
     <div class="header-actions">
       <span class="message-count">{{ messages.length }} mensagens</span>
-      <button mat-icon-button [routerLink]="['/bots', conversation.botId, 'conversations']">
+      <button mat-icon-button [routerLink]="['/conversations']">
         <mat-icon>arrow_back</mat-icon>
       </button>
       <button mat-icon-button color="warn"
@@ -70,3 +79,6 @@
   </mat-card>
 </div>
 
+<div *ngIf="!loadingConversation && !conversation && !error" class="empty-state">
+  <p>Conversa nao encontrada.</p>
+</div>

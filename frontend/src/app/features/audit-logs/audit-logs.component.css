@@ -7,18 +7,18 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+}
 
-  h1 {
-    margin: 0;
-  }
+.header h1 {
+  margin: 0;
 }
 
 .filters-card {
   margin-bottom: 20px;
+}
 
-  mat-card-content {
-    padding: 16px;
-  }
+.filters-card mat-card-content {
+  padding: 16px;
 }
 
 .filters-grid {
@@ -27,29 +27,33 @@
   gap: 16px;
 }
 
-.logs-card {
-  mat-card-content {
-    padding: 0;
-  }
+.logs-card mat-card-content {
+  padding: 0;
+}
+
+.loading-state {
+  padding: 24px;
+  text-align: center;
+  color: #64748b;
 }
 
 .full-width-table {
   width: 100%;
   border-collapse: collapse;
+}
 
-  th {
-    background-color: #f5f5f5;
-    font-weight: 600;
-  }
+.full-width-table th {
+  background-color: #f5f5f5;
+  font-weight: 600;
+}
 
-  td {
-    padding: 12px;
-    border-bottom: 1px solid #ddd;
-  }
+.full-width-table td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+}
 
-  tr:hover {
-    background-color: #fafafa;
-  }
+.full-width-table tr:hover {
+  background-color: #fafafa;
 }
 
 mat-chip {
@@ -65,3 +69,6 @@ button {
   margin-right: 8px;
 }
 
+.state-card p {
+  margin: 8px 0 0;
+}

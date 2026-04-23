@@ -1,7 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DashboardComponent } from './dashboard.component';
-import { MaterialModule } from '../../material.module';
-import { RouterModule } from '@angular/router';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { of } from 'rxjs';
+import { DashboardService } from './dashboard.service';
+import { RouterTestingModule } from '@angular/router/testing';
+
+class DashboardServiceStub {
+  getStats() {
+    return of({
+      botCount: 0,
+      activeConversationCount: 0,
+      totalMessageCount: 0,
+      userCount: 0
+    });
+  }
+}
 
 describe('DashboardComponent', () => {
   let component: DashboardComponent;
@@ -9,8 +22,8 @@ describe('DashboardComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [DashboardComponent],
-      imports: [MaterialModule, RouterModule]
+      imports: [DashboardComponent, NoopAnimationsModule, RouterTestingModule],
+      providers: [{ provide: DashboardService, useClass: DashboardServiceStub }]
     }).compileComponents();
 
     fixture = TestBed.createComponent(DashboardComponent);
@@ -22,4 +35,3 @@ describe('DashboardComponent', () => {
     expect(component).toBeTruthy();
   });
 });
-

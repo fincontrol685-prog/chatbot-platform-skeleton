@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/auth.service';
+import { getApiErrorMessage } from '../../../core/api-error.util';
 
 @Component({
   selector: 'app-register',
@@ -22,7 +23,7 @@ export class RegisterComponent {
     this.form = this.fb.group({
       username: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      password: ['', [Validators.required, Validators.minLength(8)]],
       confirmPassword: ['', Validators.required]
     });
   }
@@ -44,15 +45,14 @@ export class RegisterComponent {
       next: () => {
         this.loading = false;
         this.success = 'Conta criada com sucesso! Redirecionando...';
-        setTimeout(() => this.router.navigate(['/bots']), 1000);
+        setTimeout(() => void this.router.navigate(['/dashboard']), 1000);
       },
       error: (err) => {
         this.loading = false;
-        this.error = err?.error?.message || 'Falha ao criar conta. Tente novamente.';
+        this.error = getApiErrorMessage(err, 'Falha ao criar conta. Tente novamente.');
         // eslint-disable-next-line no-console
         console.error('Register error:', err);
       }
     });
   }
 }
-

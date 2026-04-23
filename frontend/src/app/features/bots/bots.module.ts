@@ -11,7 +11,8 @@ import { MaterialModule } from '../../material.module';
   declarations: [BotListComponent, BotCreateComponent],
   imports: [CommonModule, FormsModule, ReactiveFormsModule, MaterialModule, RouterModule.forChild([
     { path: '', component: BotListComponent },
-    { path: 'create', component: BotCreateComponent }
+    { path: 'create', component: BotCreateComponent },
+    { path: ':id/edit', component: BotCreateComponent }
   ])]
 })
 export class BotsModule { }

@@ -20,6 +20,16 @@ public class AuditLogController {
         this.auditService = auditService;
     }
 
+    @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN','GESTOR')")
+    public ResponseEntity<Page<AuditLogDto>> listAuditLogs(
+            @RequestParam(required = false) String action,
+            @RequestParam(required = false) String entityType,
+            @RequestParam(required = false) String status,
+            Pageable pageable) {
+        return ResponseEntity.ok(auditService.search(action, entityType, status, pageable));
+    }
+
     @GetMapping("/user/{userId}")
     @PreAuthorize("hasAnyRole('ADMIN','GESTOR')")
     public ResponseEntity<Page<AuditLogDto>> getAuditLogsByUser(@PathVariable Long userId, Pageable pageable) {
@@ -52,4 +62,3 @@ public class AuditLogController {
         return ResponseEntity.ok(auditService.getAuditTrailForEntity(entityType, entityId));
     }
 }
-

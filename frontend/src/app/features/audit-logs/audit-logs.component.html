@@ -46,7 +46,21 @@
 
   <mat-card class="logs-card">
     <mat-card-content>
-      <table mat-table [dataSource]="auditLogs" class="full-width-table">
+      <div *ngIf="error" class="state-card state-card--error">
+        <strong>Falha ao carregar auditoria.</strong>
+        <p>{{ error }}</p>
+      </div>
+
+      <div *ngIf="loading" class="loading-state">
+        <p>Carregando logs...</p>
+      </div>
+
+      <div *ngIf="!loading && auditLogs.length === 0" class="state-card state-card--empty">
+        <strong>Nenhum log encontrado.</strong>
+        <p>Ajuste os filtros ou gere novas operacoes no sistema para visualizar eventos.</p>
+      </div>
+
+      <table mat-table [dataSource]="auditLogs" class="full-width-table" *ngIf="!loading && auditLogs.length > 0">
         <!-- ID Column -->
         <ng-container matColumnDef="id">
           <th mat-header-cell *matHeaderCellDef>ID</th>
@@ -114,6 +128,7 @@
       </table>
 
       <mat-paginator
+        *ngIf="!loading && auditLogs.length > 0"
         [pageSizeOptions]="[5, 10, 20, 50]"
         [pageSize]="pageSize"
         [length]="totalElements"
@@ -122,4 +137,3 @@
     </mat-card-content>
   </mat-card>
 </div>
-
