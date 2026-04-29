@@ -93,6 +93,8 @@ export class DashboardComponent implements OnInit {
   loading = true;
   error = '';
   lastUpdated: Date | null = null;
+  retryCount = 0;
+  maxRetries = 3;
 
   private readonly destroyRef = inject(DestroyRef);
 
@@ -107,6 +109,11 @@ export class DashboardComponent implements OnInit {
   loadDashboardData(): void {
     this.loading = true;
     this.error = '';
+    this.retryCount = 0;
+    this.attemptLoad();
+  }
+
+  private attemptLoad(): void {
     this.dashboardService.getStats()
       .pipe(
         timeout(8000),
@@ -122,10 +129,19 @@ export class DashboardComponent implements OnInit {
           };
           this.lastUpdated = new Date();
           this.loading = false;
+          this.error = '';
         },
         error: (err) => {
-          // eslint-disable-next-line no-console
           console.error('Erro ao carregar estatísticas do dashboard', err);
+
+          // Se for 401 e ainda não tentou retry
+          if (err?.status === 401 && this.retryCount < this.maxRetries) {
+            this.retryCount++;
+            console.log(`Tentativa ${this.retryCount}/${this.maxRetries} de carregar dados...`);
+            setTimeout(() => this.attemptLoad(), 1000 * this.retryCount);
+            return;
+          }
+
           this.error = getApiErrorMessage(err, 'Nao foi possivel carregar as estatisticas do dashboard.');
           this.loading = false;
         }

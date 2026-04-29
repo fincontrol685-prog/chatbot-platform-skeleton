@@ -23,6 +23,7 @@ public class AnalyticsController {
         return ResponseEntity.ok(analyticsService.getDashboardStats());
     }
 
+
     @GetMapping("/bots/{botId}")
     @PreAuthorize("hasAnyRole('ADMIN','GESTOR','USUARIO')")
     public ResponseEntity<Map<String, Object>> getBotAnalytics(@PathVariable Long botId) {
