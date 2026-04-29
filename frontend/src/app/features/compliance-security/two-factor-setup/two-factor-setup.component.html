@@ -1,8 +1,8 @@
 <div class="container">
   <h2>Autenticação em Duas Etapas (2FA)</h2>
 
-  <mat-alert *ngIf="error" type="error">{{ error }}</mat-alert>
-  <mat-alert *ngIf="success" type="success">{{ success }}</mat-alert>
+  <div *ngIf="error" class="state-card state-card--error">{{ error }}</div>
+  <div *ngIf="success" class="state-card state-card--success">{{ success }}</div>
 
   <!-- Status View -->
   <div *ngIf="setupStep === 'status'" class="status-section">
@@ -131,4 +131,3 @@
     </mat-card>
   </div>
 </div>
-

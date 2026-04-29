@@ -61,7 +61,7 @@
     Compartilhar relatório (permitir que outros visualizem)
   </mat-checkbox>
 
-  <mat-alert *ngIf="error" type="error">{{ error }}</mat-alert>
+  <div *ngIf="error" class="state-card state-card--error">{{ error }}</div>
 
   <div class="form-actions">
     <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || loading">
@@ -72,4 +72,3 @@
     <button mat-button type="button" (click)="cancel()">Cancelar</button>
   </div>
 </form>
-

@@ -76,7 +76,7 @@ public class BotService {
     private void applyChanges(Bot bot, BotDto dto, String normalizedName, String normalizedKey) {
         bot.setName(normalizedName);
         bot.setKey(normalizedKey);
-        bot.setEnabled(dto.getEnabled() == null ? true : dto.getEnabled());
+        bot.setEnabled(dto.getEnabled() == null || dto.getEnabled());
         bot.setConfig(normalizeConfig(dto.getConfig()));
     }
 

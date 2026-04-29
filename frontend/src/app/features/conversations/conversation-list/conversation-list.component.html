@@ -1,41 +1,74 @@
-<div class="container">
-  <div class="header">
+<div class="conversations-page page-shell">
+  <section class="page-header">
     <div>
-      <h1>Conversas</h1>
-      <p class="subtitle" *ngIf="selectedBot">Bot em uso: <strong>{{ selectedBot.name }}</strong></p>
+      <span class="page-header__eyebrow">Supervisao de atendimento</span>
+      <h1>Central de conversas</h1>
+      <p>
+        Selecione um bot, acompanhe o volume recente e abra novos atendimentos com o mesmo contexto operacional usado pelo bot.
+      </p>
     </div>
-    <button mat-raised-button color="primary" (click)="novaConversa()" [disabled]="!botId || creatingConversation">
-      {{ creatingConversation ? 'Criando...' : 'Nova Conversa' }}
+
+    <button mat-raised-button color="primary" type="button" (click)="novaConversa()" [disabled]="!botId || creatingConversation">
+      <mat-icon>{{ creatingConversation ? 'hourglass_top' : 'add_comment' }}</mat-icon>
+      <span>{{ creatingConversation ? 'Criando...' : 'Nova conversa' }}</span>
     </button>
-  </div>
+  </section>
 
-  <div *ngIf="error" class="error-banner">
+  <div *ngIf="error" class="state-card state-card--error">
     <strong>Falha na operacao.</strong>
-    <span>{{ error }}</span>
+    <p>{{ error }}</p>
   </div>
 
-  <mat-card class="bot-selector-card">
+  <section class="summary-grid">
+    <mat-card class="summary-card">
+      <mat-card-content>
+        <span>Bot selecionado</span>
+        <strong>{{ selectedBot?.name || '--' }}</strong>
+      </mat-card-content>
+    </mat-card>
+    <mat-card class="summary-card">
+      <mat-card-content>
+        <span>Conversas exibidas</span>
+        <strong>{{ conversations.length }}</strong>
+      </mat-card-content>
+    </mat-card>
+    <mat-card class="summary-card">
+      <mat-card-content>
+        <span>Ativas</span>
+        <strong>{{ activeConversations }}</strong>
+      </mat-card-content>
+    </mat-card>
+    <mat-card class="summary-card">
+      <mat-card-content>
+        <span>Media de mensagens</span>
+        <strong>{{ averageMessagesPerConversation }}</strong>
+      </mat-card-content>
+    </mat-card>
+  </section>
+
+  <mat-card class="selector-panel">
     <mat-card-content>
-      <div class="bot-selector-header">
+      <div class="panel-heading">
         <div>
-          <h2>Bots disponiveis</h2>
-          <p>Escolha um bot ativo para listar e iniciar conversas.</p>
+          <span class="panel-label">Selecao operacional</span>
+          <h2>Bots ativos</h2>
         </div>
       </div>
 
-      <div *ngIf="loadingBots" class="empty-state">
-        <p>Carregando bots ativos...</p>
+      <div *ngIf="loadingBots" class="loading-band">
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
       </div>
 
-      <div *ngIf="!loadingBots && bots.length === 0" class="empty-state">
-        <p>Nenhum bot ativo disponivel.</p>
-        <p>Ative um bot em Bots para iniciar conversas por aqui.</p>
+      <div *ngIf="!loadingBots && bots.length === 0" class="state-card state-card--empty">
+        <strong>Nenhum bot ativo disponivel.</strong>
+        <p>Ative um bot em Gestao de bots para iniciar conversas por aqui.</p>
       </div>
 
       <div *ngIf="!loadingBots && bots.length > 0" class="bot-selector-grid">
         <button
           *ngFor="let bot of bots"
           mat-stroked-button
+          type="button"
           class="bot-option"
           [class.bot-option--active]="bot.id === botId"
           (click)="selectBot(bot.id)">
@@ -43,72 +76,99 @@
           <span class="bot-option__key">{{ bot.key }}</span>
         </button>
       </div>
+
+      <div class="bot-summary" *ngIf="selectedBotSummary">
+        <div class="pill-row">
+          <span class="soft-pill">{{ selectedBotSummary.primaryChannelLabel }}</span>
+          <span class="soft-pill">{{ selectedBotSummary.toneLabel }}</span>
+          <span class="soft-pill">{{ selectedBotSummary.responseStyleLabel }}</span>
+        </div>
+        <strong>{{ selectedBotSummary.role }}</strong>
+        <p>{{ selectedBotSummary.department }} · {{ selectedBotSummary.businessHours }}</p>
+      </div>
     </mat-card-content>
   </mat-card>
 
-  <mat-card>
+  <div *ngIf="loadingConversations" class="loading-band">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  </div>
+
+  <mat-card class="table-panel">
     <mat-card-content>
-      <div *ngIf="botId && conversations.length === 0" class="empty-state">
-        <p>Esse bot ainda nao tem conversas.</p>
-        <button mat-raised-button color="primary" (click)="novaConversa()" [disabled]="creatingConversation">
+      <div class="panel-heading">
+        <div>
+          <span class="panel-label">Fila recente</span>
+          <h2>Conversas do bot</h2>
+        </div>
+        <span class="panel-caption">{{ totalElements }} registro(s) no total</span>
+      </div>
+
+      <div *ngIf="botId && !loadingConversations && conversations.length === 0" class="state-card state-card--empty">
+        <strong>Esse bot ainda nao tem conversas.</strong>
+        <p>Crie o primeiro atendimento para iniciar o historico operacional.</p>
+        <button mat-raised-button color="primary" type="button" (click)="novaConversa()" [disabled]="creatingConversation">
           Criar primeira conversa
         </button>
       </div>
 
-      <table mat-table [dataSource]="conversations" class="full-width-table" *ngIf="conversations.length > 0">
-        <!-- ID Column -->
-        <ng-container matColumnDef="id">
-          <th mat-header-cell *matHeaderCellDef>ID</th>
-          <td mat-cell *matCellDef="let element">{{ element.id }}</td>
-        </ng-container>
+      <div class="table-wrapper" *ngIf="conversations.length > 0">
+        <table mat-table [dataSource]="conversations" class="conversations-table">
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef>ID</th>
+            <td mat-cell *matCellDef="let element">#{{ element.id }}</td>
+          </ng-container>
 
-        <!-- Title Column -->
-        <ng-container matColumnDef="title">
-          <th mat-header-cell *matHeaderCellDef>Título</th>
-          <td mat-cell *matCellDef="let element">{{ element.title }}</td>
-        </ng-container>
+          <ng-container matColumnDef="title">
+            <th mat-header-cell *matHeaderCellDef>Conversa</th>
+            <td mat-cell *matCellDef="let element">
+              <div class="conversation-main">
+                <strong>{{ element.title }}</strong>
+                <span>Criada em {{ element.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+              </div>
+            </td>
+          </ng-container>
 
-        <!-- Status Column -->
-        <ng-container matColumnDef="status">
-          <th mat-header-cell *matHeaderCellDef>Status</th>
-          <td mat-cell *matCellDef="let element">
-            <mat-chip [color]="getStatusColor(element.status)" selected>
-              {{ element.status }}
-            </mat-chip>
-          </td>
-        </ng-container>
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let element">
+              <mat-chip [color]="getStatusColor(element.status)" selected>
+                {{ element.status }}
+              </mat-chip>
+            </td>
+          </ng-container>
 
-        <!-- Message Count Column -->
-        <ng-container matColumnDef="messageCount">
-          <th mat-header-cell *matHeaderCellDef>Mensagens</th>
-          <td mat-cell *matCellDef="let element">{{ element.messageCount }}</td>
-        </ng-container>
+          <ng-container matColumnDef="messageCount">
+            <th mat-header-cell *matHeaderCellDef>Mensagens</th>
+            <td mat-cell *matCellDef="let element">{{ element.messageCount }}</td>
+          </ng-container>
 
-        <!-- Created At Column -->
-        <ng-container matColumnDef="createdAt">
-          <th mat-header-cell *matHeaderCellDef>Criada em</th>
-          <td mat-cell *matCellDef="let element">
-            {{ element.createdAt | date: 'dd/MM/yyyy HH:mm' }}
-          </td>
-        </ng-container>
+          <ng-container matColumnDef="createdAt">
+            <th mat-header-cell *matHeaderCellDef>Atualizacao</th>
+            <td mat-cell *matCellDef="let element">
+              {{ (element.updatedAt || element.createdAt) | date: 'dd/MM/yyyy HH:mm' }}
+            </td>
+          </ng-container>
 
-        <!-- Actions Column -->
-        <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef>Ações</th>
-          <td mat-cell *matCellDef="let element">
-            <button mat-icon-button color="primary" [routerLink]="['/conversations', element.id]">
-              <mat-icon>visibility</mat-icon>
-            </button>
-            <button mat-icon-button color="warn" (click)="closeConversation(element.id)"
-              [disabled]="element.status === 'CLOSED'">
-              <mat-icon>close</mat-icon>
-            </button>
-          </td>
-        </ng-container>
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef class="align-right">Acoes</th>
+            <td mat-cell *matCellDef="let element" class="align-right">
+              <div class="action-row">
+                <button mat-stroked-button color="primary" type="button" [routerLink]="['/conversations', element.id]">
+                  <mat-icon>forum</mat-icon>
+                  <span>Abrir</span>
+                </button>
+                <button mat-stroked-button color="warn" type="button" (click)="closeConversation(element.id)" [disabled]="element.status === 'CLOSED'">
+                  <mat-icon>close</mat-icon>
+                  <span>Encerrar</span>
+                </button>
+              </div>
+            </td>
+          </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-      </table>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </div>
 
       <mat-paginator
         *ngIf="conversations.length > 0"

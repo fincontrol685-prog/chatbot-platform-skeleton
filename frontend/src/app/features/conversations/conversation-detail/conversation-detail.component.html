@@ -1,84 +1,203 @@
-<div *ngIf="loadingConversation" class="page-loading">
+<div *ngIf="loadingConversation" class="loading-band">
   <mat-progress-bar mode="indeterminate"></mat-progress-bar>
 </div>
 
-<div *ngIf="error" class="error-banner">
+<div *ngIf="error" class="state-card state-card--error">
   <strong>Falha ao abrir a conversa.</strong>
-  <span>{{ error }}</span>
+  <p>{{ error }}</p>
 </div>
 
-<div class="conversation-container" *ngIf="conversation">
-  <div class="conversation-header">
+<div class="conversation-page page-shell" *ngIf="conversation">
+  <section class="page-header">
     <div>
+      <span class="page-header__eyebrow">Atendimento em andamento</span>
       <h1>{{ conversation.title }}</h1>
-      <mat-chip [color]="conversation.status === 'ACTIVE' ? 'accent' : 'warn'" selected>
-        {{ conversation.status }}
-      </mat-chip>
+      <p>
+        Acompanhe a troca completa, revise sinais de confianca e opere com o mesmo perfil configurado no bot.
+      </p>
     </div>
+
     <div class="header-actions">
-      <span class="message-count">{{ messages.length }} mensagens</span>
-      <button mat-icon-button [routerLink]="['/conversations']">
+      <button mat-stroked-button type="button" [routerLink]="['/conversations']">
         <mat-icon>arrow_back</mat-icon>
+        <span>Voltar</span>
       </button>
-      <button mat-icon-button color="warn"
+      <button
+        mat-raised-button
+        color="warn"
+        type="button"
         (click)="closeConversation()"
         [disabled]="conversation.status === 'CLOSED'">
         <mat-icon>close</mat-icon>
+        <span>Encerrar</span>
       </button>
     </div>
-  </div>
+  </section>
 
-  <mat-card class="messages-card">
-    <div class="messages-container" #messagesContainer>
-      <div *ngFor="let message of messages" class="message" [ngClass]="getMessageClass(message)">
-        <div class="message-header">
-          <span class="sender-name">{{ message.senderUsername }}</span>
-          <span class="message-time">{{ message.createdAt | date: 'HH:mm' }}</span>
-          <span *ngIf="message.intent" class="intent-badge">{{ message.intent }}</span>
-          <button mat-icon-button matTooltip="Marcar para revisão"
-            (click)="flagMessage(message)"
-            [color]="message.isFlagged ? 'warn' : ''">
-            <mat-icon>{{ message.isFlagged ? 'flag' : 'outlined_flag' }}</mat-icon>
-          </button>
+  <section class="summary-grid">
+    <mat-card class="summary-card">
+      <mat-card-content>
+        <span>Status</span>
+        <strong>{{ conversation.status }}</strong>
+      </mat-card-content>
+    </mat-card>
+    <mat-card class="summary-card">
+      <mat-card-content>
+        <span>Mensagens</span>
+        <strong>{{ messages.length }}</strong>
+      </mat-card-content>
+    </mat-card>
+    <mat-card class="summary-card">
+      <mat-card-content>
+        <span>Confianca media</span>
+        <strong>{{ averageConfidence }}</strong>
+      </mat-card-content>
+    </mat-card>
+    <mat-card class="summary-card">
+      <mat-card-content>
+        <span>Itens sinalizados</span>
+        <strong>{{ flaggedCount }}</strong>
+      </mat-card-content>
+    </mat-card>
+  </section>
+
+  <section class="workspace-grid">
+    <mat-card class="chat-panel">
+      <mat-card-content>
+        <div class="panel-heading">
+          <div>
+            <span class="panel-label">Historico conversacional</span>
+            <h2>Mensagens trocadas</h2>
+          </div>
+          <mat-chip [color]="conversation.status === 'ACTIVE' ? 'primary' : 'warn'" selected>
+            {{ conversation.status === 'ACTIVE' ? 'Em andamento' : 'Encerrada' }}
+          </mat-chip>
         </div>
-        <div class="message-content">
-          {{ message.content }}
+
+        <div class="messages-container" #messagesContainer>
+          <div *ngFor="let message of messages" class="message" [ngClass]="getMessageClass(message)">
+            <div class="message-shell">
+              <div class="message-header">
+                <span class="sender-name">{{ message.senderUsername }}</span>
+                <span class="message-time">{{ message.createdAt | date: 'HH:mm' }}</span>
+              </div>
+
+              <div class="message-content">{{ message.content }}</div>
+
+              <div class="message-meta">
+                <span *ngIf="message.intent" class="soft-pill">{{ message.intent }}</span>
+                <span *ngIf="message.confidence" class="soft-pill">{{ (message.confidence * 100).toFixed(0) }}% confianca</span>
+                <span *ngIf="message.isFlagged" class="soft-pill soft-pill--warn">Sinalizada</span>
+                <button
+                  mat-icon-button
+                  type="button"
+                  matTooltip="Marcar para revisao"
+                  (click)="flagMessage(message)"
+                  [color]="message.isFlagged ? 'warn' : ''">
+                  <mat-icon>{{ message.isFlagged ? 'flag' : 'outlined_flag' }}</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-        <div *ngIf="message.confidence" class="message-confidence">
-          Confiança: {{ (message.confidence * 100).toFixed(1) }}%
+
+        <mat-divider></mat-divider>
+
+        <div class="composer">
+          <form [formGroup]="messageForm" (ngSubmit)="sendMessage()" class="composer-form">
+            <mat-form-field appearance="outline">
+              <mat-label>Digite a proxima mensagem</mat-label>
+              <textarea
+                matInput
+                formControlName="content"
+                rows="4"
+                placeholder="Descreva a solicitacao, contexto e resultado esperado..."
+                [disabled]="conversation.status !== 'ACTIVE' || loading">
+              </textarea>
+            </mat-form-field>
+
+            <div class="form-actions">
+              <button
+                mat-raised-button
+                color="primary"
+                type="submit"
+                [disabled]="messageForm.invalid || conversation.status !== 'ACTIVE' || loading">
+                <mat-icon>{{ loading ? 'hourglass_top' : 'send' }}</mat-icon>
+                <span>{{ loading ? 'Enviando...' : 'Enviar mensagem' }}</span>
+              </button>
+            </div>
+          </form>
         </div>
-      </div>
+      </mat-card-content>
+    </mat-card>
+
+    <div class="sidebar-stack">
+      <mat-card class="insight-panel" *ngIf="botSummary">
+        <mat-card-content>
+          <div class="panel-heading">
+            <div>
+              <span class="panel-label">Perfil do bot</span>
+              <h2>{{ bot?.name }}</h2>
+            </div>
+          </div>
+
+          <div class="pill-row">
+            <span class="soft-pill">{{ botSummary.primaryChannelLabel }}</span>
+            <span class="soft-pill">{{ botSummary.toneLabel }}</span>
+            <span class="soft-pill">{{ botSummary.responseStyleLabel }}</span>
+          </div>
+
+          <div class="state-card info-card">
+            <strong>{{ botSummary.role }}</strong>
+            <p>{{ botSummary.department }}</p>
+          </div>
+
+          <div class="detail-list">
+            <article>
+              <span>Horario</span>
+              <strong>{{ botSummary.businessHours }}</strong>
+            </article>
+            <article>
+              <span>SLA inicial</span>
+              <strong>{{ botSummary.serviceLevel }}</strong>
+            </article>
+            <article>
+              <span>Assinatura</span>
+              <strong>{{ botSummary.signature }}</strong>
+            </article>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="insight-panel">
+        <mat-card-content>
+          <div class="panel-heading">
+            <div>
+              <span class="panel-label">Sinais operacionais</span>
+              <h2>Leitura rapida</h2>
+            </div>
+          </div>
+
+          <div class="detail-list">
+            <article>
+              <span>Ultima classificacao</span>
+              <strong>{{ lastIntent }}</strong>
+            </article>
+            <article>
+              <span>Atualizada em</span>
+              <strong>{{ (conversation.updatedAt || conversation.createdAt) | date: 'dd/MM HH:mm' }}</strong>
+            </article>
+            <article>
+              <span>Bot da conversa</span>
+              <strong>{{ bot?.name || '--' }}</strong>
+            </article>
+          </div>
+        </mat-card-content>
+      </mat-card>
     </div>
-
-    <mat-divider></mat-divider>
-
-    <mat-card-content class="message-input-container">
-      <form [formGroup]="messageForm" (ngSubmit)="sendMessage()">
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Digite sua mensagem...</mat-label>
-          <textarea matInput
-            formControlName="content"
-            rows="3"
-            placeholder="Escreva uma mensagem..."
-            [disabled]="conversation.status !== 'ACTIVE' || loading">
-          </textarea>
-        </mat-form-field>
-
-        <div class="button-group">
-          <button mat-raised-button color="primary"
-            type="submit"
-            [disabled]="messageForm.invalid || conversation.status !== 'ACTIVE' || loading">
-            <mat-icon *ngIf="!loading">send</mat-icon>
-            <mat-icon *ngIf="loading">hourglass_empty</mat-icon>
-            {{ loading ? 'Enviando...' : 'Enviar' }}
-          </button>
-        </div>
-      </form>
-      <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
-    </mat-card-content>
-  </mat-card>
+  </section>
 </div>
 
-<div *ngIf="!loadingConversation && !conversation && !error" class="empty-state">
-  <p>Conversa nao encontrada.</p>
+<div *ngIf="!loadingConversation && !conversation && !error" class="state-card state-card--empty">
+  <strong>Conversa nao encontrada.</strong>
 </div>

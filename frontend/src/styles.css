@@ -167,6 +167,11 @@ a {
   background: rgba(255, 244, 240, 0.86);
 }
 
+.state-card--success {
+  border-color: rgba(21, 114, 77, 0.18);
+  background: rgba(240, 253, 244, 0.92);
+}
+
 .state-card--empty {
   text-align: center;
 }

@@ -58,6 +58,13 @@ export class AppComponent {
       label: 'Governanca',
       items: [
         {
+          label: 'Usuarios',
+          caption: 'Perfis, papeis e acessos operacionais',
+          icon: 'badge',
+          route: '/professional/users',
+          exact: false
+        },
+        {
           label: 'Estrutura',
           caption: 'Departamentos, equipes e ownership',
           icon: 'apartment',

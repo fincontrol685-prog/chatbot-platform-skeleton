@@ -13,7 +13,7 @@
   </div>
 
   <!-- Error Message -->
-  <mat-alert *ngIf="error" type="error">{{ error }}</mat-alert>
+  <div *ngIf="error" class="state-card state-card--error">{{ error }}</div>
 
   <!-- Loading -->
   <div *ngIf="loading" class="loading">
@@ -68,4 +68,3 @@
     </mat-card-content>
   </mat-card>
 </div>
-

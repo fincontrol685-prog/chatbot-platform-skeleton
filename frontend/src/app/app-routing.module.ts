@@ -39,8 +39,8 @@ const routes: Routes = [
     loadChildren: () => import('./features/professional-management/professional-management.module').then(m => m.ProfessionalManagementModule),
     canActivate: [AuthGuard],
     data: {
-      title: 'Estrutura organizacional',
-      description: 'Mapeie departamentos, equipes e responsabilidades da operacao.'
+      title: 'Usuarios e estrutura',
+      description: 'Gerencie perfis, departamentos, equipes e ownership da operacao.'
     }
   },
   {

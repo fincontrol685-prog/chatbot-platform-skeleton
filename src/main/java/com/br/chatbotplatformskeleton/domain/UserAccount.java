@@ -27,6 +27,9 @@ public class UserAccount {
     @Column(name = "password_reset_expires_at")
     private OffsetDateTime passwordResetExpiresAt;
 
+    @Column(name = "email_verified", nullable = false)
+    private Boolean emailVerified = false;
+
     private Boolean enabled = true;
 
     private OffsetDateTime createdAt = OffsetDateTime.now();
@@ -65,4 +68,12 @@ public class UserAccount {
 
     public Set<Department> getDepartments() { return departments; }
     public void setDepartments(Set<Department> departments) { this.departments = departments; }
+
+    public Boolean getEmailVerified() {
+        return emailVerified;
+    }
+
+    public void setEmailVerified(Boolean emailVerified) {
+        this.emailVerified = emailVerified;
+    }
 }

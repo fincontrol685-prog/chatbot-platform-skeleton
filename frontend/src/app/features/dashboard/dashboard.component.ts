@@ -77,10 +77,10 @@ export class DashboardComponent implements OnInit {
       route: '/analytics-advanced/dashboard'
     },
     {
-      label: 'Ver auditoria',
-      description: 'Consulte eventos sensiveis e trilha operacional.',
-      icon: 'history_edu',
-      route: '/audit-logs'
+      label: 'Gerir perfis',
+      description: 'Atualize papeis, acessos e ownership da operacao.',
+      icon: 'badge',
+      route: '/professional/users'
     }
   ];
 
@@ -179,7 +179,7 @@ export class DashboardComponent implements OnInit {
         description: 'Operadores e stakeholders cadastrados.',
         icon: 'groups',
         tone: 'success',
-        route: '/professional/departments',
+        route: '/professional/users',
         value: this.stats.userCount
       }
     ];

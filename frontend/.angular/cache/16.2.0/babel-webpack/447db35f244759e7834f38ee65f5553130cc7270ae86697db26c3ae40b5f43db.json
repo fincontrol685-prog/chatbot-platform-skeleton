@@ -1,1 +1,0 @@
-{"ast":null,"code":"export const environment = {\n  production: false,\n  apiUrl: '' // empty means same origin (use proxy or same host)\n};","map":null,"metadata":{},"sourceType":"module","externalDependencies":[]}

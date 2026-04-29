@@ -12,6 +12,9 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActivatedRoute, RouterModule } from '@angular/router';
+import { BotDto } from '../../bots/bot.service';
+import { BotConfigSummary, buildBotConfigSummary } from '../../bots/bot-config.util';
+import { BotService } from '../../bots/bot.service';
 import { ConversationService, Conversation, ConversationMessage } from '../conversation.service';
 import { getApiErrorMessage } from '../../../core/api-error.util';
 
@@ -41,6 +44,8 @@ export class ConversationDetailComponent implements OnInit {
   @ViewChild('messagesContainer') messagesContainer!: ElementRef;
 
   conversation: Conversation | null = null;
+  bot: BotDto | null = null;
+  botSummary: BotConfigSummary | null = null;
   messages: ConversationMessage[] = [];
   messageForm: FormGroup;
   loading = false;
@@ -50,6 +55,7 @@ export class ConversationDetailComponent implements OnInit {
 
   constructor(
     private conversationService: ConversationService,
+    private botService: BotService,
     private route: ActivatedRoute,
     private fb: FormBuilder
   ) {
@@ -75,6 +81,7 @@ export class ConversationDetailComponent implements OnInit {
       .subscribe({
         next: data => {
           this.conversation = data;
+          this.loadBot(data.botId);
           this.loadingConversation = false;
         },
         error: err => {
@@ -112,16 +119,20 @@ export class ConversationDetailComponent implements OnInit {
     };
 
     this.loading = true;
-    this.conversationService.addMessage(this.conversationId, newMessage)
+    this.conversationService.sendUserMessage(this.conversationId, newMessage)
       .subscribe(
-        (message) => {
-          this.messages.push(message);
+        (exchange) => {
+          this.messages = [...this.messages, exchange.userMessage, exchange.botMessage];
+          if (this.conversation) {
+            this.conversation = {
+              ...this.conversation,
+              messageCount: this.messages.length,
+              updatedAt: exchange.botMessage.createdAt
+            };
+          }
           this.messageForm.reset();
           this.loading = false;
           this.scrollToBottom();
-
-          // Simulate bot response
-          this.simulateBotResponse();
         },
         (error) => {
           console.error('Erro ao enviar mensagem:', error);
@@ -129,23 +140,6 @@ export class ConversationDetailComponent implements OnInit {
           this.loading = false;
         }
       );
-  }
-
-  private simulateBotResponse(): void {
-    setTimeout(() => {
-      const botMessage: ConversationMessage = {
-        id: 0,
-        conversationId: this.conversationId,
-        senderId: 0,
-        senderUsername: 'Bot',
-        messageType: 'BOT',
-        content: 'Obrigado pela sua mensagem. Estou processando sua solicitação.',
-        createdAt: new Date().toISOString(),
-        isFlagged: false
-      };
-      this.messages.push(botMessage);
-      this.scrollToBottom();
-    }, 1000);
   }
 
   closeConversation(): void {
@@ -176,5 +170,36 @@ export class ConversationDetailComponent implements OnInit {
 
   getMessageClass(message: ConversationMessage): string {
     return message.messageType === 'USER' ? 'user-message' : 'bot-message';
+  }
+
+  get flaggedCount(): number {
+    return this.messages.filter(message => message.isFlagged).length;
+  }
+
+  get lastIntent(): string {
+    const lastMessageWithIntent = [...this.messages].reverse().find(message => !!message.intent);
+    return lastMessageWithIntent?.intent || 'Sem classificacao';
+  }
+
+  get averageConfidence(): string {
+    const messagesWithConfidence = this.messages.filter(message => typeof message.confidence === 'number');
+    if (messagesWithConfidence.length === 0) {
+      return '--';
+    }
+
+    const total = messagesWithConfidence.reduce((sum, message) => sum + (message.confidence || 0), 0);
+    return `${((total / messagesWithConfidence.length) * 100).toFixed(0)}%`;
+  }
+
+  private loadBot(botId: number): void {
+    this.botService.get(botId).subscribe({
+      next: bot => {
+        this.bot = bot;
+        this.botSummary = buildBotConfigSummary(bot.config);
+      },
+      error: err => {
+        console.error('Erro ao carregar bot da conversa', err);
+      }
+    });
   }
 }

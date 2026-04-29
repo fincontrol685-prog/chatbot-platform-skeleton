@@ -6,9 +6,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { Router, RouterModule } from '@angular/router';
 import { ConversationService, Conversation } from '../conversation.service';
 import { BotService, BotDto } from '../../bots/bot.service';
+import { BotConfigSummary, buildBotConfigSummary } from '../../bots/bot-config.util';
 import { getApiErrorMessage } from '../../../core/api-error.util';
 
 @Component({
@@ -22,6 +24,7 @@ import { getApiErrorMessage } from '../../../core/api-error.util';
     MatIconModule,
     MatCardModule,
     MatChipsModule,
+    MatProgressBarModule,
     RouterModule
   ],
   templateUrl: './conversation-list.component.html',
@@ -36,6 +39,7 @@ export class ConversationListComponent implements OnInit {
   botId = 0;
   bots: BotDto[] = [];
   loadingBots = false;
+  loadingConversations = false;
   creatingConversation = false;
   error = '';
 
@@ -71,6 +75,23 @@ export class ConversationListComponent implements OnInit {
     return this.bots.find(bot => bot.id === this.botId);
   }
 
+  get selectedBotSummary(): BotConfigSummary | null {
+    return this.selectedBot ? buildBotConfigSummary(this.selectedBot.config) : null;
+  }
+
+  get activeConversations(): number {
+    return this.conversations.filter(conversation => conversation.status === 'ACTIVE').length;
+  }
+
+  get averageMessagesPerConversation(): string {
+    if (this.conversations.length === 0) {
+      return '0';
+    }
+
+    const totalMessages = this.conversations.reduce((sum, conversation) => sum + conversation.messageCount, 0);
+    return (totalMessages / this.conversations.length).toFixed(1);
+  }
+
   loadConversations(): void {
     if (!this.botId) {
       this.conversations = [];
@@ -78,16 +99,19 @@ export class ConversationListComponent implements OnInit {
       return;
     }
 
+    this.loadingConversations = true;
     this.conversationService.listByBot(this.botId, this.currentPage, this.pageSize)
       .subscribe({
         next: data => {
           this.conversations = data.content;
           this.totalElements = data.totalElements;
+          this.loadingConversations = false;
         },
         error: err => {
           this.error = getApiErrorMessage(err, 'Nao foi possivel carregar as conversas do bot selecionado.');
           this.conversations = [];
           this.totalElements = 0;
+          this.loadingConversations = false;
         }
       });
   }

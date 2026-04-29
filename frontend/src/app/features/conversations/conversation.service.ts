@@ -30,6 +30,11 @@ export interface ConversationMessage {
   isFlagged: boolean;
 }
 
+export interface ConversationExchange {
+  userMessage: ConversationMessage;
+  botMessage: ConversationMessage;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -87,6 +92,10 @@ export class ConversationService {
     return this.http.post<ConversationMessage>(`${this.messageUrl}/conversation/${conversationId}`, message);
   }
 
+  sendUserMessage(conversationId: number, message: ConversationMessage): Observable<ConversationExchange> {
+    return this.http.post<ConversationExchange>(`${this.messageUrl}/conversation/${conversationId}/exchange`, message);
+  }
+
   getMessage(id: number): Observable<ConversationMessage> {
     return this.http.get<ConversationMessage>(`${this.messageUrl}/${id}`);
   }
@@ -121,4 +130,3 @@ export class ConversationService {
     return this.http.get<number>(`${this.messageUrl}/bot/${botId}/stats/avg-sentiment`);
   }
 }
-

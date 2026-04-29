@@ -38,6 +38,7 @@ public class DataInitializer implements CommandLineRunner {
 
         ensureUser("admin", "admin@chatbot.local", "admin123", adminRole);
         ensureUser("user", "user@chatbot.local", "user12345", userRole);
+        ensureSystemUser("bot.system", "bot@chatbot.local", "bot-system-123", userRole);
 
         log.info("Application data initialized successfully");
     }
@@ -66,5 +67,21 @@ public class DataInitializer implements CommandLineRunner {
 
         userRepository.save(user);
         log.info("Default user created: username={}", username);
+    }
+
+    private void ensureSystemUser(String username, String email, String rawPassword, Role role) {
+        if (userRepository.findByUsernameIgnoreCase(username).isPresent()) {
+            return;
+        }
+
+        UserAccount user = new UserAccount();
+        user.setUsername(username);
+        user.setEmail(email);
+        user.setPasswordHash(passwordEncoder.encode(rawPassword));
+        user.setEnabled(false);
+        user.setRoles(Set.of(role));
+
+        userRepository.save(user);
+        log.info("System user created: username={}", username);
     }
 }

@@ -1,8 +1,8 @@
 <div class="container">
   <h2>Gerenciamento de Consentimento GDPR</h2>
 
-  <mat-alert *ngIf="error" type="error">{{ error }}</mat-alert>
-  <mat-alert *ngIf="success" type="success">{{ success }}</mat-alert>
+  <div *ngIf="error" class="state-card state-card--error">{{ error }}</div>
+  <div *ngIf="success" class="state-card state-card--success">{{ success }}</div>
 
   <div *ngIf="loading" class="loading">
     <mat-spinner diameter="40"></mat-spinner>
@@ -58,4 +58,3 @@
     </mat-card-content>
   </mat-card>
 </div>
-

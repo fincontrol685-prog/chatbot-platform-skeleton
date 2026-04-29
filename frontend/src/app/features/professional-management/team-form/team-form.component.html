@@ -36,7 +36,7 @@
     <mat-error *ngIf="form.get('maxConversationsPerUser')?.hasError('min')">Deve ser maior que 0</mat-error>
   </mat-form-field>
 
-  <mat-alert *ngIf="error" type="error">{{ error }}</mat-alert>
+  <div *ngIf="error" class="state-card state-card--error">{{ error }}</div>
 
   <div class="form-actions">
     <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || loading">
@@ -47,4 +47,3 @@
     <button mat-button type="button" (click)="cancel()">Cancelar</button>
   </div>
 </form>
-

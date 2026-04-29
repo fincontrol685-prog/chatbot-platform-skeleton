@@ -1,13 +1,14 @@
 package com.br.chatbotplatformskeleton.controller;
 
+import com.br.chatbotplatformskeleton.dto.ConversationExchangeDto;
 import com.br.chatbotplatformskeleton.dto.ConversationMessageDto;
+import com.br.chatbotplatformskeleton.service.CurrentUserService;
 import com.br.chatbotplatformskeleton.service.ConversationMessageService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -18,9 +19,14 @@ import java.util.List;
 public class ConversationMessageController {
 
     private final ConversationMessageService messageService;
+    private final CurrentUserService currentUserService;
 
-    public ConversationMessageController(ConversationMessageService messageService) {
+    public ConversationMessageController(
+        ConversationMessageService messageService,
+        CurrentUserService currentUserService
+    ) {
         this.messageService = messageService;
+        this.currentUserService = currentUserService;
     }
 
     @PostMapping("/conversation/{conversationId}")
@@ -29,9 +35,21 @@ public class ConversationMessageController {
             @PathVariable Long conversationId,
             @RequestBody ConversationMessageDto dto,
             Authentication authentication) {
-        Long senderId = extractUserId(authentication);
+        Long senderId = currentUserService.requireCurrentUserId(authentication);
         ConversationMessageDto created = messageService.addMessage(dto, conversationId, senderId);
         return ResponseEntity.created(URI.create("/api/messages/" + created.getId())).body(created);
+    }
+
+    @PostMapping("/conversation/{conversationId}/exchange")
+    @PreAuthorize("hasAnyRole('ADMIN','GESTOR','USUARIO')")
+    public ResponseEntity<ConversationExchangeDto> exchangeMessage(
+        @PathVariable Long conversationId,
+        @RequestBody ConversationMessageDto dto,
+        Authentication authentication
+    ) {
+        Long senderId = currentUserService.requireCurrentUserId(authentication);
+        ConversationExchangeDto exchange = messageService.processUserMessage(dto, conversationId, senderId);
+        return ResponseEntity.created(URI.create("/api/messages/conversation/" + conversationId + "/exchange")).body(exchange);
     }
 
     @GetMapping("/{id}")
@@ -61,7 +79,7 @@ public class ConversationMessageController {
     public ResponseEntity<ConversationMessageDto> flagMessage(
             @PathVariable Long id,
             Authentication authentication) {
-        Long userId = extractUserId(authentication);
+        Long userId = currentUserService.requireCurrentUserId(authentication);
         return messageService.flagMessage(id, userId)
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
@@ -86,10 +104,4 @@ public class ConversationMessageController {
     public ResponseEntity<Double> getAverageSentimentScore(@PathVariable Long botId) {
         return ResponseEntity.ok(messageService.getAverageSentimentScore(botId));
     }
-
-    private Long extractUserId(Authentication authentication) {
-        // Placeholder implementation
-        return 1L;
-    }
 }
-

@@ -2,6 +2,8 @@ package com.br.chatbotplatformskeleton.controller;
 
 import com.br.chatbotplatformskeleton.dto.ApiErrorResponse;
 import com.br.chatbotplatformskeleton.dto.ApiValidationError;
+import com.br.chatbotplatformskeleton.util.InputSanitizer;
+import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
@@ -21,30 +23,44 @@ import java.time.OffsetDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static org.springframework.http.ResponseEntity.*;
 
 @RestControllerAdvice
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
+    private static final Logger logger = LoggerFactory.getLogger(ApiExceptionHandler.class);
+
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
         MethodArgumentNotValidException ex,
-        HttpHeaders headers,
-        HttpStatusCode status,
-        WebRequest request
+        @Nullable HttpHeaders headers,
+        @Nullable HttpStatusCode status,
+        @Nullable WebRequest request
     ) {
         Map<String, String> fieldMessages = new LinkedHashMap<>();
 
         ex.getBindingResult()
             .getFieldErrors()
-            .stream()
-            .forEach(fieldError -> fieldMessages.putIfAbsent(fieldError.getField(), fieldError.getDefaultMessage()));
+            .forEach(fieldError -> {
+                String fieldName = fieldError.getField();
+                String message = fieldError.getDefaultMessage();
+
+                // Sanitize field name and message
+                String sanitizedField = InputSanitizer.encodeHtmlEntities(fieldName);
+                String sanitizedMessage = InputSanitizer.encodeHtmlEntities(message);
+
+                fieldMessages.putIfAbsent(sanitizedField, sanitizedMessage);
+            });
 
         List<ApiValidationError> validationErrors = fieldMessages.entrySet()
             .stream()
             .map(entry -> new ApiValidationError(entry.getKey(), entry.getValue()))
             .toList();
 
-        return ResponseEntity.badRequest().body(buildResponse(
+        return badRequest().body(buildResponse(
             HttpStatus.BAD_REQUEST,
             "Dados de entrada invalidos",
             request,
@@ -54,12 +70,12 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(
-        HttpMessageNotReadableException ex,
-        HttpHeaders headers,
-        HttpStatusCode status,
-        WebRequest request
+        @Nullable HttpMessageNotReadableException ex,
+        @Nullable HttpHeaders headers,
+        @Nullable HttpStatusCode status,
+        @Nullable WebRequest request
     ) {
-        return ResponseEntity.badRequest().body(buildResponse(
+        return badRequest().body(buildResponse(
             HttpStatus.BAD_REQUEST,
             "Corpo da requisicao invalido",
             request,
@@ -68,67 +84,86 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ApiErrorResponse> handleBadCredentials(BadCredentialsException ex, HttpServletRequest request) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(buildResponse(
+    public ResponseEntity<ApiErrorResponse> handleBadCredentials(BadCredentialsException ignored, HttpServletRequest request) {
+        String sanitizedPath = InputSanitizer.encodeHtmlEntities(request.getRequestURI());
+        return status(HttpStatus.UNAUTHORIZED).body(buildResponse(
             HttpStatus.UNAUTHORIZED,
             "Credenciais invalidas",
-            request.getRequestURI(),
+            sanitizedPath,
             List.of()
         ));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiErrorResponse> handleIllegalArgument(IllegalArgumentException ex, HttpServletRequest request) {
-        return ResponseEntity.badRequest().body(buildResponse(
+        // Sanitize error message to prevent information leakage and XSS
+        String safeMessage = InputSanitizer.createSafeErrorMessage(ex.getMessage());
+        String sanitizedPath = InputSanitizer.encodeHtmlEntities(request.getRequestURI());
+
+        return badRequest().body(buildResponse(
             HttpStatus.BAD_REQUEST,
-            ex.getMessage(),
-            request.getRequestURI(),
+            safeMessage,
+            sanitizedPath,
             List.of()
         ));
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ApiErrorResponse> handleDataIntegrity(DataIntegrityViolationException ex, HttpServletRequest request) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(buildResponse(
+    public ResponseEntity<ApiErrorResponse> handleDataIntegrity(DataIntegrityViolationException ignored, HttpServletRequest request) {
+        String sanitizedPath = InputSanitizer.encodeHtmlEntities(request.getRequestURI());
+        return status(HttpStatus.CONFLICT).body(buildResponse(
             HttpStatus.CONFLICT,
             "Conflito de dados ao processar a requisicao",
-            request.getRequestURI(),
+            sanitizedPath,
             List.of()
         ));
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ApiErrorResponse> handleAccessDenied(AccessDeniedException ex, HttpServletRequest request) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(buildResponse(
+    public ResponseEntity<ApiErrorResponse> handleAccessDenied(AccessDeniedException ignored, HttpServletRequest request) {
+        String sanitizedPath = InputSanitizer.encodeHtmlEntities(request.getRequestURI());
+        return status(HttpStatus.FORBIDDEN).body(buildResponse(
             HttpStatus.FORBIDDEN,
             "Acesso negado",
-            request.getRequestURI(),
+            sanitizedPath,
             List.of()
         ));
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse> handleUnexpected(Exception ex, HttpServletRequest request) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(buildResponse(
+        // Check for potential XSS attempts in exception message
+        String exceptionMessage = ex.getMessage();
+        if (InputSanitizer.containsXssPayload(exceptionMessage)) {
+            logger.warn("Potential XSS attempt detected in exception message from request: {}", request.getRequestURI());
+        }
+
+        // Log the full error for debugging purposes (not exposed to client)
+        logger.error("Unexpected error occurred", ex);
+
+        // Return generic error message to prevent information leakage
+        String sanitizedPath = InputSanitizer.encodeHtmlEntities(request.getRequestURI());
+        return status(HttpStatus.INTERNAL_SERVER_ERROR).body(buildResponse(
             HttpStatus.INTERNAL_SERVER_ERROR,
             "Erro interno inesperado",
-            request.getRequestURI(),
+            sanitizedPath,
             List.of()
         ));
     }
 
-    private ApiErrorResponse buildResponse(HttpStatus status, String message, WebRequest request, List<ApiValidationError> validationErrors) {
-        String path = request.getDescription(false).replace("uri=", "");
+    private ApiErrorResponse buildResponse(HttpStatus status, String message, @Nullable WebRequest request, List<ApiValidationError> validationErrors) {
+        String path = request != null ? request.getDescription(false).replace("uri=", "") : "";
         return buildResponse(status, message, path, validationErrors);
     }
 
     private ApiErrorResponse buildResponse(HttpStatus status, String message, String path, List<ApiValidationError> validationErrors) {
+        String sanitizedPath = InputSanitizer.encodeHtmlEntities(path);
         return new ApiErrorResponse(
             OffsetDateTime.now(),
             status.value(),
             status.getReasonPhrase(),
             message,
-            path,
+            sanitizedPath,
             validationErrors
         );
     }

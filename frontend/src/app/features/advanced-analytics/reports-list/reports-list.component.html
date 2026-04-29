@@ -17,7 +17,7 @@
     </button>
   </div>
 
-  <mat-alert *ngIf="error" type="error">{{ error }}</mat-alert>
+  <div *ngIf="error" class="state-card state-card--error">{{ error }}</div>
 
   <div *ngIf="loading" class="loading">
     <mat-spinner diameter="40"></mat-spinner>
@@ -91,4 +91,3 @@
     </mat-card-content>
   </mat-card>
 </div>
-

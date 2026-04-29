@@ -1,44 +1,62 @@
 package com.br.chatbotplatformskeleton.controller;
 
-import com.br.chatbotplatformskeleton.domain.Role;
-import com.br.chatbotplatformskeleton.domain.UserAccount;
-import com.br.chatbotplatformskeleton.repository.RoleRepository;
-import com.br.chatbotplatformskeleton.repository.UserRepository;
+import com.br.chatbotplatformskeleton.dto.RoleOptionDto;
+import com.br.chatbotplatformskeleton.dto.UserProfileDto;
+import com.br.chatbotplatformskeleton.dto.UserUpsertRequest;
+import com.br.chatbotplatformskeleton.service.UserProfileService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
 
-    private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final UserProfileService userProfileService;
 
-    public UserController(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-        this.passwordEncoder = passwordEncoder;
+    public UserController(UserProfileService userProfileService) {
+        this.userProfileService = userProfileService;
     }
 
     @GetMapping
-    public ResponseEntity<List<UserAccount>> list() {
-        return ResponseEntity.ok(userRepository.findAll());
+    @PreAuthorize("hasAnyRole('ADMIN','GESTOR')")
+    public ResponseEntity<List<UserProfileDto>> list(
+        @RequestParam(required = false) String search,
+        @RequestParam(required = false) Boolean enabled
+    ) {
+        return ResponseEntity.ok(userProfileService.listUsers(search, enabled));
+    }
+
+    @GetMapping("/roles")
+    @PreAuthorize("hasAnyRole('ADMIN','GESTOR')")
+    public ResponseEntity<List<RoleOptionDto>> listRoles() {
+        return ResponseEntity.ok(userProfileService.listRoles());
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','GESTOR')")
+    public ResponseEntity<UserProfileDto> get(@PathVariable Long id) {
+        return ResponseEntity.ok(userProfileService.getUser(id));
     }
 
     @PostMapping
-    public ResponseEntity<UserAccount> create(@RequestBody UserAccount user) {
-        user.setPasswordHash(passwordEncoder.encode(user.getPasswordHash()));
-        // map role names if provided
-        Set<Role> roles = user.getRoles().stream().map(r -> roleRepository.findByName(r.getName()).orElse(r)).collect(Collectors.toSet());
-        user.setRoles(roles);
-        UserAccount saved = userRepository.save(user);
-        return ResponseEntity.ok(saved);
+    @PreAuthorize("hasAnyRole('ADMIN','GESTOR')")
+    public ResponseEntity<UserProfileDto> create(@Valid @RequestBody UserUpsertRequest request) {
+        return ResponseEntity.ok(userProfileService.createUser(request));
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','GESTOR')")
+    public ResponseEntity<UserProfileDto> update(@PathVariable Long id, @Valid @RequestBody UserUpsertRequest request) {
+        return ResponseEntity.ok(userProfileService.updateUser(id, request));
+    }
+
+    @PatchMapping("/{id}/status")
+    @PreAuthorize("hasAnyRole('ADMIN','GESTOR')")
+    public ResponseEntity<UserProfileDto> updateStatus(@PathVariable Long id, @RequestParam boolean enabled) {
+        return ResponseEntity.ok(userProfileService.updateStatus(id, enabled));
     }
 }
