@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { timeout } from 'rxjs';
@@ -97,6 +97,7 @@ export class DashboardComponent implements OnInit {
   maxRetries = 3;
 
   private readonly destroyRef = inject(DestroyRef);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   constructor(
     private dashboardService: DashboardService
@@ -110,6 +111,7 @@ export class DashboardComponent implements OnInit {
     this.loading = true;
     this.error = '';
     this.retryCount = 0;
+    this.cdr.markForCheck();
     this.attemptLoad();
   }
 
@@ -130,6 +132,7 @@ export class DashboardComponent implements OnInit {
           this.lastUpdated = new Date();
           this.loading = false;
           this.error = '';
+          this.cdr.markForCheck();
         },
         error: (err) => {
           console.error('Erro ao carregar estatísticas do dashboard', err);
@@ -144,6 +147,7 @@ export class DashboardComponent implements OnInit {
 
           this.error = getApiErrorMessage(err, 'Nao foi possivel carregar as estatisticas do dashboard.');
           this.loading = false;
+          this.cdr.markForCheck();
         }
       });
   }
