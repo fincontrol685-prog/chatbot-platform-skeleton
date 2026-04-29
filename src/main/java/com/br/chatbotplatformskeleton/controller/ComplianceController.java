@@ -2,6 +2,7 @@ package com.br.chatbotplatformskeleton.controller;
 
 import com.br.chatbotplatformskeleton.dto.ConsentLogDto;
 import com.br.chatbotplatformskeleton.dto.DataDeletionRequestDto;
+import com.br.chatbotplatformskeleton.repository.UserRepository;
 import com.br.chatbotplatformskeleton.service.ComplianceService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,9 +19,11 @@ import java.util.List;
 public class ComplianceController {
 
     private final ComplianceService complianceService;
+    private final UserRepository userRepository;
 
-    public ComplianceController(ComplianceService complianceService) {
+    public ComplianceController(ComplianceService complianceService, UserRepository userRepository) {
         this.complianceService = complianceService;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -123,10 +126,11 @@ public class ComplianceController {
     }
 
     private Long extractUserId(Authentication authentication) {
-        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            // In a real application, you would look up the user ID by username
-            return 1L;  // Placeholder
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetails userDetails) {
+            String username = userDetails.getUsername();
+            return userRepository.findByUsernameIgnoreCaseOrEmailIgnoreCase(username, username)
+                .map(user -> user.getId())
+                .orElse(null);
         }
         return null;
     }

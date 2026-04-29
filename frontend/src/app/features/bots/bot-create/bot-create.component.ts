@@ -1,9 +1,19 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormBuilder, Validators } from '@angular/forms';
 import { getApiErrorMessage } from '../../../core/api-error.util';
 import { BotService, BotDto } from '../bot.service';
+import { ReactiveFormsModule } from '@angular/forms';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MaterialModule } from '../../../material.module';
+
+
+
 import {
   BOT_CHANNEL_LABELS,
   BOT_PRESETS,
@@ -22,6 +32,17 @@ import {
 
 @Component({
   selector: 'app-bot-create',
+    standalone: true, // se for standalone
+      imports: [
+      CommonModule,
+      ReactiveFormsModule,
+      RouterModule,
+      MatFormFieldModule,
+      MatInputModule,
+      MatSelectModule,
+      MatSlideToggleModule,
+      MaterialModule,
+      ],
   templateUrl: './bot-create.component.html',
   styleUrls: ['./bot-create.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush

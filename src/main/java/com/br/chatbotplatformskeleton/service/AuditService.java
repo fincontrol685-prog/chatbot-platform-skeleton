@@ -31,6 +31,7 @@ public class AuditService {
     }
 
     public void log(Long userId, String action, String entityType, Long entityId, String oldValue, String newValue) {
+        if (userId == null) return;
         Optional<UserAccount> userOpt = userRepository.findById(userId);
         if (userOpt.isEmpty()) return;
 
@@ -49,6 +50,7 @@ public class AuditService {
     }
 
     public void logError(Long userId, String action, String entityType, Long entityId, String errorMessage) {
+        if (userId == null) return;
         Optional<UserAccount> userOpt = userRepository.findById(userId);
         if (userOpt.isEmpty()) return;
 

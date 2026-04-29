@@ -32,6 +32,10 @@ public class TwoFactorAuthService {
      * Inicia setup de 2FA TOTP para um usuário
      */
     public TwoFactorAuthDto initializeTotpSetup(Long userId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID cannot be null");
+        }
+
         Optional<UserAccount> userOpt = userRepository.findById(userId);
         if (userOpt.isEmpty()) {
             throw new IllegalArgumentException("User not found: " + userId);
@@ -67,6 +71,13 @@ public class TwoFactorAuthService {
      * Verifica o código TOTP e ativa 2FA se válido
      */
     public TwoFactorAuthDto verifyAndActivateTwoFactorAuth(Long userId, String totpCode) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID cannot be null");
+        }
+        if (totpCode == null || totpCode.trim().isEmpty()) {
+            throw new IllegalArgumentException("TOTP code cannot be empty");
+        }
+
         Optional<TwoFactorAuth> tfaOpt = twoFactorAuthRepository.findByUserId(userId);
         if (tfaOpt.isEmpty()) {
             throw new IllegalArgumentException("2FA not initialized for user: " + userId);
@@ -101,6 +112,13 @@ public class TwoFactorAuthService {
      * Valida um código TOTP ou backup code
      */
     public boolean validateTwoFactorCode(Long userId, String code) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID cannot be null");
+        }
+        if (code == null || code.trim().isEmpty()) {
+            throw new IllegalArgumentException("Code cannot be empty");
+        }
+
         Optional<TwoFactorAuth> tfaOpt = twoFactorAuthRepository.findByUserIdAndIsEnabledTrue(userId);
         if (tfaOpt.isEmpty()) {
             return false;  // 2FA não está habilitado
@@ -147,6 +165,13 @@ public class TwoFactorAuthService {
      * Desativa 2FA para um usuário
      */
     public void disableTwoFactorAuth(Long userId, Long requesterId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID cannot be null");
+        }
+        if (requesterId == null) {
+            throw new IllegalArgumentException("Requester ID cannot be null");
+        }
+
         Optional<TwoFactorAuth> tfaOpt = twoFactorAuthRepository.findByUserId(userId);
         if (tfaOpt.isPresent()) {
             TwoFactorAuth tfa = tfaOpt.get();
@@ -157,6 +182,9 @@ public class TwoFactorAuthService {
     }
 
     public Optional<TwoFactorAuthDto> getTwoFactorAuthStatus(Long userId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID cannot be null");
+        }
         return twoFactorAuthRepository.findByUserId(userId).map(this::toDto);
     }
 

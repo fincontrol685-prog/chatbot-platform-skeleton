@@ -10,6 +10,9 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forChild(routes)]
+  imports: [
+    DashboardComponent,
+    RouterModule.forChild(routes)
+  ]
 })
 export class DashboardModule { }

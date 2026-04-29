@@ -8,11 +8,19 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MaterialModule } from '../../material.module';
 
 @NgModule({
-  declarations: [BotListComponent, BotCreateComponent],
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, MaterialModule, RouterModule.forChild([
-    { path: '', component: BotListComponent },
-    { path: 'create', component: BotCreateComponent },
-    { path: ':id/edit', component: BotCreateComponent }
-  ])]
+  providers: [BotService],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MaterialModule,
+    BotListComponent,
+    BotCreateComponent,
+    RouterModule.forChild([
+      { path: '', component: BotListComponent },
+      { path: 'create', component: BotCreateComponent },
+      { path: ':id/edit', component: BotCreateComponent }
+    ])
+  ]
 })
 export class BotsModule { }

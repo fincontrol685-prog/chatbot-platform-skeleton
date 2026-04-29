@@ -37,7 +37,7 @@
                 [routerLink]="item.route"
                 routerLinkActive="is-active"
                 [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
-                (click)="closeNavigation()">
+                (click)="closeNavigationAfterNavigation()">
                 <mat-icon class="nav-link-icon">{{ item.icon }}</mat-icon>
                 <div class="nav-link-copy">
                   <span class="nav-link-label">{{ item.label }}</span>

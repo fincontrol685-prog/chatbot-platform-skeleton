@@ -2,6 +2,7 @@ package com.br.chatbotplatformskeleton.controller;
 
 import com.br.chatbotplatformskeleton.dto.AnalyticsMetricDto;
 import com.br.chatbotplatformskeleton.dto.CustomReportDto;
+import com.br.chatbotplatformskeleton.repository.UserRepository;
 import com.br.chatbotplatformskeleton.service.AdvancedAnalyticsService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,9 +25,11 @@ import java.util.List;
 public class AdvancedAnalyticsController {
 
     private final AdvancedAnalyticsService analyticsService;
+    private final UserRepository userRepository;
 
-    public AdvancedAnalyticsController(AdvancedAnalyticsService analyticsService) {
+    public AdvancedAnalyticsController(AdvancedAnalyticsService analyticsService, UserRepository userRepository) {
         this.analyticsService = analyticsService;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -182,9 +185,11 @@ public class AdvancedAnalyticsController {
     }
 
     private Long extractUserId(Authentication authentication) {
-        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            return 1L;  // Placeholder
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetails userDetails) {
+            String username = userDetails.getUsername();
+            return userRepository.findByUsernameIgnoreCaseOrEmailIgnoreCase(username, username)
+                .map(user -> user.getId())
+                .orElse(null);
         }
         return null;
     }

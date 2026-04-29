@@ -1,6 +1,10 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MaterialModule } from '../../../material.module';
 import { getApiErrorMessage } from '../../../core/api-error.util';
 import { BotService, BotDto } from '../bot.service';
 import { BotConfigSummary, buildBotConfigSummary } from '../bot-config.util';
@@ -11,6 +15,13 @@ interface BotListItem extends BotDto {
 
 @Component({
   selector: 'app-bot-list',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    MaterialModule
+  ],
   templateUrl: './bot-list.component.html',
   styleUrls: ['./bot-list.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush

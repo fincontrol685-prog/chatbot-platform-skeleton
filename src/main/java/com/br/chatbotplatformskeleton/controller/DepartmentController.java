@@ -1,6 +1,7 @@
 package com.br.chatbotplatformskeleton.controller;
 
 import com.br.chatbotplatformskeleton.dto.DepartmentDto;
+import com.br.chatbotplatformskeleton.repository.UserRepository;
 import com.br.chatbotplatformskeleton.service.DepartmentService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,9 +19,11 @@ import java.util.List;
 public class DepartmentController {
 
     private final DepartmentService departmentService;
+    private final UserRepository userRepository;
 
-    public DepartmentController(DepartmentService departmentService) {
+    public DepartmentController(DepartmentService departmentService, UserRepository userRepository) {
         this.departmentService = departmentService;
+        this.userRepository = userRepository;
     }
 
     @PostMapping
@@ -80,12 +83,11 @@ public class DepartmentController {
     }
 
     private Long extractUserId(Authentication authentication) {
-        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetails userDetails) {
             String username = userDetails.getUsername();
-            // In a real application, you would look up the user ID by username
-            // For now, we'll return a placeholder
-            return 1L;  // This should be replaced with actual user lookup
+            return userRepository.findByUsernameIgnoreCaseOrEmailIgnoreCase(username, username)
+                .map(user -> user.getId())
+                .orElse(null);
         }
         return null;
     }

@@ -154,6 +154,13 @@ export class AppComponent {
     }
   }
 
+  closeNavigationAfterNavigation(): void {
+    // Delay the drawer closing to ensure routerLink is processed first
+    setTimeout(() => {
+      this.closeNavigation();
+    }, 50);
+  }
+
   private resolveRouteData(route: ActivatedRoute): { title: string; description: string } {
     let currentRoute: ActivatedRoute | null = route;
     let resolvedTitle = 'Workspace';
