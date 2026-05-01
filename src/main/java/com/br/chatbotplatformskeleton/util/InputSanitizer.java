@@ -1,11 +1,13 @@
 package com.br.chatbotplatformskeleton.util;
 
+import org.springframework.stereotype.Component;
 import java.util.regex.Pattern;
 
 /**
  * Utility class for sanitizing user inputs and preventing XSS vulnerabilities.
  * Provides methods to encode HTML entities and validate input patterns.
  */
+@Component
 public class InputSanitizer {
 
     // HTML entity encoding patterns
@@ -189,6 +191,37 @@ public class InputSanitizer {
         return !lowerUrl.startsWith("javascript:") &&
                !lowerUrl.startsWith("data:") &&
                !lowerUrl.startsWith("vbscript:");
+    }
+
+    /**
+     * Instance method to sanitize user input.
+     * Combines XSS stripping and HTML entity encoding.
+     *
+     * @param input The string to sanitize
+     * @return Sanitized string safe for storage and display
+     */
+    public String sanitize(String input) {
+        if (input == null || input.isEmpty()) {
+            return input;
+        }
+
+        // First strip any XSS payloads, then encode HTML entities
+        String stripped = stripXssPayload(input);
+        return encodeHtmlEntities(stripped);
+    }
+
+    /**
+     * Instance method to validate that a string is not empty.
+     * Throws IllegalArgumentException if validation fails.
+     *
+     * @param input The string to validate
+     * @param fieldName The name of the field being validated (for error messages)
+     * @throws IllegalArgumentException if input is null or empty
+     */
+    public void validateNotEmpty(String input, String fieldName) {
+        if (input == null || input.trim().isEmpty()) {
+            throw new IllegalArgumentException(fieldName + " cannot be empty or null");
+        }
     }
 }
 

@@ -18,22 +18,22 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
 
     Optional<Team> findByCode(String code);
 
-    @Query("SELECT t FROM Team t WHERE t.department.id = :departmentId AND t.isActive = true")
+    @Query("SELECT DISTINCT t FROM Team t LEFT JOIN FETCH t.department WHERE t.department.id = :departmentId AND t.isActive = true")
     List<Team> findByDepartmentIdAndIsActiveTrue(@Param("departmentId") Long departmentId);
 
-    @Query("SELECT t FROM Team t WHERE t.teamLeadId = :teamLeadId AND t.isActive = true")
+    @Query("SELECT DISTINCT t FROM Team t WHERE t.teamLeadId = :teamLeadId AND t.isActive = true")
     List<Team> findByTeamLeadIdAndIsActiveTrue(@Param("teamLeadId") Long teamLeadId);
 
-    @Query("SELECT t FROM Team t WHERE t.isActive = true AND (LOWER(t.name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(t.code) LIKE LOWER(CONCAT('%', :search, '%')))")
+    @Query("SELECT DISTINCT t FROM Team t LEFT JOIN FETCH t.department WHERE t.isActive = true AND (LOWER(t.name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(t.code) LIKE LOWER(CONCAT('%', :search, '%')))")
     Page<Team> searchByNameOrCode(@Param("search") String search, Pageable pageable);
 
-    @Query("SELECT t FROM Team t WHERE t.department.id = :departmentId AND t.isActive = true")
+    @Query("SELECT DISTINCT t FROM Team t LEFT JOIN FETCH t.department WHERE t.department.id = :departmentId AND t.isActive = true")
     Page<Team> findByDepartmentIdAndIsActiveTrue(@Param("departmentId") Long departmentId, Pageable pageable);
 
-    @Query("SELECT t FROM Team t JOIN t.members u WHERE u.id = :userId AND t.isActive = true")
+    @Query("SELECT DISTINCT t FROM Team t LEFT JOIN FETCH t.members u LEFT JOIN FETCH t.department WHERE u.id = :userId AND t.isActive = true")
     List<Team> findTeamsByMemberId(@Param("userId") Long userId);
 
-    @Query("SELECT t FROM Team t WHERE t.isActive = true")
+    @Query("SELECT DISTINCT t FROM Team t LEFT JOIN FETCH t.department WHERE t.isActive = true")
     Page<Team> findAllActive(Pageable pageable);
 }
 
