@@ -77,7 +77,7 @@ public class BotResponseService {
      * @return Parsed and enriched BotConfig with defaults
      */
     @Cacheable(value = "botConfig", key = "#rawConfig.hashCode()", unless = "#result == null")
-    private BotConfig readConfig(String rawConfig) {
+    public BotConfig readConfig(String rawConfig) {
         if (rawConfig == null || rawConfig.isBlank()) {
             return defaultConfig();
         }

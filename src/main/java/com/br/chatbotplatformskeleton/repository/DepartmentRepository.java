@@ -32,7 +32,7 @@ public interface DepartmentRepository extends JpaRepository<Department, Long> {
     @Query("SELECT d FROM Department d WHERE d.isActive = true")
     Page<Department> findByIsActiveTrue(Pageable pageable);
 
-    @Query("SELECT d FROM Department d WHERE d.isActive = true AND (LOWER(d.name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(d.code) LIKE LOWER(CONCAT('%', :search, '%')))")
+    @Query("SELECT d FROM Department d WHERE d.isActive = true AND (LOWER(d.name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(d.code) LIKE LOWER(CONCAT('%', :search, '%'))) ORDER BY d.createdAt DESC")
     Page<Department> searchByNameOrCode(@Param("search") String search, Pageable pageable);
 }
 

@@ -7,6 +7,7 @@ import com.br.chatbotplatformskeleton.repository.RoleRepository;
 import com.br.chatbotplatformskeleton.repository.UserRepository;
 import com.br.chatbotplatformskeleton.security.JwtUtil;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -30,6 +31,8 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
 
+    private AuthService authService;
+
     @Mock
     private AuthenticationManager authenticationManager;
 
@@ -48,14 +51,14 @@ class AuthServiceTest {
     @Mock
     private EmailService emailService;
 
-    @InjectMocks
-    private AuthService authService;
 
-    private UserAccount testUser;
+     private UserAccount testUser;
     private Role testRole;
 
     @BeforeEach
     void setUp() {
+        authService = new AuthService(authenticationManager, jwtUtil, userRepository, roleRepository, passwordEncoder, emailService, 900000L);
+
         testRole = new Role();
         testRole.setId(1L);
         testRole.setName("USUARIO");
@@ -87,6 +90,7 @@ class AuthServiceTest {
 
         // Assert
         assertNotNull(response);
+        assertEquals("jwt-token", response.getAccessToken());
         assertEquals("jwt-token", response.getToken());
         assertTrue(response.getExpirationTime() > 0);
         verify(authenticationManager, times(1)).authenticate(any());
@@ -139,14 +143,12 @@ class AuthServiceTest {
         // Assert
         assertNotNull(response);
         assertEquals("jwt-token", response.getAccessToken());
+        assertEquals("jwt-token", response.getToken());
         verify(userRepository, times(1)).save(any(UserAccount.class));
     }
 
     @Test
     void testRegisterWeakPassword() {
-        // Arrange
-        when(userRepository.existsByUsernameIgnoreCase("newuser")).thenReturn(false);
-        when(userRepository.existsByEmailIgnoreCase("newuser@example.com")).thenReturn(false);
 
         // Act & Assert
         assertThrows(IllegalArgumentException.class,
@@ -178,8 +180,6 @@ class AuthServiceTest {
 
     @Test
     void testRegisterInvalidEmail() {
-        // Arrange
-        when(userRepository.existsByUsernameIgnoreCase("newuser")).thenReturn(false);
 
         // Act & Assert
         assertThrows(IllegalArgumentException.class,
@@ -228,6 +228,8 @@ class AuthServiceTest {
         // Assert
         verify(userRepository, times(1)).findByPasswordResetToken("valid-token");
         verify(userRepository, times(1)).save(any(UserAccount.class));
+        assertNull(testUser.getPasswordResetToken());
+        assertNull(testUser.getPasswordResetExpiresAt());
     }
 
     @Test
@@ -256,11 +258,6 @@ class AuthServiceTest {
 
     @Test
     void testResetPasswordWeakPassword() {
-        // Arrange
-        testUser.setPasswordResetToken("valid-token");
-        testUser.setPasswordResetExpiresAt(OffsetDateTime.now().plusHours(1));
-
-        when(userRepository.findByPasswordResetToken("valid-token")).thenReturn(Optional.of(testUser));
 
         // Act & Assert
         assertThrows(IllegalArgumentException.class,

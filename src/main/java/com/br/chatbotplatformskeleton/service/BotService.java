@@ -7,12 +7,13 @@ import com.br.chatbotplatformskeleton.repository.BotRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.mapstruct.factory.Mappers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -25,9 +26,9 @@ public class BotService {
     private final BotMapper botMapper;
 
     public BotService(BotRepository botRepository, ObjectMapper objectMapper, BotMapper botMapper) {
-        this.botRepository = botRepository;
-        this.objectMapper = objectMapper;
-        this.botMapper = botMapper;
+        this.botRepository = Objects.requireNonNull(botRepository, "botRepository must not be null");
+        this.objectMapper = Objects.requireNonNull(objectMapper, "objectMapper must not be null");
+        this.botMapper = botMapper != null ? botMapper : Mappers.getMapper(BotMapper.class);
     }
 
     public List<BotDto> listAll() {

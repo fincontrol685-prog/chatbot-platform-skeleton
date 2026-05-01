@@ -96,11 +96,23 @@ class ConversationServiceTest {
         createdConv.setStatus("ACTIVE");
         createdConv.setMessageCount(0L);
 
+        ConversationDto dto = new ConversationDto();
+        dto.setId(2L);
+        dto.setBotId(1L);
+        dto.setUserId(1L);
+        dto.setTitle("New Conversation");
+        dto.setStatus("ACTIVE");
+        dto.setMessageCount(0L);
+
         when(botRepository.findById(1L)).thenReturn(Optional.of(testBot));
         when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
         when(conversationRepository.save(any(Conversation.class))).thenReturn(createdConv);
-        when(conversationMapper.toDto(createdConv)).thenReturn(new ConversationDto(2L, 1L, 1L, "New Conversation", "ACTIVE", 0L, null, null));
+        when(conversationMapper.toDto(createdConv)).thenReturn(dto);
 
+
+
+
+        when(conversationMapper.toDto(createdConv)).thenReturn(dto);
         // Act
         ConversationDto result = conversationService.create(newConvDto, 1L);
 
