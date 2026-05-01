@@ -18,6 +18,7 @@ public interface DepartmentRepository extends JpaRepository<Department, Long> {
 
     Optional<Department> findByCode(String code);
 
+    @Query("SELECT d FROM Department d WHERE d.isActive = true")
     List<Department> findByIsActiveTrue();
 
     List<Department> findByParentDepartmentId(Long parentDepartmentId);
@@ -28,6 +29,7 @@ public interface DepartmentRepository extends JpaRepository<Department, Long> {
     @Query("SELECT d FROM Department d WHERE d.managerId = :managerId AND d.isActive = true")
     List<Department> findByManagerId(@Param("managerId") Long managerId);
 
+    @Query("SELECT d FROM Department d WHERE d.isActive = true")
     Page<Department> findByIsActiveTrue(Pageable pageable);
 
     @Query("SELECT d FROM Department d WHERE d.isActive = true AND (LOWER(d.name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(d.code) LIKE LOWER(CONCAT('%', :search, '%')))")

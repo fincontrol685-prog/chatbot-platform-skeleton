@@ -15,15 +15,15 @@ import java.util.List;
 public interface ConversationRepository extends JpaRepository<Conversation, Long> {
     
     Page<Conversation> findByBotId(Long botId, Pageable pageable);
-    
+
     Page<Conversation> findByUserId(Long userId, Pageable pageable);
-    
+
     Page<Conversation> findByBotIdAndStatus(Long botId, String status, Pageable pageable);
-    
+
     Page<Conversation> findByUserIdAndStatus(Long userId, String status, Pageable pageable);
-    
+
     @Query("SELECT c FROM Conversation c WHERE c.bot.id = :botId AND c.createdAt >= :startDate AND c.createdAt <= :endDate")
-    Page<Conversation> findByBotIdAndDateRange(@Param("botId") Long botId, 
+    Page<Conversation> findByBotIdAndDateRange(@Param("botId") Long botId,
                                                 @Param("startDate") OffsetDateTime startDate,
                                                 @Param("endDate") OffsetDateTime endDate,
                                                 Pageable pageable);
@@ -37,6 +37,7 @@ public interface ConversationRepository extends JpaRepository<Conversation, Long
     @Query("SELECT COUNT(c) FROM Conversation c WHERE c.user.id = :userId AND c.status = 'ACTIVE'")
     long countActiveByUserId(@Param("userId") Long userId);
     
-    List<Conversation> findByStatusAndClosedAtIsNotNull(String status);
+    @Query("SELECT c FROM Conversation c WHERE c.status = :status AND c.closedAt IS NOT NULL")
+    List<Conversation> findByStatusAndClosedAtNotNull(@Param("status") String status);
 }
 

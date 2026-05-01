@@ -18,14 +18,17 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
 
     Optional<Team> findByCode(String code);
 
-    List<Team> findByDepartmentIdAndIsActiveTrue(Long departmentId);
+    @Query("SELECT t FROM Team t WHERE t.department.id = :departmentId AND t.isActive = true")
+    List<Team> findByDepartmentIdAndIsActiveTrue(@Param("departmentId") Long departmentId);
 
-    List<Team> findByTeamLeadIdAndIsActiveTrue(Long teamLeadId);
+    @Query("SELECT t FROM Team t WHERE t.teamLeadId = :teamLeadId AND t.isActive = true")
+    List<Team> findByTeamLeadIdAndIsActiveTrue(@Param("teamLeadId") Long teamLeadId);
 
     @Query("SELECT t FROM Team t WHERE t.isActive = true AND (LOWER(t.name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(t.code) LIKE LOWER(CONCAT('%', :search, '%')))")
     Page<Team> searchByNameOrCode(@Param("search") String search, Pageable pageable);
 
-    Page<Team> findByDepartmentIdAndIsActiveTrue(Long departmentId, Pageable pageable);
+    @Query("SELECT t FROM Team t WHERE t.department.id = :departmentId AND t.isActive = true")
+    Page<Team> findByDepartmentIdAndIsActiveTrue(@Param("departmentId") Long departmentId, Pageable pageable);
 
     @Query("SELECT t FROM Team t JOIN t.members u WHERE u.id = :userId AND t.isActive = true")
     List<Team> findTeamsByMemberId(@Param("userId") Long userId);

@@ -12,11 +12,14 @@ import java.util.Optional;
 @Repository
 public interface TeamRoleRepository extends JpaRepository<TeamRole, Long> {
 
-    List<TeamRole> findByTeamIdAndIsActiveTrue(Long teamId);
+    @Query("SELECT tr FROM TeamRole tr WHERE tr.team.id = :teamId AND tr.isActive = true")
+    List<TeamRole> findByTeamIdAndIsActiveTrue(@Param("teamId") Long teamId);
 
-    List<TeamRole> findByUserIdAndIsActiveTrue(Long userId);
+    @Query("SELECT tr FROM TeamRole tr WHERE tr.user.id = :userId AND tr.isActive = true")
+    List<TeamRole> findByUserIdAndIsActiveTrue(@Param("userId") Long userId);
 
-    Optional<TeamRole> findByTeamIdAndUserIdAndIsActiveTrue(Long teamId, Long userId);
+    @Query("SELECT tr FROM TeamRole tr WHERE tr.team.id = :teamId AND tr.user.id = :userId AND tr.isActive = true")
+    Optional<TeamRole> findByTeamIdAndUserIdAndIsActiveTrue(@Param("teamId") Long teamId, @Param("userId") Long userId);
 
     @Query("SELECT tr FROM TeamRole tr WHERE tr.team.id = :teamId AND tr.role = :role AND tr.isActive = true")
     Optional<TeamRole> findTeamLeadByTeamId(@Param("teamId") Long teamId, @Param("role") String role);
