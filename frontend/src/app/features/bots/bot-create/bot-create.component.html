@@ -12,9 +12,11 @@
     </button>
   </section>
 
-  <div *ngIf="loadingBot" class="loading-band">
-    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-  </div>
+  @if (loadingBot) {
+    <div class="loading-band">
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    </div>
+  }
 
   <div class="create-layout">
     <form class="create-form" [formGroup]="form" (ngSubmit)="submit()">
@@ -30,21 +32,27 @@
             <mat-form-field appearance="outline" class="field-span-2">
               <mat-label>Nome do bot</mat-label>
               <input matInput formControlName="name" placeholder="Ex: Atendimento Prime" />
-              <mat-error *ngIf="identityGroup.controls.name.hasError('required') && identityGroup.controls.name.touched">
-                Informe o nome do bot.
-              </mat-error>
+              @if (identityGroup.controls.name.hasError('required') && identityGroup.controls.name.touched) {
+                <mat-error>
+                  Informe o nome do bot.
+                </mat-error>
+              }
             </mat-form-field>
 
             <mat-form-field appearance="outline">
               <mat-label>Chave tecnica</mat-label>
               <input matInput formControlName="key" placeholder="atendimento-prime" />
               <mat-hint>Use letras, numeros, "_" ou "-".</mat-hint>
-              <mat-error *ngIf="identityGroup.controls.key.hasError('required') && identityGroup.controls.key.touched">
-                Informe a chave do bot.
-              </mat-error>
-              <mat-error *ngIf="identityGroup.controls.key.hasError('pattern') && identityGroup.controls.key.touched">
-                A chave aceita apenas letras, numeros, "_" ou "-".
-              </mat-error>
+              @if (identityGroup.controls.key.hasError('required') && identityGroup.controls.key.touched) {
+                <mat-error>
+                  Informe a chave do bot.
+                </mat-error>
+              }
+              @if (identityGroup.controls.key.hasError('pattern') && identityGroup.controls.key.touched) {
+                <mat-error>
+                  A chave aceita apenas letras, numeros, "_" ou "-".
+                </mat-error>
+              }
             </mat-form-field>
 
             <div class="toggle-card">
@@ -97,27 +105,33 @@
             <mat-form-field appearance="outline">
               <mat-label>Canal principal</mat-label>
               <mat-select formControlName="primaryChannel">
-                <mat-option *ngFor="let option of channelOptions" [value]="option.value">
-                  {{ option.label }}
-                </mat-option>
+                @for (option of channelOptions; track option) {
+                  <mat-option [value]="option.value">
+                    {{ option.label }}
+                  </mat-option>
+                }
               </mat-select>
             </mat-form-field>
 
             <mat-form-field appearance="outline">
               <mat-label>Tom de atendimento</mat-label>
               <mat-select formControlName="tone">
-                <mat-option *ngFor="let option of toneOptions" [value]="option.value">
-                  {{ option.label }}
-                </mat-option>
+                @for (option of toneOptions; track option) {
+                  <mat-option [value]="option.value">
+                    {{ option.label }}
+                  </mat-option>
+                }
               </mat-select>
             </mat-form-field>
 
             <mat-form-field appearance="outline">
               <mat-label>Profundidade da resposta</mat-label>
               <mat-select formControlName="responseStyle">
-                <mat-option *ngFor="let option of responseStyleOptions" [value]="option.value">
-                  {{ option.label }}
-                </mat-option>
+                @for (option of responseStyleOptions; track option) {
+                  <mat-option [value]="option.value">
+                    {{ option.label }}
+                  </mat-option>
+                }
               </mat-select>
             </mat-form-field>
           </div>
@@ -262,9 +276,11 @@
             <textarea matInput rows="5" formControlName="notes"></textarea>
           </mat-form-field>
 
-          <div *ngIf="error" class="form-error">
-            {{ error }}
-          </div>
+          @if (error) {
+            <div class="form-error">
+              {{ error }}
+            </div>
+          }
 
           <div class="form-actions">
             <button mat-stroked-button type="button" routerLink="/bots">Cancelar</button>
@@ -287,18 +303,19 @@
           </div>
 
           <div class="preset-list">
-            <button
-              mat-stroked-button
-              type="button"
-              class="preset-card"
-              *ngFor="let preset of presets"
-              (click)="applyPreset(preset.id)">
-              <div class="preset-card__header">
-                <strong>{{ preset.label }}</strong>
-                <span>{{ preset.badge }}</span>
-              </div>
-              <p>{{ preset.description }}</p>
-            </button>
+            @for (preset of presets; track preset) {
+              <button
+                mat-stroked-button
+                type="button"
+                class="preset-card"
+                (click)="applyPreset(preset.id)">
+                <div class="preset-card__header">
+                  <strong>{{ preset.label }}</strong>
+                  <span>{{ preset.badge }}</span>
+                </div>
+                <p>{{ preset.description }}</p>
+              </button>
+            }
           </div>
         </mat-card-content>
       </mat-card>

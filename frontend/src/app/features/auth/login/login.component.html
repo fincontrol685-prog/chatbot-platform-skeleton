@@ -41,54 +41,64 @@
           <mat-form-field appearance="outline" class="form-field">
             <mat-label>Usuário ou Email</mat-label>
             <input matInput
-                   formControlName="username"
-                   placeholder="Digite seu usuário"
-                   [disabled]="loading"
-                   autocomplete="username"
-                   class="form-input" />
+              formControlName="username"
+              placeholder="Digite seu usuário"
+              [disabled]="loading"
+              autocomplete="username"
+              class="form-input" />
             <mat-icon matPrefix class="input-icon">person</mat-icon>
-            <mat-error *ngIf="form.get('username')?.hasError('required')">
-              Usuário é obrigatório
-            </mat-error>
+            @if (form.get('username')?.hasError('required')) {
+              <mat-error>
+                Usuário é obrigatório
+              </mat-error>
+            }
           </mat-form-field>
 
           <!-- Password Field -->
           <mat-form-field appearance="outline" class="form-field">
             <mat-label>Senha</mat-label>
             <input matInput
-                   [type]="showPassword ? 'text' : 'password'"
-                   formControlName="password"
-                   placeholder="Digite sua senha"
-                   [disabled]="loading"
-                   autocomplete="current-password"
-                   class="form-input" />
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="Digite sua senha"
+              [disabled]="loading"
+              autocomplete="current-password"
+              class="form-input" />
             <mat-icon matPrefix class="input-icon">lock</mat-icon>
             <button mat-icon-button matSuffix (click)="togglePasswordVisibility()" [disabled]="loading" type="button" class="toggle-password">
               <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
             </button>
-            <mat-error *ngIf="form.get('password')?.hasError('required')">
-              Senha é obrigatória
-            </mat-error>
+            @if (form.get('password')?.hasError('required')) {
+              <mat-error>
+                Senha é obrigatória
+              </mat-error>
+            }
           </mat-form-field>
 
           <!-- Error Message -->
-          <div *ngIf="error" class="error-message">
-            <mat-icon class="error-icon">error</mat-icon>
-            <span>{{ error }}</span>
-          </div>
+          @if (error) {
+            <div class="error-message">
+              <mat-icon class="error-icon">error</mat-icon>
+              <span>{{ error }}</span>
+            </div>
+          }
 
           <!-- Loading Indicator -->
-          <div *ngIf="loading" class="loading-indicator">
-            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-          </div>
+          @if (loading) {
+            <div class="loading-indicator">
+              <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+            </div>
+          }
 
           <!-- Submit Button -->
           <button mat-raised-button
-                  color="primary"
-                  type="submit"
-                  [disabled]="form.invalid || loading"
-                  class="submit-button">
-            <mat-icon *ngIf="!loading" class="button-icon">login</mat-icon>
+            color="primary"
+            type="submit"
+            [disabled]="form.invalid || loading"
+            class="submit-button">
+            @if (!loading) {
+              <mat-icon class="button-icon">login</mat-icon>
+            }
             <span>{{ loading ? 'Autenticando...' : 'Entrar' }}</span>
           </button>
         </form>

@@ -4,14 +4,15 @@ import { ProfessionalManagementService } from '../professional-management.servic
 import { TeamDto, DepartmentDto } from '../models/department.model';
 
 @Component({
-  selector: 'app-team-form',
-  templateUrl: './team-form.component.html',
-  styles: [`
+    selector: 'app-team-form',
+    templateUrl: './team-form.component.html',
+    styles: [`
     .full-width { width: 100%; margin-bottom: 15px; }
     .form-actions { display: flex; gap: 10px; margin-top: 20px; }
     form { padding: 10px 0; }
     mat-spinner { margin-right: 8px; }
-  `]
+  `],
+    standalone: false
 })
 export class TeamFormComponent implements OnInit {
   @Input() team: TeamDto | null = null;

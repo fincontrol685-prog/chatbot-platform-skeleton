@@ -4,14 +4,15 @@ import { ProfessionalManagementService } from '../professional-management.servic
 import { DepartmentDto } from '../models/department.model';
 
 @Component({
-  selector: 'app-department-form',
-  templateUrl: './department-form.component.html',
-  styles: [`
+    selector: 'app-department-form',
+    templateUrl: './department-form.component.html',
+    styles: [`
     .full-width { width: 100%; margin-bottom: 15px; }
     .form-actions { display: flex; gap: 10px; margin-top: 20px; }
     form { padding: 10px 0; }
     mat-spinner { margin-right: 8px; }
-  `]
+  `],
+    standalone: false
 })
 export class DepartmentFormComponent implements OnInit {
   @Input() department: DepartmentDto | null = null;

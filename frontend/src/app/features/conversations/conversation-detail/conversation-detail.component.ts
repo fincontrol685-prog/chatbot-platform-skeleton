@@ -19,26 +19,25 @@ import { ConversationService, Conversation, ConversationMessage } from '../conve
 import { getApiErrorMessage } from '../../../core/api-error.util';
 
 @Component({
-  selector: 'app-conversation-detail',
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatIconModule,
-    MatListModule,
-    MatProgressBarModule,
-    MatChipsModule,
-    MatDividerModule,
-    MatTooltipModule,
-    RouterModule
-  ],
-  templateUrl: './conversation-detail.component.html',
-  styleUrls: ['./conversation-detail.component.css']
+    selector: 'app-conversation-detail',
+    imports: [
+        CommonModule,
+        FormsModule,
+        ReactiveFormsModule,
+        MatCardModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatButtonModule,
+        MatIconModule,
+        MatListModule,
+        MatProgressBarModule,
+        MatChipsModule,
+        MatDividerModule,
+        MatTooltipModule,
+        RouterModule
+    ],
+    templateUrl: './conversation-detail.component.html',
+    styleUrls: ['./conversation-detail.component.css']
 })
 export class ConversationDetailComponent implements OnInit {
   @ViewChild('messagesContainer') messagesContainer!: ElementRef;

@@ -4,9 +4,9 @@ import { AdvancedAnalyticsService } from '../advanced-analytics.service';
 import { CustomReportDto } from '../models/analytics.model';
 
 @Component({
-  selector: 'app-report-form',
-  templateUrl: './report-form.component.html',
-  styles: [`
+    selector: 'app-report-form',
+    templateUrl: './report-form.component.html',
+    styles: [`
     .full-width {
       width: 100%;
       margin-bottom: 15px;
@@ -54,7 +54,8 @@ import { CustomReportDto } from '../models/analytics.model';
     mat-spinner {
       margin-right: 8px;
     }
-  `]
+  `],
+    standalone: false
 })
 export class ReportFormComponent implements OnInit {
   @Input() report: CustomReportDto | null = null;

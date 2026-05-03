@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormBuilder, Validators } from '@angular/forms';
@@ -31,21 +31,19 @@ import {
 } from '../bot-config.util';
 
 @Component({
-  selector: 'app-bot-create',
-    standalone: true, // se for standalone
-      imports: [
-      CommonModule,
-      ReactiveFormsModule,
-      RouterModule,
-      MatFormFieldModule,
-      MatInputModule,
-      MatSelectModule,
-      MatSlideToggleModule,
-      MaterialModule,
-      ],
-  templateUrl: './bot-create.component.html',
-  styleUrls: ['./bot-create.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-bot-create', // se for standalone
+    imports: [
+    ReactiveFormsModule,
+    RouterModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatSlideToggleModule,
+    MaterialModule
+],
+    templateUrl: './bot-create.component.html',
+    styleUrls: ['./bot-create.component.css'],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BotCreateComponent implements OnInit {
   private readonly fb = inject(FormBuilder);

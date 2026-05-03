@@ -5,9 +5,10 @@ import { AuthService } from '../../../core/auth.service';
 import { getApiErrorMessage } from '../../../core/api-error.util';
 
 @Component({
-  selector: 'app-reset-password',
-  templateUrl: './reset-password.component.html',
-  styleUrls: ['./reset-password.component.css']
+    selector: 'app-reset-password',
+    templateUrl: './reset-password.component.html',
+    styleUrls: ['./reset-password.component.css'],
+    standalone: false
 })
 export class ResetPasswordComponent implements OnInit {
   form: FormGroup;

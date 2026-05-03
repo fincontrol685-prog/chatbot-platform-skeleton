@@ -3,9 +3,9 @@ import { ComplianceSecurityService } from '../compliance-security.service';
 import { ConsentLogDto } from '../models/compliance.model';
 
 @Component({
-  selector: 'app-consent-manager',
-  templateUrl: './consent-manager.component.html',
-  styles: [`
+    selector: 'app-consent-manager',
+    templateUrl: './consent-manager.component.html',
+    styles: [`
     .container { padding: 20px; }
     h2 { margin-bottom: 20px; color: #1976d2; }
     h3 { margin-top: 30px; margin-bottom: 15px; color: #333; }
@@ -17,7 +17,8 @@ import { ConsentLogDto } from '../models/compliance.model';
     ul { margin: 15px 0; padding-left: 20px; }
     li { margin: 10px 0; line-height: 1.6; }
     mat-list { padding: 0; }
-  `]
+  `],
+    standalone: false
 })
 export class ConsentManagerComponent implements OnInit {
   consents: ConsentLogDto[] = [];

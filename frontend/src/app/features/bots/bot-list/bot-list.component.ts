@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -14,17 +14,15 @@ interface BotListItem extends BotDto {
 }
 
 @Component({
-  selector: 'app-bot-list',
-  standalone: true,
-  imports: [
-    CommonModule,
+    selector: 'app-bot-list',
+    imports: [
     FormsModule,
     RouterModule,
     MaterialModule
-  ],
-  templateUrl: './bot-list.component.html',
-  styleUrls: ['./bot-list.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+],
+    templateUrl: './bot-list.component.html',
+    styleUrls: ['./bot-list.component.css'],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BotListComponent implements OnInit {
   bots: BotListItem[] = [];

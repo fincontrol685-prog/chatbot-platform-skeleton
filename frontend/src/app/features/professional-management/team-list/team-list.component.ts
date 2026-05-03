@@ -3,9 +3,9 @@ import { ProfessionalManagementService } from '../professional-management.servic
 import { TeamDto } from '../models/department.model';
 
 @Component({
-  selector: 'app-team-list',
-  templateUrl: './team-list.component.html',
-  styles: [`
+    selector: 'app-team-list',
+    templateUrl: './team-list.component.html',
+    styles: [`
     .container { padding: 20px; }
     h2 { margin-bottom: 20px; color: #1976d2; }
     .search-section { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; }
@@ -19,7 +19,8 @@ import { TeamDto } from '../models/department.model';
     mat-list { max-width: 800px; }
     mat-list-item { cursor: pointer; margin-bottom: 5px; }
     mat-list-item:hover { background-color: #f5f5f5; }
-  `]
+  `],
+    standalone: false
 })
 export class TeamListComponent implements OnInit {
   teams: TeamDto[] = [];
