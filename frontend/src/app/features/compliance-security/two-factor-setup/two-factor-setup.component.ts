@@ -30,8 +30,8 @@ import { TwoFactorAuthDto } from '../models/compliance.model';
 })
 export class TwoFactorSetupComponent implements OnInit {
   twoFactorStatus: TwoFactorAuthDto | null = null;
-  setupForm!: FormGroup;
-  verifyForm!: FormGroup;
+  setupForm: FormGroup;
+  verifyForm: FormGroup;
   loading = false;
   error: string | null = null;
   success: string | null = null;
@@ -43,18 +43,15 @@ export class TwoFactorSetupComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private service: ComplianceSecurityService
-  ) {}
-
-  ngOnInit(): void {
-    this.initForms();
-    this.loadStatus();
-  }
-
-  initForms(): void {
+  ) {
     this.setupForm = this.fb.group({});
     this.verifyForm = this.fb.group({
       token: ['', [Validators.required, Validators.minLength(6)]]
     });
+  }
+
+  ngOnInit(): void {
+    this.loadStatus();
   }
 
   loadStatus(): void {

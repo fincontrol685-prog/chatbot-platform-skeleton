@@ -61,7 +61,7 @@ export class ReportFormComponent implements OnInit {
   @Output() saved = new EventEmitter<CustomReportDto>();
   @Output() cancelled = new EventEmitter<void>();
 
-  form!: FormGroup;
+  form: FormGroup;
   loading = false;
   error: string | null = null;
 
@@ -80,13 +80,7 @@ export class ReportFormComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private service: AdvancedAnalyticsService
-  ) {}
-
-  ngOnInit(): void {
-    this.initForm();
-  }
-
-  initForm(): void {
+  ) {
     this.form = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
       description: [''],
@@ -99,7 +93,13 @@ export class ReportFormComponent implements OnInit {
       }),
       metricTypes: [[], Validators.required]
     });
+  }
 
+  ngOnInit(): void {
+    this.initForm();
+  }
+
+  initForm(): void {
     if (this.report) {
       this.form.patchValue({
         name: this.report.name,

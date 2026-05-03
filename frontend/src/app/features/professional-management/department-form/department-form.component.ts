@@ -18,7 +18,7 @@ export class DepartmentFormComponent implements OnInit {
   @Output() saved = new EventEmitter<DepartmentDto>();
   @Output() cancelled = new EventEmitter<void>();
 
-  form!: FormGroup;
+  form: FormGroup;
   loading = false;
   error: string | null = null;
   departments: DepartmentDto[] = [];
@@ -26,14 +26,7 @@ export class DepartmentFormComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private service: ProfessionalManagementService
-  ) {}
-
-  ngOnInit(): void {
-    this.initForm();
-    this.loadDepartments();
-  }
-
-  initForm(): void {
+  ) {
     this.form = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
       code: ['', [Validators.required, Validators.minLength(2)]],
@@ -41,7 +34,14 @@ export class DepartmentFormComponent implements OnInit {
       description: [''],
       parentDepartmentId: [null]
     });
+  }
 
+  ngOnInit(): void {
+    this.initForm();
+    this.loadDepartments();
+  }
+
+  initForm(): void {
     if (this.department) {
       this.form.patchValue(this.department);
     }

@@ -10,7 +10,7 @@ import { getApiErrorMessage } from '../../../core/api-error.util';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
-  form!: FormGroup;
+  form: FormGroup;
   error = '';
   loading = false;
   showPassword = false;
@@ -21,7 +21,12 @@ export class LoginComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private fb: FormBuilder
-  ) {}
+  ) {
+    this.form = this.fb.group({
+      username: ['', Validators.required],
+      password: ['', Validators.required]
+    });
+  }
 
   ngOnInit(): void {
     this.returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/dashboard';
@@ -30,11 +35,6 @@ export class LoginComponent implements OnInit {
       void this.router.navigateByUrl(this.returnUrl);
       return;
     }
-
-    this.form = this.fb.group({
-      username: ['', Validators.required],
-      password: ['', Validators.required]
-    });
   }
 
   submit(): void {
