@@ -1,47 +1,59 @@
 <div class="container">
   <h2>Gerenciamento de Consentimento GDPR</h2>
 
-  <div *ngIf="error" class="state-card state-card--error">{{ error }}</div>
-  <div *ngIf="success" class="state-card state-card--success">{{ success }}</div>
+  @if (error) {
+    <div class="state-card state-card--error">{{ error }}</div>
+  }
+  @if (success) {
+    <div class="state-card state-card--success">{{ success }}</div>
+  }
 
-  <div *ngIf="loading" class="loading">
-    <mat-spinner diameter="40"></mat-spinner>
-  </div>
+  @if (loading) {
+    <div class="loading">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  }
 
   <mat-card>
     <mat-card-header>
       <mat-card-title>Seus Consentimentos</mat-card-title>
       <mat-card-subtitle>Controle quais dados podemos processar</mat-card-subtitle>
     </mat-card-header>
-    <mat-card-content *ngIf="!loading">
-      <mat-selection-list [compareWith]="compareConsent">
-        <mat-list-option
-          *ngFor="let consentType of consentTypes"
-          [value]="consentType.id"
-          [selected]="isConsentGranted(consentType.id)"
-          (change)="toggleConsent(consentType.id)"
-        >
-          <div matListItemTitle>{{ consentType.label }}</div>
-          <div matListItemLine>{{ consentType.description }}</div>
-        </mat-list-option>
-      </mat-selection-list>
-
-      <div *ngIf="consents.length > 0" class="consent-history">
-        <h3>Histórico de Consentimentos</h3>
-        <mat-list>
-          <mat-list-item *ngFor="let consent of consents">
-            <mat-icon matListItemIcon [color]="consent.status === 'GRANTED' ? 'accent' : 'warn'">
-              {{ consent.status === 'GRANTED' ? 'check_circle' : 'cancel' }}
-            </mat-icon>
-            <div matListItemTitle>{{ getConsentLabel(consent.consentType) }}</div>
-            <div matListItemLine>
-              {{ consent.status === 'GRANTED' ? 'Concedido em' : 'Revogado em' }}
-              {{ (consent.status === 'GRANTED' ? consent.grantedAt : consent.revokedAt) | date: 'dd/MM/yyyy HH:mm' }}
-            </div>
-          </mat-list-item>
-        </mat-list>
-      </div>
-    </mat-card-content>
+    @if (!loading) {
+      <mat-card-content>
+        <mat-selection-list [compareWith]="compareConsent">
+          @for (consentType of consentTypes; track consentType) {
+            <mat-list-option
+              [value]="consentType.id"
+              [selected]="isConsentGranted(consentType.id)"
+              (change)="toggleConsent(consentType.id)"
+              >
+              <div matListItemTitle>{{ consentType.label }}</div>
+              <div matListItemLine>{{ consentType.description }}</div>
+            </mat-list-option>
+          }
+        </mat-selection-list>
+        @if (consents.length > 0) {
+          <div class="consent-history">
+            <h3>Histórico de Consentimentos</h3>
+            <mat-list>
+              @for (consent of consents; track consent) {
+                <mat-list-item>
+                  <mat-icon matListItemIcon [color]="consent.status === 'GRANTED' ? 'accent' : 'warn'">
+                    {{ consent.status === 'GRANTED' ? 'check_circle' : 'cancel' }}
+                  </mat-icon>
+                  <div matListItemTitle>{{ getConsentLabel(consent.consentType) }}</div>
+                  <div matListItemLine>
+                    {{ consent.status === 'GRANTED' ? 'Concedido em' : 'Revogado em' }}
+                    {{ (consent.status === 'GRANTED' ? consent.grantedAt : consent.revokedAt) | date: 'dd/MM/yyyy HH:mm' }}
+                  </div>
+                </mat-list-item>
+              }
+            </mat-list>
+          </div>
+        }
+      </mat-card-content>
+    }
   </mat-card>
 
   <mat-card class="info-card">

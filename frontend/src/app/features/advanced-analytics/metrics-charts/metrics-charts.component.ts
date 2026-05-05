@@ -8,9 +8,9 @@ interface ChartData {
 }
 
 @Component({
-  selector: 'app-metrics-charts',
-  templateUrl: './metrics-charts.component.html',
-  styles: [`
+    selector: 'app-metrics-charts',
+    templateUrl: './metrics-charts.component.html',
+    styles: [`
     .charts-container {
       padding: 20px;
       display: flex;
@@ -70,7 +70,8 @@ interface ChartData {
         overflow-x: auto;
       }
     }
-  `]
+  `],
+    standalone: false
 })
 export class MetricsChartsComponent implements OnInit {
   @Input() metrics: AnalyticsMetricDto[] = [];

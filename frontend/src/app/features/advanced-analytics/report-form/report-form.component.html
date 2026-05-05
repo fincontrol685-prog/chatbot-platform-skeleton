@@ -2,8 +2,12 @@
   <mat-form-field appearance="outline" class="full-width">
     <mat-label>Nome do Relatório</mat-label>
     <input matInput formControlName="name" />
-    <mat-error *ngIf="form.get('name')?.hasError('required')">Nome é obrigatório</mat-error>
-    <mat-error *ngIf="form.get('name')?.hasError('minlength')">Mínimo 3 caracteres</mat-error>
+    @if (form.get('name')?.hasError('required')) {
+      <mat-error>Nome é obrigatório</mat-error>
+    }
+    @if (form.get('name')?.hasError('minlength')) {
+      <mat-error>Mínimo 3 caracteres</mat-error>
+    }
   </mat-form-field>
 
   <mat-form-field appearance="outline" class="full-width">
@@ -22,27 +26,33 @@
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Tipo de Relatório</mat-label>
       <mat-select formControlName="type" (change)="onTypeChange()">
-        <mat-option *ngFor="let type of reportTypes" [value]="type">
-          {{ type }}
-        </mat-option>
+        @for (type of reportTypes; track type) {
+          <mat-option [value]="type">
+            {{ type }}
+          </mat-option>
+        }
       </mat-select>
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Tipo de Gráfico</mat-label>
       <mat-select formControlName="chartType">
-        <mat-option *ngFor="let chart of chartTypes" [value]="chart">
-          {{ chart }}
-        </mat-option>
+        @for (chart of chartTypes; track chart) {
+          <mat-option [value]="chart">
+            {{ chart }}
+          </mat-option>
+        }
       </mat-select>
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Agrupar por</mat-label>
       <mat-select formControlName="groupBy">
-        <mat-option *ngFor="let group of groupByOptions" [value]="group">
-          {{ group }}
-        </mat-option>
+        @for (group of groupByOptions; track group) {
+          <mat-option [value]="group">
+            {{ group }}
+          </mat-option>
+        }
       </mat-select>
     </mat-form-field>
   </div>
@@ -50,23 +60,33 @@
   <div class="form-section">
     <h3>Métricas</h3>
     <mat-selection-list formControlName="metricTypes" class="metrics-list">
-      <mat-list-option *ngFor="let metric of metricOptions" [value]="metric">
-        {{ metric }}
-      </mat-list-option>
+      @for (metric of metricOptions; track metric) {
+        <mat-list-option [value]="metric">
+          {{ metric }}
+        </mat-list-option>
+      }
     </mat-selection-list>
-    <mat-error *ngIf="form.get('metricTypes')?.hasError('required')">Selecione pelo menos uma métrica</mat-error>
+    @if (form.get('metricTypes')?.hasError('required')) {
+      <mat-error>Selecione pelo menos uma métrica</mat-error>
+    }
   </div>
 
   <mat-checkbox formControlName="isPublic" class="full-width">
     Compartilhar relatório (permitir que outros visualizem)
   </mat-checkbox>
 
-  <div *ngIf="error" class="state-card state-card--error">{{ error }}</div>
+  @if (error) {
+    <div class="state-card state-card--error">{{ error }}</div>
+  }
 
   <div class="form-actions">
     <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || loading">
-      <mat-icon *ngIf="!loading">save</mat-icon>
-      <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
+      @if (!loading) {
+        <mat-icon>save</mat-icon>
+      }
+      @if (loading) {
+        <mat-spinner diameter="20"></mat-spinner>
+      }
       {{ report ? 'Atualizar' : 'Criar' }}
     </button>
     <button mat-button type="button" (click)="cancel()">Cancelar</button>

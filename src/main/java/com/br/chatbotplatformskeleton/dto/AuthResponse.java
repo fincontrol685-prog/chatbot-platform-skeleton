@@ -17,4 +17,15 @@ public class AuthResponse {
     public void setTokenType(String tokenType) { this.tokenType = tokenType; }
     public long getExpiresIn() { return expiresIn; }
     public void setExpiresIn(long expiresIn) { this.expiresIn = expiresIn; }
+
+    public String getToken() {
+        return accessToken;
+    }
+
+    public int getExpirationTime() {
+        return (int) expiresIn;
+
+    }
+
+
 }

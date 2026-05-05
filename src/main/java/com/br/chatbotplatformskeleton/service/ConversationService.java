@@ -4,44 +4,54 @@ import com.br.chatbotplatformskeleton.domain.Conversation;
 import com.br.chatbotplatformskeleton.domain.Bot;
 import com.br.chatbotplatformskeleton.domain.UserAccount;
 import com.br.chatbotplatformskeleton.dto.ConversationDto;
+import com.br.chatbotplatformskeleton.mapper.ConversationMapper;
 import com.br.chatbotplatformskeleton.repository.ConversationRepository;
 import com.br.chatbotplatformskeleton.repository.BotRepository;
 import com.br.chatbotplatformskeleton.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
-@Transactional
 public class ConversationService {
 
+    private static final Logger log = LoggerFactory.getLogger(ConversationService.class);
     private final ConversationRepository conversationRepository;
     private final BotRepository botRepository;
     private final UserRepository userRepository;
     private final AuditService auditService;
+    private final ConversationMapper conversationMapper;
+    private final CurrentUserService currentUserService;
 
     public ConversationService(ConversationRepository conversationRepository,
                              BotRepository botRepository,
                              UserRepository userRepository,
-                             AuditService auditService) {
+                             AuditService auditService,
+                             ConversationMapper conversationMapper,
+                             CurrentUserService currentUserService) {
         this.conversationRepository = conversationRepository;
         this.botRepository = botRepository;
         this.userRepository = userRepository;
         this.auditService = auditService;
+        this.conversationMapper = conversationMapper;
+        this.currentUserService = currentUserService;
     }
 
+    @Transactional
     public ConversationDto create(ConversationDto dto, Long userId) {
+        log.info("Creating conversation for user: {} and bot: {}", userId, dto.getBotId());
         Optional<Bot> botOpt = botRepository.findById(dto.getBotId());
         Optional<UserAccount> userOpt = userRepository.findById(userId);
 
         if (botOpt.isEmpty() || userOpt.isEmpty()) {
+            log.warn("Conversation creation failed: bot or user not found - botId: {}, userId: {}", dto.getBotId(), userId);
             throw new IllegalArgumentException("Bot or User not found");
         }
 
@@ -59,32 +69,49 @@ public class ConversationService {
 
         Conversation saved = conversationRepository.save(conversation);
         auditService.log(userId, "CREATE", "CONVERSATION", saved.getId(), null, toJson(saved));
-        return toDto(saved);
+        log.info("Conversation created successfully with id: {}", saved.getId());
+        return conversationMapper.toDto(saved);
     }
 
-    public Optional<ConversationDto> findById(Long id) {
-        return conversationRepository.findById(id).map(this::toDto);
+    public Optional<ConversationDto> findById(Long id, UserAccount requester) {
+        log.debug("Finding conversation with id: {}", id);
+        return conversationRepository.findById(id)
+            .map(conversation -> {
+                ensureConversationAccess(requester, conversation);
+                return conversationMapper.toDto(conversation);
+            });
     }
 
     public Page<ConversationDto> findByBotId(Long botId, Pageable pageable) {
-        return conversationRepository.findByBotId(botId, pageable).map(this::toDto);
+        log.debug("Finding conversations for bot: {}", botId);
+        return conversationRepository.findByBotId(botId, pageable).map(conversationMapper::toDto);
     }
 
-    public Page<ConversationDto> findByUserId(Long userId, Pageable pageable) {
-        return conversationRepository.findByUserId(userId, pageable).map(this::toDto);
+    public Page<ConversationDto> findByUserId(Long userId, Pageable pageable, UserAccount requester) {
+        log.debug("Finding conversations for user: {}", userId);
+        if (!isPrivileged(requester) && !userId.equals(requester.getId())) {
+            throw new AccessDeniedException("Acesso negado a conversas de outro usuario");
+        }
+        return conversationRepository.findByUserId(userId, pageable).map(conversationMapper::toDto);
     }
 
     public Page<ConversationDto> findByBotIdAndStatus(Long botId, String status, Pageable pageable) {
-        return conversationRepository.findByBotIdAndStatus(botId, status, pageable).map(this::toDto);
+        log.debug("Finding conversations with status: {} for bot: {}", status, botId);
+        return conversationRepository.findByBotIdAndStatus(botId, status, pageable).map(conversationMapper::toDto);
     }
 
     public Page<ConversationDto> findActiveConversations(Long botId, Pageable pageable) {
         return findByBotIdAndStatus(botId, "ACTIVE", pageable);
     }
 
+    @Transactional
     public Optional<ConversationDto> closeConversation(Long conversationId, Long userId) {
+        log.info("Closing conversation: {} by user: {}", conversationId, userId);
         Optional<Conversation> convOpt = conversationRepository.findById(conversationId);
-        if (convOpt.isEmpty()) return Optional.empty();
+        if (convOpt.isEmpty()) {
+            log.warn("Close conversation failed: conversation not found - id: {}", conversationId);
+            return Optional.empty();
+        }
 
         Conversation conversation = convOpt.get();
         String oldValue = toJson(conversation);
@@ -93,12 +120,17 @@ public class ConversationService {
 
         Conversation saved = conversationRepository.save(conversation);
         auditService.log(userId, "UPDATE", "CONVERSATION", saved.getId(), oldValue, toJson(saved));
-        return Optional.of(toDto(saved));
+        return Optional.of(conversationMapper.toDto(saved));
     }
 
+    @Transactional
     public Optional<ConversationDto> updateTitle(Long conversationId, String newTitle, Long userId) {
+        log.info("Updating conversation title for id: {} by user: {}", conversationId, userId);
         Optional<Conversation> convOpt = conversationRepository.findById(conversationId);
-        if (convOpt.isEmpty()) return Optional.empty();
+        if (convOpt.isEmpty()) {
+            log.warn("Update title failed: conversation not found - id: {}", conversationId);
+            return Optional.empty();
+        }
 
         Conversation conversation = convOpt.get();
         String oldValue = conversation.getTitle();
@@ -107,7 +139,7 @@ public class ConversationService {
 
         Conversation saved = conversationRepository.save(conversation);
         auditService.log(userId, "UPDATE", "CONVERSATION", saved.getId(), oldValue, newTitle);
-        return Optional.of(toDto(saved));
+        return Optional.of(conversationMapper.toDto(saved));
     }
 
     public long getActiveConversationCount(Long botId) {
@@ -116,29 +148,32 @@ public class ConversationService {
 
     public Page<ConversationDto> searchConversations(Long botId, String status, OffsetDateTime startDate, OffsetDateTime endDate, Pageable pageable) {
         if (status != null && startDate != null && endDate != null) {
-            return conversationRepository.findByBotIdAndDateRange(botId, startDate, endDate, pageable).map(this::toDto);
+            return conversationRepository.findByBotIdAndDateRange(botId, startDate, endDate, pageable).map(conversationMapper::toDto);
         }
         return findByBotId(botId, pageable);
     }
 
-    private ConversationDto toDto(Conversation conversation) {
-        ConversationDto dto = new ConversationDto();
-        dto.setId(conversation.getId());
-        dto.setBotId(conversation.getBot().getId());
-        dto.setUserId(conversation.getUser().getId());
-        dto.setTitle(conversation.getTitle());
-        dto.setStatus(conversation.getStatus());
-        dto.setMessageCount(conversation.getMessageCount());
-        dto.setCreatedAt(conversation.getCreatedAt());
-        dto.setUpdatedAt(conversation.getUpdatedAt());
-        dto.setClosedAt(conversation.getClosedAt());
-        dto.setMetadata(conversation.getMetadata());
-        return dto;
+    private void ensureConversationAccess(UserAccount requester, Conversation conversation) {
+        if (conversation == null) {
+            return;
+        }
+
+        if (isPrivileged(requester)) {
+            return;
+        }
+
+        if (requester == null || conversation.getUser() == null || !conversation.getUser().getId().equals(requester.getId())) {
+            throw new AccessDeniedException("Acesso negado a esta conversa");
+        }
     }
+
+    private boolean isPrivileged(UserAccount requester) {
+        return currentUserService.isPrivileged(requester);
+    }
+
 
     private String toJson(Conversation conversation) {
         return String.format("{\"id\":%d,\"title\":\"%s\",\"status\":\"%s\",\"messageCount\":%d}",
             conversation.getId(), conversation.getTitle(), conversation.getStatus(), conversation.getMessageCount());
     }
 }
-

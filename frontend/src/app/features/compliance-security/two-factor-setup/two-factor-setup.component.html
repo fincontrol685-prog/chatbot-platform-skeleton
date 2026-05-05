@@ -1,133 +1,156 @@
 <div class="container">
   <h2>Autenticação em Duas Etapas (2FA)</h2>
 
-  <div *ngIf="error" class="state-card state-card--error">{{ error }}</div>
-  <div *ngIf="success" class="state-card state-card--success">{{ success }}</div>
+  @if (error) {
+    <div class="state-card state-card--error">{{ error }}</div>
+  }
+  @if (success) {
+    <div class="state-card state-card--success">{{ success }}</div>
+  }
 
   <!-- Status View -->
-  <div *ngIf="setupStep === 'status'" class="status-section">
-    <mat-card>
-      <mat-card-header>
-        <mat-card-title>Status do 2FA</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div *ngIf="loading" class="loading">
-          <mat-spinner diameter="40"></mat-spinner>
-        </div>
-
-        <div *ngIf="!loading && twoFactorStatus">
-          <mat-list>
-            <mat-list-item>
-              <mat-icon matListItemIcon [color]="twoFactorStatus.isEnabled ? 'accent' : 'warn'">
-                {{ twoFactorStatus.isEnabled ? 'verified' : 'security' }}
-              </mat-icon>
-              <div matListItemTitle>Status</div>
-              <div matListItemLine>
-                {{ twoFactorStatus.isEnabled ? 'Ativado' : 'Desativado' }}
+  @if (setupStep === 'status') {
+    <div class="status-section">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Status do 2FA</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          @if (loading) {
+            <div class="loading">
+              <mat-spinner diameter="40"></mat-spinner>
+            </div>
+          }
+          @if (!loading && twoFactorStatus) {
+            <div>
+              <mat-list>
+                <mat-list-item>
+                  <mat-icon matListItemIcon [color]="twoFactorStatus.isEnabled ? 'accent' : 'warn'">
+                    {{ twoFactorStatus.isEnabled ? 'verified' : 'security' }}
+                  </mat-icon>
+                  <div matListItemTitle>Status</div>
+                  <div matListItemLine>
+                    {{ twoFactorStatus.isEnabled ? 'Ativado' : 'Desativado' }}
+                  </div>
+                </mat-list-item>
+                <mat-list-item>
+                  <mat-icon matListItemIcon>vpn_key</mat-icon>
+                  <div matListItemTitle>Método</div>
+                  <div matListItemLine>{{ twoFactorStatus.method }} (Google Authenticator, Authy, etc.)</div>
+                </mat-list-item>
+              </mat-list>
+              <div class="actions">
+                @if (!twoFactorStatus.isEnabled) {
+                  <button
+                    mat-raised-button
+                    color="primary"
+                    (click)="initiateTwoFactor()"
+                    >
+                    <mat-icon>add</mat-icon> Ativar 2FA
+                  </button>
+                }
+                @if (twoFactorStatus.isEnabled) {
+                  <button
+                    mat-raised-button
+                    color="warn"
+                    (click)="disableTwoFactor()"
+                    >
+                    <mat-icon>delete</mat-icon> Desativar 2FA
+                  </button>
+                }
               </div>
-            </mat-list-item>
-            <mat-list-item>
-              <mat-icon matListItemIcon>vpn_key</mat-icon>
-              <div matListItemTitle>Método</div>
-              <div matListItemLine>{{ twoFactorStatus.method }} (Google Authenticator, Authy, etc.)</div>
-            </mat-list-item>
-          </mat-list>
-
-          <div class="actions">
-            <button
-              mat-raised-button
-              color="primary"
-              *ngIf="!twoFactorStatus.isEnabled"
-              (click)="initiateTwoFactor()"
-            >
-              <mat-icon>add</mat-icon> Ativar 2FA
-            </button>
-            <button
-              mat-raised-button
-              color="warn"
-              *ngIf="twoFactorStatus.isEnabled"
-              (click)="disableTwoFactor()"
-            >
-              <mat-icon>delete</mat-icon> Desativar 2FA
-            </button>
-          </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
-  </div>
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
+    </div>
+  }
 
   <!-- Setup Step -->
-  <div *ngIf="setupStep === 'init'" class="setup-section">
-    <mat-card>
-      <mat-card-header>
-        <mat-card-title>Configurar Autenticação em Duas Etapas</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <p>Para ativar 2FA, você precisa de um aplicativo autenticador como:</p>
-        <ul>
-          <li>Google Authenticator</li>
-          <li>Microsoft Authenticator</li>
-          <li>Authy</li>
-          <li>FreeOTP</li>
-        </ul>
-      </mat-card-content>
-      <mat-card-actions>
-        <button mat-raised-button color="primary" (click)="initiateTwoFactor()" [disabled]="loading">
-          <mat-icon>arrow_forward</mat-icon> Continuar
-        </button>
-        <button mat-button (click)="cancel()">Cancelar</button>
-      </mat-card-actions>
-    </mat-card>
-  </div>
+  @if (setupStep === 'init') {
+    <div class="setup-section">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Configurar Autenticação em Duas Etapas</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p>Para ativar 2FA, você precisa de um aplicativo autenticador como:</p>
+          <ul>
+            <li>Google Authenticator</li>
+            <li>Microsoft Authenticator</li>
+            <li>Authy</li>
+            <li>FreeOTP</li>
+          </ul>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-raised-button color="primary" (click)="initiateTwoFactor()" [disabled]="loading">
+            <mat-icon>arrow_forward</mat-icon> Continuar
+          </button>
+          <button mat-button (click)="cancel()">Cancelar</button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  }
 
   <!-- Verify Step -->
-  <div *ngIf="setupStep === 'verify'" class="verify-section">
-    <mat-card>
-      <mat-card-header>
-        <mat-card-title>Verificar Configuração 2FA</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div *ngIf="qrCodeUrl" class="qr-code-section">
-          <p>Escaneie este código QR com seu aplicativo autenticador:</p>
-          <img [src]="qrCodeUrl" alt="QR Code" class="qr-code" />
-        </div>
-
-        <div *ngIf="secret" class="secret-section">
-          <p>Ou insira manualmente esta chave:</p>
-          <code class="secret-code">{{ secret }}</code>
-        </div>
-
-        <form [formGroup]="verifyForm">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Código do Autenticador (6 dígitos)</mat-label>
-            <input matInput formControlName="token" maxlength="6" />
-            <mat-error *ngIf="verifyForm.get('token')?.hasError('required')">
-              Código é obrigatório
-            </mat-error>
-            <mat-error *ngIf="verifyForm.get('token')?.hasError('minlength')">
-              Insira 6 dígitos
-            </mat-error>
-          </mat-form-field>
-        </form>
-
-        <div *ngIf="backupCodes.length > 0" class="backup-codes">
-          <h4>Códigos de Backup (Guardar em local seguro)</h4>
-          <div class="codes-list">
-            <code *ngFor="let code of backupCodes" class="backup-code">{{ code }}</code>
-          </div>
-        </div>
-      </mat-card-content>
-      <mat-card-actions>
-        <button
-          mat-raised-button
-          color="primary"
-          (click)="verifyAndActivate()"
-          [disabled]="verifyForm.invalid || loading"
-        >
-          <mat-icon>check</mat-icon> Ativar
-        </button>
-        <button mat-button (click)="cancel()">Cancelar</button>
-      </mat-card-actions>
-    </mat-card>
-  </div>
+  @if (setupStep === 'verify') {
+    <div class="verify-section">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Verificar Configuração 2FA</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          @if (qrCodeUrl) {
+            <div class="qr-code-section">
+              <p>Escaneie este código QR com seu aplicativo autenticador:</p>
+              <img [src]="qrCodeUrl" alt="QR Code" class="qr-code" />
+            </div>
+          }
+          @if (secret) {
+            <div class="secret-section">
+              <p>Ou insira manualmente esta chave:</p>
+              <code class="secret-code">{{ secret }}</code>
+            </div>
+          }
+          <form [formGroup]="verifyForm">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Código do Autenticador (6 dígitos)</mat-label>
+              <input matInput formControlName="token" maxlength="6" />
+              @if (verifyForm.get('token')?.hasError('required')) {
+                <mat-error>
+                  Código é obrigatório
+                </mat-error>
+              }
+              @if (verifyForm.get('token')?.hasError('minlength')) {
+                <mat-error>
+                  Insira 6 dígitos
+                </mat-error>
+              }
+            </mat-form-field>
+          </form>
+          @if (backupCodes.length > 0) {
+            <div class="backup-codes">
+              <h4>Códigos de Backup (Guardar em local seguro)</h4>
+              <div class="codes-list">
+                @for (code of backupCodes; track code) {
+                  <code class="backup-code">{{ code }}</code>
+                }
+              </div>
+            </div>
+          }
+        </mat-card-content>
+        <mat-card-actions>
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="verifyAndActivate()"
+            [disabled]="verifyForm.invalid || loading"
+            >
+            <mat-icon>check</mat-icon> Ativar
+          </button>
+          <button mat-button (click)="cancel()">Cancelar</button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  }
 </div>

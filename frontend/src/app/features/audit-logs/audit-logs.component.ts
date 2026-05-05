@@ -30,26 +30,25 @@ export interface AuditLog {
 }
 
 @Component({
-  selector: 'app-audit-logs',
-  standalone: true,
-  imports: [
-    CommonModule,
-    MatTableModule,
-    MatPaginatorModule,
-    MatButtonModule,
-    MatIconModule,
-    MatCardModule,
-    MatChipsModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    FormsModule,
-    RouterModule
-  ],
-  templateUrl: './audit-logs.component.html',
-  styleUrls: ['./audit-logs.component.css']
+    selector: 'app-audit-logs',
+    imports: [
+        CommonModule,
+        MatTableModule,
+        MatPaginatorModule,
+        MatButtonModule,
+        MatIconModule,
+        MatCardModule,
+        MatChipsModule,
+        MatDatepickerModule,
+        MatNativeDateModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatSelectModule,
+        FormsModule,
+        RouterModule
+    ],
+    templateUrl: './audit-logs.component.html',
+    styleUrls: ['./audit-logs.component.css']
 })
 export class AuditLogsComponent implements OnInit {
   displayedColumns: string[] = ['id', 'username', 'action', 'entityType', 'status', 'ipAddress', 'createdAt', 'actions'];

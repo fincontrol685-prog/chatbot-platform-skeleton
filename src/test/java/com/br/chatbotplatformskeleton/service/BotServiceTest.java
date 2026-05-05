@@ -2,6 +2,7 @@ package com.br.chatbotplatformskeleton.service;
 
 import com.br.chatbotplatformskeleton.domain.Bot;
 import com.br.chatbotplatformskeleton.dto.BotDto;
+import com.br.chatbotplatformskeleton.mapper.BotMapper;
 import com.br.chatbotplatformskeleton.repository.BotRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,6 +12,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,11 +27,14 @@ class BotServiceTest {
     @Mock
     private BotRepository botRepository;
 
+    @Mock
+    private BotMapper botMapper;
+
     private BotService botService;
 
     @BeforeEach
     void setUp() {
-        botService = new BotService(botRepository, new ObjectMapper());
+        botService = new BotService(botRepository, new ObjectMapper(), botMapper);
     }
 
     @Test
@@ -46,6 +51,15 @@ class BotServiceTest {
             bot.setId(10L);
             return bot;
         });
+
+        BotDto expectedResult = new BotDto();
+        expectedResult.setId(10L);
+        expectedResult.setName("Atendimento Prime");
+        expectedResult.setKey("atendimento-prime");
+        expectedResult.setEnabled(true);
+        expectedResult.setConfig("{\"profile\" : {\"assistantRole\" : \"Analista virtual\"}}");
+
+        when(botMapper.toDto(any(Bot.class))).thenReturn(expectedResult);
 
         BotDto created = botService.create(dto);
 
@@ -72,6 +86,14 @@ class BotServiceTest {
             return bot;
         });
 
+        BotDto expectedResult = new BotDto();
+        expectedResult.setId(11L);
+        expectedResult.setName("Bot legado");
+        expectedResult.setKey("bot-legado");
+        expectedResult.setConfig("Observacao interna para rollout controlado");
+
+        when(botMapper.toDto(any(Bot.class))).thenReturn(expectedResult);
+
         BotDto created = botService.create(dto);
 
         assertThat(created.getConfig()).isEqualTo("Observacao interna para rollout controlado");
@@ -96,5 +118,31 @@ class BotServiceTest {
         assertThatThrownBy(() -> botService.update(7L, dto))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("Ja existe um bot com esta chave");
+    }
+
+    @Test
+    void listAllShouldFallbackToGeneratedMapperWhenInjectedMapperIsNull() {
+        BotService serviceWithFallbackMapper = new BotService(botRepository, new ObjectMapper(), null);
+
+        Bot bot = new Bot();
+        bot.setId(3L);
+        bot.setName("Bot de suporte");
+        bot.setKey("bot-suporte");
+        bot.setEnabled(true);
+        bot.setConfig("{\"channel\":\"web\"}");
+
+        when(botRepository.findAll()).thenReturn(List.of(bot));
+
+        List<BotDto> result = serviceWithFallbackMapper.listAll();
+
+        assertThat(result)
+            .singleElement()
+            .satisfies(dto -> {
+                assertThat(dto.getId()).isEqualTo(3L);
+                assertThat(dto.getName()).isEqualTo("Bot de suporte");
+                assertThat(dto.getKey()).isEqualTo("bot-suporte");
+                assertThat(dto.getEnabled()).isTrue();
+                assertThat(dto.getConfig()).isEqualTo("{\"channel\":\"web\"}");
+            });
     }
 }

@@ -9,8 +9,11 @@ import com.br.chatbotplatformskeleton.dto.ConversationMessageDto;
 import com.br.chatbotplatformskeleton.repository.ConversationMessageRepository;
 import com.br.chatbotplatformskeleton.repository.ConversationRepository;
 import com.br.chatbotplatformskeleton.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,108 +26,134 @@ import java.util.stream.Collectors;
 @Transactional
 public class ConversationMessageService {
 
+    private static final Logger log = LoggerFactory.getLogger(ConversationMessageService.class);
+
     private final ConversationMessageRepository messageRepository;
     private final ConversationRepository conversationRepository;
     private final UserRepository userRepository;
     private final AuditService auditService;
     private final BotResponseService botResponseService;
+    private final CurrentUserService currentUserService;
 
     public ConversationMessageService(ConversationMessageRepository messageRepository,
                                      ConversationRepository conversationRepository,
                                      UserRepository userRepository,
                                      AuditService auditService,
-                                     BotResponseService botResponseService) {
+                                     BotResponseService botResponseService,
+                                     CurrentUserService currentUserService) {
         this.messageRepository = messageRepository;
         this.conversationRepository = conversationRepository;
         this.userRepository = userRepository;
         this.auditService = auditService;
         this.botResponseService = botResponseService;
+        this.currentUserService = currentUserService;
     }
 
-    public ConversationMessageDto addMessage(ConversationMessageDto dto, Long conversationId, Long senderId) {
+    public ConversationMessageDto addMessage(ConversationMessageDto dto, Long conversationId, UserAccount requester) {
         Conversation conversation = requireConversation(conversationId);
-        UserAccount sender = requireUser(senderId);
+        ensureConversationAccess(conversation, requester);
+        UserAccount sender = requireUser(requester.getId());
 
         ConversationMessage saved = saveMessage(
             conversation,
             sender,
-            normalizeMessageType(dto.getMessageType()),
+            "USER",
             normalizeContent(dto.getContent()),
-            dto.getSentimentScore(),
-            dto.getIntent(),
-            dto.getConfidence(),
-            dto.getResponseTimeMs(),
-            dto.getMetadata(),
-            Boolean.TRUE.equals(dto.getIsFlagged())
+            null,
+            null,
+            null,
+            null,
+            null,
+            false
         );
 
         touchConversation(conversation, 1L);
-        auditService.log(senderId, "CREATE", "MESSAGE", saved.getId(), null, saved.getContent());
+        auditService.log(requester.getId(), "CREATE", "MESSAGE", saved.getId(), null, saved.getContent());
         return toDto(saved);
     }
 
-    public ConversationExchangeDto processUserMessage(ConversationMessageDto dto, Long conversationId, Long senderId) {
+    public ConversationExchangeDto processUserMessage(ConversationMessageDto dto, Long conversationId, UserAccount requester) {
         Conversation conversation = requireConversation(conversationId);
+        ensureConversationAccess(conversation, requester);
         if (!"ACTIVE".equalsIgnoreCase(conversation.getStatus())) {
             throw new IllegalArgumentException("A conversa nao esta ativa");
         }
 
-        UserAccount sender = requireUser(senderId);
+        // Validate bot is enabled
+        if (conversation.getBot() == null) {
+            throw new IllegalArgumentException("Bot nao encontrado para esta conversa");
+        }
+        if (!Boolean.TRUE.equals(conversation.getBot().getEnabled())) {
+            throw new IllegalArgumentException("Bot desativado. Nao e possivel enviar mensagens");
+        }
+
+        UserAccount sender = requireUser(requester.getId());
         String content = normalizeContent(dto.getContent());
-        BotResponseService.ResponsePlan responsePlan = botResponseService.buildResponsePlan(
-            conversation,
-            messageRepository.findMessagesByConversationIdOrdered(conversationId),
-            content
-        );
 
-        ConversationMessage userMessage = saveMessage(
-            conversation,
-            sender,
-            "USER",
-            content,
-            responsePlan.sentimentScore(),
-            responsePlan.intent(),
-            responsePlan.confidence(),
-            null,
-            responsePlan.metadata(),
-            responsePlan.flaggedForReview()
-        );
+        try {
+            BotResponseService.ResponsePlan responsePlan = botResponseService.buildResponsePlan(
+                conversation,
+                messageRepository.findMessagesByConversationIdOrdered(conversationId),
+                content
+            );
 
-        UserAccount botSender = userRepository.findByUsernameIgnoreCase(botResponseService.getSystemUsername())
-            .orElseThrow(() -> new IllegalArgumentException("Usuario interno do bot nao encontrado"));
+            ConversationMessage userMessage = saveMessage(
+                conversation,
+                sender,
+                "USER",
+                content,
+                responsePlan.sentimentScore(),
+                responsePlan.intent(),
+                responsePlan.confidence(),
+                null,
+                responsePlan.metadata(),
+                responsePlan.flaggedForReview()
+            );
 
-        ConversationMessage botMessage = saveMessage(
-            conversation,
-            botSender,
-            "BOT",
-            responsePlan.botContent(),
-            Math.max(0.05d, responsePlan.sentimentScore()),
-            responsePlan.intent(),
-            responsePlan.confidence(),
-            responsePlan.responseTimeMs(),
-            responsePlan.metadata(),
-            false
-        );
+            UserAccount botSender = userRepository.findByUsernameIgnoreCase(botResponseService.getSystemUsername())
+                .orElseThrow(() -> new IllegalArgumentException("Usuario interno do bot nao encontrado ou desativado. Contate o administrador"));
 
-        touchConversation(conversation, 2L);
-        auditService.log(senderId, "CREATE", "MESSAGE", userMessage.getId(), null, userMessage.getContent());
-        auditService.log(senderId, "CREATE", "BOT_MESSAGE", botMessage.getId(), null, botMessage.getContent());
+            ConversationMessage botMessage = saveMessage(
+                conversation,
+                botSender,
+                "BOT",
+                responsePlan.botContent(),
+                Math.max(0.05d, responsePlan.sentimentScore()),
+                responsePlan.intent(),
+                responsePlan.confidence(),
+                responsePlan.responseTimeMs(),
+                responsePlan.metadata(),
+                false
+            );
 
-        ConversationExchangeDto exchange = new ConversationExchangeDto();
-        exchange.setUserMessage(toDto(userMessage));
-        exchange.setBotMessage(toDto(botMessage));
-        return exchange;
+            touchConversation(conversation, 2L);
+            auditService.log(requester.getId(), "CREATE", "MESSAGE", userMessage.getId(), null, userMessage.getContent());
+            auditService.log(requester.getId(), "CREATE", "BOT_MESSAGE", botMessage.getId(), null, botMessage.getContent());
+
+            ConversationExchangeDto exchange = new ConversationExchangeDto();
+            exchange.setUserMessage(toDto(userMessage));
+            exchange.setBotMessage(toDto(botMessage));
+            return exchange;
+        } catch (Exception ex) {
+            log.error("Erro ao processar mensagem para conversa {}: {}", conversationId, ex.getMessage(), ex);
+            throw new IllegalArgumentException("Erro ao processar sua mensagem: " + ex.getMessage(), ex);
+        }
     }
 
-    public Optional<ConversationMessageDto> findById(Long id) {
-        return messageRepository.findById(id).map(this::toDto);
+    public Optional<ConversationMessageDto> findById(Long id, UserAccount requester) {
+        return messageRepository.findById(id).map(message -> {
+            ensureConversationAccess(message.getConversation(), requester);
+            return toDto(message);
+        });
     }
 
-    public Page<ConversationMessageDto> findByConversationId(Long conversationId, Pageable pageable) {
+    public Page<ConversationMessageDto> findByConversationId(Long conversationId, Pageable pageable, UserAccount requester) {
+        ensureConversationAccess(requireConversation(conversationId), requester);
         return messageRepository.findByConversationId(conversationId, pageable).map(this::toDto);
     }
 
-    public List<ConversationMessageDto> getConversationHistory(Long conversationId) {
+    public List<ConversationMessageDto> getConversationHistory(Long conversationId, UserAccount requester) {
+        ensureConversationAccess(requireConversation(conversationId), requester);
         return messageRepository.findMessagesByConversationIdOrdered(conversationId)
             .stream()
             .map(this::toDto)
@@ -185,6 +214,17 @@ public class ConversationMessageService {
     private UserAccount requireUser(Long senderId) {
         return userRepository.findById(senderId)
             .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    }
+
+    private void ensureConversationAccess(Conversation conversation, UserAccount requester) {
+        if (currentUserService.isPrivileged(requester)) {
+            return;
+        }
+
+        if (conversation == null || conversation.getUser() == null || requester == null ||
+            !conversation.getUser().getId().equals(requester.getId())) {
+            throw new AccessDeniedException("Acesso negado a esta conversa");
+        }
     }
 
     private ConversationMessage saveMessage(

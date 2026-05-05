@@ -1,1 +1,0 @@
-{"ast":null,"code":"/* Minimal polyfills for development */\n/**\n * Recommended: import 'zone.js' for Angular change detection.\n * The project already depends on zone.js in package.json so this import is safe.\n */\nimport 'zone.js';\n// You can add other polyfills here if needed in the future.","map":null,"metadata":{},"sourceType":"module","externalDependencies":[]}

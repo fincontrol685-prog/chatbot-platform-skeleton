@@ -13,6 +13,7 @@ import java.util.List;
 @Repository
 public interface BotTemplateRepository extends JpaRepository<BotTemplate, Long> {
 
+    @Query("SELECT t FROM BotTemplate t WHERE t.isPublic = true")
     Page<BotTemplate> findByIsPublicTrue(Pageable pageable);
 
     Page<BotTemplate> findByCategory(String category, Pageable pageable);

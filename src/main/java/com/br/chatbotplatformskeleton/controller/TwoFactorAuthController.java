@@ -3,6 +3,11 @@ package com.br.chatbotplatformskeleton.controller;
 import com.br.chatbotplatformskeleton.dto.TwoFactorAuthDto;
 import com.br.chatbotplatformskeleton.repository.UserRepository;
 import com.br.chatbotplatformskeleton.service.TwoFactorAuthService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +21,8 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/security/2fa")
+@Tag(name = "Two Factor Authentication", description = "Autenticação de Dois Fatores (2FA)")
+@SecurityRequirement(name = "Bearer Authentication")
 public class TwoFactorAuthController {
 
     private static final Logger logger = LoggerFactory.getLogger(TwoFactorAuthController.class);
@@ -30,6 +37,12 @@ public class TwoFactorAuthController {
 
     @PostMapping("/init")
     @PreAuthorize("hasAnyRole('ADMIN','GESTOR','USUARIO')")
+    @Operation(summary = "Inicializar Autenticação de Dois Fatores", description = "Gera um código QR para configurar 2FA via TOTP")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "2FA inicializado, retorna código QR"),
+            @ApiResponse(responseCode = "403", description = "Acesso negado"),
+            @ApiResponse(responseCode = "400", description = "Usuário não identificado")
+    })
     public ResponseEntity<TwoFactorAuthDto> initializeTwoFactorAuth(Authentication authentication) {
         Long userId = extractUserId(authentication);
         if (userId == null) {
@@ -41,6 +54,12 @@ public class TwoFactorAuthController {
 
     @PostMapping("/verify")
     @PreAuthorize("hasAnyRole('ADMIN','GESTOR','USUARIO')")
+    @Operation(summary = "Verificar e Ativar 2FA", description = "Verifica o código TOTP e ativa a autenticação de dois fatores")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "2FA verificado e ativado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Código inválido ou usuário não identificado"),
+            @ApiResponse(responseCode = "403", description = "Acesso negado")
+    })
     public ResponseEntity<Map<String, Object>> verifyAndActivate(
             @RequestParam String code,
             Authentication authentication) {
@@ -57,6 +76,11 @@ public class TwoFactorAuthController {
     }
 
     @PostMapping("/validate")
+    @Operation(summary = "Validar Código 2FA", description = "Valida um código TOTP para login com 2FA ativo")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Código validado, retorna resultado"),
+            @ApiResponse(responseCode = "400", description = "Usuário ou código inválido")
+    })
     public ResponseEntity<Map<String, Boolean>> validateCode(
             @RequestParam Long userId,
             @RequestParam String code) {
@@ -68,6 +92,11 @@ public class TwoFactorAuthController {
 
     @GetMapping("/status")
     @PreAuthorize("hasAnyRole('ADMIN','GESTOR','USUARIO')")
+    @Operation(summary = "Obter Status do 2FA", description = "Retorna o status da autenticação de dois fatores do usuário")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Status obtido com sucesso"),
+            @ApiResponse(responseCode = "403", description = "Acesso negado")
+    })
     public ResponseEntity<TwoFactorAuthDto> getTwoFactorStatus(Authentication authentication) {
         Long userId = extractUserId(authentication);
         if (userId == null) {
@@ -82,6 +111,12 @@ public class TwoFactorAuthController {
 
     @DeleteMapping
     @PreAuthorize("hasAnyRole('ADMIN','GESTOR','USUARIO')")
+    @Operation(summary = "Desativar 2FA", description = "Desativa a autenticação de dois fatores do usuário")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "2FA desativado com sucesso"),
+            @ApiResponse(responseCode = "403", description = "Acesso negado"),
+            @ApiResponse(responseCode = "400", description = "Usuário não identificado")
+    })
     public ResponseEntity<Void> disableTwoFactorAuth(Authentication authentication) {
         Long userId = extractUserId(authentication);
         if (userId == null) {

@@ -13,57 +13,71 @@
   </div>
 
   <!-- Error Message -->
-  <div *ngIf="error" class="state-card state-card--error">{{ error }}</div>
+  @if (error) {
+    <div class="state-card state-card--error">{{ error }}</div>
+  }
 
   <!-- Loading -->
-  <div *ngIf="loading" class="loading">
-    <mat-spinner diameter="40"></mat-spinner>
-  </div>
+  @if (loading) {
+    <div class="loading">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  }
 
   <!-- Departments List -->
-  <mat-list *ngIf="!loading && filteredDepartments.length > 0">
-    <mat-list-item *ngFor="let dept of filteredDepartments" (click)="selectDepartment(dept)">
-      <mat-icon matListItemIcon>business</mat-icon>
-      <div matListItemTitle>{{ dept.name }}</div>
-      <div matListItemLine>{{ dept.code }} - {{ dept.location }}</div>
-      <div matListItemLine class="text-secondary">{{ dept.description }}</div>
-    </mat-list-item>
-  </mat-list>
+  @if (!loading && filteredDepartments.length > 0) {
+    <mat-list>
+      @for (dept of filteredDepartments; track dept) {
+        <mat-list-item (click)="selectDepartment(dept)">
+          <mat-icon matListItemIcon>business</mat-icon>
+          <div matListItemTitle>{{ dept.name }}</div>
+          <div matListItemLine>{{ dept.code }} - {{ dept.location }}</div>
+          <div matListItemLine class="text-secondary">{{ dept.description }}</div>
+        </mat-list-item>
+      }
+    </mat-list>
+  }
 
   <!-- Empty State -->
-  <div *ngIf="!loading && filteredDepartments.length === 0" class="empty-state">
-    <mat-icon>folder_off</mat-icon>
-    <p>Nenhum departamento encontrado</p>
-  </div>
+  @if (!loading && filteredDepartments.length === 0) {
+    <div class="empty-state">
+      <mat-icon>folder_off</mat-icon>
+      <p>Nenhum departamento encontrado</p>
+    </div>
+  }
 
   <!-- Detail View -->
-  <mat-card *ngIf="selectedDepartment && !showForm" class="detail-card">
-    <mat-card-header>
-      <mat-card-title>{{ selectedDepartment.name }}</mat-card-title>
-      <mat-card-subtitle>{{ selectedDepartment.code }}</mat-card-subtitle>
-    </mat-card-header>
-    <mat-card-content>
-      <p><strong>Localização:</strong> {{ selectedDepartment.location }}</p>
-      <p><strong>Descrição:</strong> {{ selectedDepartment.description }}</p>
-      <p><strong>Status:</strong> {{ selectedDepartment.isActive ? 'Ativo' : 'Inativo' }}</p>
-    </mat-card-content>
-    <mat-card-actions>
-      <button mat-button color="primary" (click)="openForm()">Editar</button>
-      <button mat-button color="warn" (click)="deleteDepartment(selectedDepartment!.id)">Desativar</button>
-    </mat-card-actions>
-  </mat-card>
+  @if (selectedDepartment && !showForm) {
+    <mat-card class="detail-card">
+      <mat-card-header>
+        <mat-card-title>{{ selectedDepartment.name }}</mat-card-title>
+        <mat-card-subtitle>{{ selectedDepartment.code }}</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p><strong>Localização:</strong> {{ selectedDepartment.location }}</p>
+        <p><strong>Descrição:</strong> {{ selectedDepartment.description }}</p>
+        <p><strong>Status:</strong> {{ selectedDepartment.isActive ? 'Ativo' : 'Inativo' }}</p>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-button color="primary" (click)="openForm()">Editar</button>
+        <button mat-button color="warn" (click)="deleteDepartment(selectedDepartment!.id)">Desativar</button>
+      </mat-card-actions>
+    </mat-card>
+  }
 
   <!-- Form -->
-  <mat-card *ngIf="showForm" class="form-card">
-    <mat-card-header>
-      <mat-card-title>{{ selectedDepartment ? 'Editar' : 'Novo' }} Departamento</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <app-department-form
-        [department]="selectedDepartment"
-        (saved)="onDepartmentSaved($event)"
-        (cancelled)="closeForm()"
-      ></app-department-form>
-    </mat-card-content>
-  </mat-card>
+  @if (showForm) {
+    <mat-card class="form-card">
+      <mat-card-header>
+        <mat-card-title>{{ selectedDepartment ? 'Editar' : 'Novo' }} Departamento</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <app-department-form
+          [department]="selectedDepartment"
+          (saved)="onDepartmentSaved($event)"
+          (cancelled)="closeForm()"
+        ></app-department-form>
+      </mat-card-content>
+    </mat-card>
+  }
 </div>
