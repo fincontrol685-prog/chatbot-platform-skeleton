@@ -5,9 +5,10 @@ import { AuthService } from '../../../core/auth.service';
 import { getApiErrorMessage } from '../../../core/api-error.util';
 
 @Component({
-  selector: 'app-register',
-  templateUrl: './register.component.html',
-  styleUrls: ['./register.component.css']
+    selector: 'app-register',
+    templateUrl: './register.component.html',
+    styleUrls: ['./register.component.css'],
+    standalone: false
 })
 export class RegisterComponent {
   form: FormGroup;

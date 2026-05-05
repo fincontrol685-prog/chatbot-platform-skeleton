@@ -4,9 +4,9 @@ import { ProfessionalManagementService } from '../professional-management.servic
 import { DepartmentDto } from '../models/department.model';
 
 @Component({
-  selector: 'app-department-list',
-  templateUrl: './department-list.component.html',
-  styles: [`
+    selector: 'app-department-list',
+    templateUrl: './department-list.component.html',
+    styles: [`
     .container { padding: 20px; }
     h2 { margin-bottom: 20px; color: #1976d2; }
     .search-section { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; }
@@ -20,7 +20,8 @@ import { DepartmentDto } from '../models/department.model';
     mat-list { max-width: 800px; }
     mat-list-item { cursor: pointer; margin-bottom: 5px; }
     mat-list-item:hover { background-color: #f5f5f5; }
-  `]
+  `],
+    standalone: false
 })
 export class DepartmentListComponent implements OnInit {
   departments: DepartmentDto[] = [];

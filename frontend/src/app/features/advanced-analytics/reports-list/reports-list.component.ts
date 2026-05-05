@@ -4,9 +4,9 @@ import { AdvancedAnalyticsService } from '../advanced-analytics.service';
 import { CustomReportDto, ReportDefinition } from '../models/analytics.model';
 
 @Component({
-  selector: 'app-reports-list',
-  templateUrl: './reports-list.component.html',
-  styles: [`
+    selector: 'app-reports-list',
+    templateUrl: './reports-list.component.html',
+    styles: [`
     .container {
       padding: 20px;
     }
@@ -138,7 +138,8 @@ import { CustomReportDto, ReportDefinition } from '../models/analytics.model';
     strong {
       color: #333;
     }
-  `]
+  `],
+    standalone: false
 })
 export class ReportsListComponent implements OnInit {
   reports: CustomReportDto[] = [];

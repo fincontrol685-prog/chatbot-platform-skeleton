@@ -1,0 +1,1 @@
+import{G as e,na as n,tc as a}from"./chunk-YRE5MUFP.js";var $=(()=>{class t{static \u0275fac=function(i){return new(i||t)};static \u0275mod=n({type:t});static \u0275inj=e({imports:[a]})}return t})();export{$ as a};

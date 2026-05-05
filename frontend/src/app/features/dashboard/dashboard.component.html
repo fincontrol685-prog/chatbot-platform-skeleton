@@ -51,95 +51,103 @@
     </mat-card>
   </section>
 
-  <div *ngIf="loading" class="loading-band">
-    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-  </div>
+  @if (loading) {
+    <div class="loading-band">
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    </div>
+  }
 
-  <div *ngIf="error" class="state-card state-card--error">
-    <strong>Falha ao carregar dados.</strong>
-    <p>{{ error }}</p>
-  </div>
+  @if (error) {
+    <div class="state-card state-card--error">
+      <strong>Falha ao carregar dados.</strong>
+      <p>{{ error }}</p>
+    </div>
+  }
 
-  <section *ngIf="!loading" class="metrics-grid">
-    <a
-      class="metric-card"
-      *ngFor="let card of metricCards"
-      [routerLink]="card.route"
-      [attr.data-tone]="card.tone">
-      <mat-card>
+  @if (!loading) {
+    <section class="metrics-grid">
+      @for (card of metricCards; track card) {
+        <a
+          class="metric-card"
+          [routerLink]="card.route"
+          [attr.data-tone]="card.tone">
+          <mat-card>
+            <mat-card-content>
+              <div class="metric-card__icon">
+                <mat-icon>{{ card.icon }}</mat-icon>
+              </div>
+              <div class="metric-card__copy">
+                <span>{{ card.label }}</span>
+                <strong>{{ card.value }}</strong>
+                <p>{{ card.description }}</p>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </a>
+      }
+    </section>
+  }
+
+  @if (!loading) {
+    <section class="dashboard-grid">
+      <mat-card class="dashboard-panel">
         <mat-card-content>
-          <div class="metric-card__icon">
-            <mat-icon>{{ card.icon }}</mat-icon>
+          <div class="panel-heading">
+            <div>
+              <span class="panel-label">Sinal operacional</span>
+              <h2>Resumo do ambiente</h2>
+            </div>
+            <mat-chip color="primary" selected>Ativo</mat-chip>
           </div>
-          <div class="metric-card__copy">
-            <span>{{ card.label }}</span>
-            <strong>{{ card.value }}</strong>
-            <p>{{ card.description }}</p>
+          <div class="insight-list">
+            <article>
+              <mat-icon>hub</mat-icon>
+              <div>
+                <strong>Capacidade distribuida</strong>
+                <p>{{ stats.botCount }} bots e {{ stats.userCount }} usuarios estao cadastrados no ambiente.</p>
+              </div>
+            </article>
+            <article>
+              <mat-icon>mark_chat_unread</mat-icon>
+              <div>
+                <strong>Atendimento monitorado</strong>
+                <p>{{ stats.activeConversationCount }} conversas estao ativas e {{ stats.totalMessageCount }} mensagens ja foram processadas.</p>
+              </div>
+            </article>
+            <article>
+              <mat-icon>manage_search</mat-icon>
+              <div>
+                <strong>Leituras recomendadas</strong>
+                <p>Use analytics e auditoria para verificar gargalos, risco operacional e rastreabilidade.</p>
+              </div>
+            </article>
           </div>
         </mat-card-content>
       </mat-card>
-    </a>
-  </section>
-
-  <section class="dashboard-grid" *ngIf="!loading">
-    <mat-card class="dashboard-panel">
-      <mat-card-content>
-        <div class="panel-heading">
-          <div>
-            <span class="panel-label">Sinal operacional</span>
-            <h2>Resumo do ambiente</h2>
+      <mat-card class="dashboard-panel">
+        <mat-card-content>
+          <div class="panel-heading">
+            <div>
+              <span class="panel-label">Acoes rapidas</span>
+              <h2>Movimentos frequentes</h2>
+            </div>
           </div>
-          <mat-chip color="primary" selected>Ativo</mat-chip>
-        </div>
-
-        <div class="insight-list">
-          <article>
-            <mat-icon>hub</mat-icon>
-            <div>
-              <strong>Capacidade distribuida</strong>
-              <p>{{ stats.botCount }} bots e {{ stats.userCount }} usuarios estao cadastrados no ambiente.</p>
-            </div>
-          </article>
-          <article>
-            <mat-icon>mark_chat_unread</mat-icon>
-            <div>
-              <strong>Atendimento monitorado</strong>
-              <p>{{ stats.activeConversationCount }} conversas estao ativas e {{ stats.totalMessageCount }} mensagens ja foram processadas.</p>
-            </div>
-          </article>
-          <article>
-            <mat-icon>manage_search</mat-icon>
-            <div>
-              <strong>Leituras recomendadas</strong>
-              <p>Use analytics e auditoria para verificar gargalos, risco operacional e rastreabilidade.</p>
-            </div>
-          </article>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card class="dashboard-panel">
-      <mat-card-content>
-        <div class="panel-heading">
-          <div>
-            <span class="panel-label">Acoes rapidas</span>
-            <h2>Movimentos frequentes</h2>
+          <div class="action-list">
+            @for (action of quickActions; track action) {
+              <a class="action-link" [routerLink]="action.route">
+                <div class="action-link__icon">
+                  <mat-icon>{{ action.icon }}</mat-icon>
+                </div>
+                <div class="action-link__copy">
+                  <strong>{{ action.label }}</strong>
+                  <p>{{ action.description }}</p>
+                </div>
+                <mat-icon class="action-link__arrow">north_east</mat-icon>
+              </a>
+            }
           </div>
-        </div>
-
-        <div class="action-list">
-          <a class="action-link" *ngFor="let action of quickActions" [routerLink]="action.route">
-            <div class="action-link__icon">
-              <mat-icon>{{ action.icon }}</mat-icon>
-            </div>
-            <div class="action-link__copy">
-              <strong>{{ action.label }}</strong>
-              <p>{{ action.description }}</p>
-            </div>
-            <mat-icon class="action-link__arrow">north_east</mat-icon>
-          </a>
-        </div>
-      </mat-card-content>
-    </mat-card>
-  </section>
+        </mat-card-content>
+      </mat-card>
+    </section>
+  }
 </div>

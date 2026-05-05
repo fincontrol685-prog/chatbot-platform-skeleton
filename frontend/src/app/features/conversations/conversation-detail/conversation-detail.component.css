@@ -170,6 +170,19 @@
   background: rgba(16, 35, 60, 0.04);
 }
 
+.context-list {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--color-ink);
+  line-height: 1.75;
+}
+
+.context-block {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(16, 35, 60, 0.08);
+}
+
 .detail-list span {
   display: block;
   margin-bottom: 8px;

@@ -24,20 +24,54 @@ public class JwtFilter extends OncePerRequestFilter {
     public JwtFilter(JwtUtil jwtUtil) { this.jwtUtil = jwtUtil; }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain)
+            throws ServletException, IOException {
+
+        final List<String> SWAGGER_WHITELIST = List.of(
+                "/swagger-ui",
+                "/swagger-ui/",
+                "/swagger-ui.html",
+                "/v3/api-docs",
+                "/v3/api-docs/"
+        );
+
+        String path = request.getServletPath();
+
+
+        // 🔥 Ignora Swagger
+        if (SWAGGER_WHITELIST.stream().anyMatch(path::startsWith)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
+
         if (StringUtils.hasText(header) && header.startsWith("Bearer ")) {
             String token = header.substring(7);
+
             if (jwtUtil.validateToken(token)) {
                 Claims claims = jwtUtil.getClaims(token);
                 String username = claims.getSubject();
+
                 List<String> roles = claims.get("roles", List.class);
-                List<SimpleGrantedAuthority> authorities = roles == null ? List.of() : roles.stream().map(r -> new SimpleGrantedAuthority("ROLE_" + r)).collect(Collectors.toList());
-                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(username, null, authorities);
+
+                List<SimpleGrantedAuthority> authorities =
+                        roles == null ? List.of()
+                                : roles.stream()
+                                  .map(r -> new SimpleGrantedAuthority("ROLE_" + r))
+                                  .collect(Collectors.toList());
+
+                UsernamePasswordAuthenticationToken auth =
+                        new UsernamePasswordAuthenticationToken(username, null, authorities);
+
                 auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
         }
+
         filterChain.doFilter(request, response);
     }
 }

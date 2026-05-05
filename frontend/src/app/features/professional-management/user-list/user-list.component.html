@@ -61,215 +61,209 @@
     </mat-card-content>
   </mat-card>
 
-  <div *ngIf="loading" class="loading-band">
-    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-  </div>
+  @if (loading) {
+    <div class="loading-band">
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    </div>
+  }
 
-  <div *ngIf="error" class="state-card state-card--error">
-    <strong>Falha ao carregar dados.</strong>
-    <p>{{ error }}</p>
-  </div>
+  @if (error) {
+    <div class="state-card state-card--error">
+      <strong>Falha ao carregar dados.</strong>
+      <p>{{ error }}</p>
+    </div>
+  }
 
-  <section class="content-grid" *ngIf="!loading">
-    <mat-card class="table-panel">
-      <mat-card-content>
-        <div class="panel-heading">
-          <div>
-            <span class="panel-label">Operacao interna</span>
-            <h2>Base de usuarios</h2>
+  @if (!loading) {
+    <section class="content-grid">
+      <mat-card class="table-panel">
+        <mat-card-content>
+          <div class="panel-heading">
+            <div>
+              <span class="panel-label">Operacao interna</span>
+              <h2>Base de usuarios</h2>
+            </div>
+            <span class="panel-caption">{{ filteredUsers.length }} perfil(is) visivel(is)</span>
           </div>
-          <span class="panel-caption">{{ filteredUsers.length }} perfil(is) visivel(is)</span>
-        </div>
-
-        <div class="state-card state-card--empty" *ngIf="filteredUsers.length === 0">
-          <strong>Nenhum usuario encontrado.</strong>
-          <p>Ajuste os filtros atuais ou crie um novo perfil para iniciar a governanca.</p>
-        </div>
-
-        <div class="table-wrapper" *ngIf="filteredUsers.length > 0">
-          <table mat-table [dataSource]="filteredUsers" class="users-table">
-            <ng-container matColumnDef="user">
-              <th mat-header-cell *matHeaderCellDef>Usuario</th>
-              <td mat-cell *matCellDef="let user">
-                <button class="row-link" type="button" (click)="selectUser(user)">
-                  <strong>{{ user.displayName }}</strong>
-                  <span>{{ user.email }}</span>
-                  <small>&#64;{{ user.username }}</small>
-                </button>
-              </td>
-            </ng-container>
-
-            <ng-container matColumnDef="roles">
-              <th mat-header-cell *matHeaderCellDef>Papeis</th>
-              <td mat-cell *matCellDef="let user">
-                <div class="pill-row">
-                  <span class="soft-pill" *ngFor="let role of user.roles">{{ role }}</span>
-                </div>
-              </td>
-            </ng-container>
-
-            <ng-container matColumnDef="departments">
-              <th mat-header-cell *matHeaderCellDef>Departamentos</th>
-              <td mat-cell *matCellDef="let user">
-                <span class="inline-copy">
-                  {{ user.departmentNames.length ? user.departmentNames.join(', ') : 'Nao vinculado' }}
-                </span>
-              </td>
-            </ng-container>
-
-            <ng-container matColumnDef="status">
-              <th mat-header-cell *matHeaderCellDef>Status</th>
-              <td mat-cell *matCellDef="let user">
-                <mat-chip [color]="user.enabled ? 'primary' : 'warn'" selected>
-                  {{ user.enabled ? 'Ativo' : 'Inativo' }}
-                </mat-chip>
-              </td>
-            </ng-container>
-
-            <ng-container matColumnDef="createdAt">
-              <th mat-header-cell *matHeaderCellDef>Criado em</th>
-              <td mat-cell *matCellDef="let user">
-                {{ user.createdAt | date: 'dd/MM/yyyy HH:mm' }}
-              </td>
-            </ng-container>
-
-            <ng-container matColumnDef="actions">
-              <th mat-header-cell *matHeaderCellDef class="align-right">Acoes</th>
-              <td mat-cell *matCellDef="let user" class="align-right">
-                <div class="action-row">
-                  <button mat-stroked-button color="primary" type="button" (click)="selectUser(user); openEdit()">
-                    <mat-icon>edit</mat-icon>
-                    <span>Editar</span>
-                  </button>
-                  <button mat-stroked-button color="primary" type="button" (click)="toggleStatus(user)">
-                    <mat-icon>{{ user.enabled ? 'person_off' : 'person' }}</mat-icon>
-                    <span>{{ user.enabled ? 'Inativar' : 'Ativar' }}</span>
-                  </button>
-                </div>
-              </td>
-            </ng-container>
-
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr
-              mat-row
-              *matRowDef="let row; columns: displayedColumns; trackBy: trackByUser"
-              [class.row-selected]="selectedUser?.id === row.id">
-            </tr>
-          </table>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card class="editor-panel">
-      <mat-card-content>
-        <div class="panel-heading">
-          <div>
-            <span class="panel-label">{{ editing ? 'Edicao' : 'Perfil' }}</span>
-            <h2>{{ editing ? (selectedUser ? 'Editar usuario' : 'Novo usuario') : 'Leitura rapida' }}</h2>
-          </div>
-        </div>
-
-        <ng-container *ngIf="!editing && selectedUser; else editorState">
-          <div class="detail-stack">
-            <div class="identity-block">
-              <strong>{{ selectedUser.displayName }}</strong>
-              <span>{{ selectedUser.email }}</span>
-              <small>&#64;{{ selectedUser.username }}</small>
+          @if (filteredUsers.length === 0) {
+            <div class="state-card state-card--empty">
+              <strong>Nenhum usuario encontrado.</strong>
+              <p>Ajuste os filtros atuais ou crie um novo perfil para iniciar a governanca.</p>
             </div>
-
-            <div class="pill-row">
-              <span class="soft-pill" *ngFor="let role of selectedUser.roles">{{ role }}</span>
+          }
+          @if (filteredUsers.length > 0) {
+            <div class="table-wrapper">
+              <table mat-table [dataSource]="filteredUsers" class="users-table">
+                <ng-container matColumnDef="user">
+                  <th mat-header-cell *matHeaderCellDef>Usuario</th>
+                  <td mat-cell *matCellDef="let user">
+                    <button class="row-link" type="button" (click)="selectUser(user)">
+                      <strong>{{ user.displayName }}</strong>
+                      <span>{{ user.email }}</span>
+                      <small>&#64;{{ user.username }}</small>
+                    </button>
+                  </td>
+                </ng-container>
+                <ng-container matColumnDef="roles">
+                  <th mat-header-cell *matHeaderCellDef>Papeis</th>
+                  <td mat-cell *matCellDef="let user">
+                    <div class="pill-row">
+                      @for (role of user.roles; track role) {
+                        <span class="soft-pill">{{ role }}</span>
+                      }
+                    </div>
+                  </td>
+                </ng-container>
+                <ng-container matColumnDef="departments">
+                  <th mat-header-cell *matHeaderCellDef>Departamentos</th>
+                  <td mat-cell *matCellDef="let user">
+                    <span class="inline-copy">
+                      {{ user.departmentNames.length ? user.departmentNames.join(', ') : 'Nao vinculado' }}
+                    </span>
+                  </td>
+                </ng-container>
+                <ng-container matColumnDef="status">
+                  <th mat-header-cell *matHeaderCellDef>Status</th>
+                  <td mat-cell *matCellDef="let user">
+                    <mat-chip [color]="user.enabled ? 'primary' : 'warn'" selected>
+                      {{ user.enabled ? 'Ativo' : 'Inativo' }}
+                    </mat-chip>
+                  </td>
+                </ng-container>
+                <ng-container matColumnDef="createdAt">
+                  <th mat-header-cell *matHeaderCellDef>Criado em</th>
+                  <td mat-cell *matCellDef="let user">
+                    {{ user.createdAt | date: 'dd/MM/yyyy HH:mm' }}
+                  </td>
+                </ng-container>
+                <ng-container matColumnDef="actions">
+                  <th mat-header-cell *matHeaderCellDef class="align-right">Acoes</th>
+                  <td mat-cell *matCellDef="let user" class="align-right">
+                    <div class="action-row">
+                      <button mat-stroked-button color="primary" type="button" (click)="selectUser(user); openEdit()">
+                        <mat-icon>edit</mat-icon>
+                        <span>Editar</span>
+                      </button>
+                      <button mat-stroked-button color="primary" type="button" (click)="toggleStatus(user)">
+                        <mat-icon>{{ user.enabled ? 'person_off' : 'person' }}</mat-icon>
+                        <span>{{ user.enabled ? 'Inativar' : 'Ativar' }}</span>
+                      </button>
+                    </div>
+                  </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr
+                  mat-row
+                  *matRowDef="let row; columns: displayedColumns; trackBy: trackByUser"
+                  [class.row-selected]="selectedUser?.id === row.id">
+                </tr>
+              </table>
             </div>
-
-            <div class="detail-grid">
-              <article>
-                <span>Status</span>
-                <strong>{{ selectedUser.enabled ? 'Ativo' : 'Inativo' }}</strong>
-              </article>
-              <article>
-                <span>Departamentos</span>
-                <strong>{{ selectedUser.departmentNames.length || 0 }}</strong>
-              </article>
-            </div>
-
-            <div class="state-card info-card">
-              <strong>Departamentos vinculados</strong>
-              <p>
-                {{ selectedUser.departmentNames.length ? selectedUser.departmentNames.join(', ') : 'Sem vinculacao definida.' }}
-              </p>
-            </div>
-
-            <div class="form-actions">
-              <button mat-stroked-button type="button" (click)="openEdit()">Editar perfil</button>
-              <button mat-raised-button color="primary" type="button" (click)="toggleStatus(selectedUser)">
-                {{ selectedUser.enabled ? 'Inativar usuario' : 'Ativar usuario' }}
-              </button>
+          }
+        </mat-card-content>
+      </mat-card>
+      <mat-card class="editor-panel">
+        <mat-card-content>
+          <div class="panel-heading">
+            <div>
+              <span class="panel-label">{{ editing ? 'Edicao' : 'Perfil' }}</span>
+              <h2>{{ editing ? (selectedUser ? 'Editar usuario' : 'Novo usuario') : 'Leitura rapida' }}</h2>
             </div>
           </div>
-        </ng-container>
-
-        <ng-template #editorState>
-          <ng-container *ngIf="editing; else emptyState">
-            <form [formGroup]="form" (ngSubmit)="save()" class="editor-form">
-              <mat-form-field appearance="outline">
-                <mat-label>Usuario</mat-label>
-                <input matInput formControlName="username" placeholder="maria.silva" />
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Email</mat-label>
-                <input matInput formControlName="email" placeholder="maria@empresa.com" />
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>{{ selectedUser ? 'Nova senha (opcional)' : 'Senha inicial' }}</mat-label>
-                <input matInput type="password" formControlName="password" />
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Papeis</mat-label>
-                <mat-select formControlName="roles" multiple>
-                  <mat-option *ngFor="let role of roles" [value]="role.name">
-                    {{ role.name }} - {{ role.description }}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Departamentos</mat-label>
-                <mat-select formControlName="departmentIds" multiple>
-                  <mat-option *ngFor="let department of departments" [value]="department.id">
-                    {{ department.name }}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-
-              <div class="toggle-card">
-                <span class="toggle-card__label">Disponibilidade</span>
-                <mat-slide-toggle color="primary" formControlName="enabled">
-                  {{ form.controls.enabled.value ? 'Usuario ativo' : 'Usuario inativo' }}
-                </mat-slide-toggle>
-                <small>Desative quando quiser bloquear acesso sem perder historico e ownership.</small>
+          @if (!editing && selectedUser) {
+            <div class="detail-stack">
+              <div class="identity-block">
+                <strong>{{ selectedUser.displayName }}</strong>
+                <span>{{ selectedUser.email }}</span>
+                <small>&#64;{{ selectedUser.username }}</small>
               </div>
-
+              <div class="pill-row">
+                @for (role of selectedUser.roles; track role) {
+                  <span class="soft-pill">{{ role }}</span>
+                }
+              </div>
+              <div class="detail-grid">
+                <article>
+                  <span>Status</span>
+                  <strong>{{ selectedUser.enabled ? 'Ativo' : 'Inativo' }}</strong>
+                </article>
+                <article>
+                  <span>Departamentos</span>
+                  <strong>{{ selectedUser.departmentNames.length || 0 }}</strong>
+                </article>
+              </div>
+              <div class="state-card info-card">
+                <strong>Departamentos vinculados</strong>
+                <p>
+                  {{ selectedUser.departmentNames.length ? selectedUser.departmentNames.join(', ') : 'Sem vinculacao definida.' }}
+                </p>
+              </div>
               <div class="form-actions">
-                <button mat-stroked-button type="button" (click)="cancelEdit()">Cancelar</button>
-                <button mat-raised-button color="primary" type="submit" [disabled]="saving">
-                  <mat-icon>{{ saving ? 'hourglass_top' : 'save' }}</mat-icon>
-                  <span>{{ saving ? 'Salvando...' : 'Salvar perfil' }}</span>
+                <button mat-stroked-button type="button" (click)="openEdit()">Editar perfil</button>
+                <button mat-raised-button color="primary" type="button" (click)="toggleStatus(selectedUser)">
+                  {{ selectedUser.enabled ? 'Inativar usuario' : 'Ativar usuario' }}
                 </button>
               </div>
-            </form>
-          </ng-container>
-        </ng-template>
-
-        <ng-template #emptyState>
-          <div class="state-card state-card--empty">
-            <strong>Selecione um usuario.</strong>
-            <p>Abra um perfil existente ou crie um novo para configurar papeis e departamentos.</p>
-          </div>
-        </ng-template>
-      </mat-card-content>
-    </mat-card>
-  </section>
+            </div>
+          } @else {
+            @if (editing) {
+              <form [formGroup]="form" (ngSubmit)="save()" class="editor-form">
+                <mat-form-field appearance="outline">
+                  <mat-label>Usuario</mat-label>
+                  <input matInput formControlName="username" placeholder="maria.silva" />
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>Email</mat-label>
+                  <input matInput formControlName="email" placeholder="maria@empresa.com" />
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ selectedUser ? 'Nova senha (opcional)' : 'Senha inicial' }}</mat-label>
+                  <input matInput type="password" formControlName="password" />
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>Papeis</mat-label>
+                  <mat-select formControlName="roles" multiple>
+                    @for (role of roles; track role) {
+                      <mat-option [value]="role.name">
+                        {{ role.name }} - {{ role.description }}
+                      </mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>Departamentos</mat-label>
+                  <mat-select formControlName="departmentIds" multiple>
+                    @for (department of departments; track department) {
+                      <mat-option [value]="department.id">
+                        {{ department.name }}
+                      </mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+                <div class="toggle-card">
+                  <span class="toggle-card__label">Disponibilidade</span>
+                  <mat-slide-toggle color="primary" formControlName="enabled">
+                    {{ form.controls.enabled.value ? 'Usuario ativo' : 'Usuario inativo' }}
+                  </mat-slide-toggle>
+                  <small>Desative quando quiser bloquear acesso sem perder historico e ownership.</small>
+                </div>
+                <div class="form-actions">
+                  <button mat-stroked-button type="button" (click)="cancelEdit()">Cancelar</button>
+                  <button mat-raised-button color="primary" type="submit" [disabled]="saving">
+                    <mat-icon>{{ saving ? 'hourglass_top' : 'save' }}</mat-icon>
+                    <span>{{ saving ? 'Salvando...' : 'Salvar perfil' }}</span>
+                  </button>
+                </div>
+              </form>
+            } @else {
+              <div class="state-card state-card--empty">
+                <strong>Selecione um usuario.</strong>
+                <p>Abra um perfil existente ou crie um novo para configurar papeis e departamentos.</p>
+              </div>
+            }
+          }
+        </mat-card-content>
+      </mat-card>
+    </section>
+  }
 </div>

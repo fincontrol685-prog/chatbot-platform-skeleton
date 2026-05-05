@@ -11,9 +11,10 @@ interface MonitoringCard {
 }
 
 @Component({
-  selector: 'app-metrics-dashboard',
-  templateUrl: './metrics-dashboard.component.html',
-  styleUrls: ['./metrics-dashboard.component.css']
+    selector: 'app-metrics-dashboard',
+    templateUrl: './metrics-dashboard.component.html',
+    styleUrls: ['./metrics-dashboard.component.css'],
+    standalone: false
 })
 export class MetricsDashboardComponent implements OnInit {
   bots: BotDto[] = [];

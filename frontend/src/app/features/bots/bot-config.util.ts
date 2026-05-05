@@ -32,6 +32,8 @@ export interface BotProfessionalConfig {
     scope: string;
     restrictions: string;
     successCriteria: string;
+    requiredContext: string;
+    handoffContext: string;
   };
   notes: string;
 }
@@ -110,7 +112,9 @@ export const DEFAULT_BOT_CONFIG: BotProfessionalConfig = {
   knowledge: {
     scope: 'Catalogo de servicos, status de solicitacoes e duvidas frequentes.',
     restrictions: 'Nao prometer excecoes comerciais sem aprovacao e nao compartilhar dados sensiveis.',
-    successCriteria: 'Responder com clareza, registrar contexto e direcionar o cliente sem retrabalho.'
+    successCriteria: 'Responder com clareza, registrar contexto e direcionar o cliente sem retrabalho.',
+    requiredContext: 'objetivo da solicitacao; contexto atual; impacto percebido; urgencia',
+    handoffContext: 'resumo do caso; impacto atual; prioridade; retorno esperado'
   },
   notes: ''
 };
@@ -150,7 +154,9 @@ export const BOT_PRESETS: BotPresetDefinition[] = [
       knowledge: {
         scope: 'Incidentes, indisponibilidade, orientacoes de uso, segunda via e acompanhamento de chamados.',
         restrictions: 'Nao resetar credenciais criticas sem validacao e nao confirmar indisponibilidade sem evidencias basicas.',
-        successCriteria: 'Reduzir tempo de triagem e entregar contexto completo para o especialista.'
+        successCriteria: 'Reduzir tempo de triagem e entregar contexto completo para o especialista.',
+        requiredContext: 'sistema ou fluxo afetado; erro observado; inicio do problema; impacto na operacao',
+        handoffContext: 'resumo do incidente; evidencias coletadas; impacto atual; proximo passo esperado'
       },
       notes: ''
     }
@@ -189,7 +195,9 @@ export const BOT_PRESETS: BotPresetDefinition[] = [
       knowledge: {
         scope: 'Qualificacao de lead, planos, demonstracoes, prazo de implantacao e proximos passos.',
         restrictions: 'Nao prometer descontos fora da politica e nao assumir integracoes sem avaliacao tecnica.',
-        successCriteria: 'Qualificar o lead com dados completos para acelerar a conversao.'
+        successCriteria: 'Qualificar o lead com dados completos para acelerar a conversao.',
+        requiredContext: 'objetivo de negocio; porte da operacao; prazo de decisao; principais dores atuais',
+        handoffContext: 'resumo da oportunidade; potencial de negocio; prazo; proxima acao comercial'
       },
       notes: ''
     }
@@ -228,7 +236,9 @@ export const BOT_PRESETS: BotPresetDefinition[] = [
       knowledge: {
         scope: 'Acessos, sistemas internos, onboarding, equipamentos e politicas operacionais.',
         restrictions: 'Nao liberar permissao sem aprovacao e nao tratar incidente critico fora do fluxo oficial.',
-        successCriteria: 'Abrir chamados consistentes e reduzir encaminhamentos incorretos.'
+        successCriteria: 'Abrir chamados consistentes e reduzir encaminhamentos incorretos.',
+        requiredContext: 'colaborador afetado; sistema ou recurso; urgencia; impacto no trabalho',
+        handoffContext: 'resumo da solicitacao; bloqueio atual; prioridade; area responsavel esperada'
       },
       notes: ''
     }
@@ -294,6 +304,17 @@ export function buildBotConfigSummary(rawConfig?: string | null): BotConfigSumma
     ),
     isStructured: true
   };
+}
+
+export function splitConfigChecklist(value?: string | null): string[] {
+  if (!value?.trim()) {
+    return [];
+  }
+
+  return value
+    .split(/\r?\n|;/)
+    .map(item => item.trim())
+    .filter(Boolean);
 }
 
 function mergeBotConfig(config?: Partial<BotProfessionalConfig> | null): BotProfessionalConfig {

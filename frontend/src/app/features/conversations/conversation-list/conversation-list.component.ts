@@ -14,21 +14,20 @@ import { BotConfigSummary, buildBotConfigSummary } from '../../bots/bot-config.u
 import { getApiErrorMessage } from '../../../core/api-error.util';
 
 @Component({
-  selector: 'app-conversation-list',
-  standalone: true,
-  imports: [
-    CommonModule,
-    MatTableModule,
-    MatPaginatorModule,
-    MatButtonModule,
-    MatIconModule,
-    MatCardModule,
-    MatChipsModule,
-    MatProgressBarModule,
-    RouterModule
-  ],
-  templateUrl: './conversation-list.component.html',
-  styleUrls: ['./conversation-list.component.css']
+    selector: 'app-conversation-list',
+    imports: [
+        CommonModule,
+        MatTableModule,
+        MatPaginatorModule,
+        MatButtonModule,
+        MatIconModule,
+        MatCardModule,
+        MatChipsModule,
+        MatProgressBarModule,
+        RouterModule
+    ],
+    templateUrl: './conversation-list.component.html',
+    styleUrls: ['./conversation-list.component.css']
 })
 export class ConversationListComponent implements OnInit {
   displayedColumns: string[] = ['id', 'title', 'status', 'messageCount', 'createdAt', 'actions'];

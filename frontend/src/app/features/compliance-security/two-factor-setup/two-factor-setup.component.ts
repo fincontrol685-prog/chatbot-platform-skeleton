@@ -4,9 +4,9 @@ import { ComplianceSecurityService } from '../compliance-security.service';
 import { TwoFactorAuthDto } from '../models/compliance.model';
 
 @Component({
-  selector: 'app-two-factor-setup',
-  templateUrl: './two-factor-setup.component.html',
-  styles: [`
+    selector: 'app-two-factor-setup',
+    templateUrl: './two-factor-setup.component.html',
+    styles: [`
     .container { padding: 20px; }
     h2 { margin-bottom: 20px; color: #1976d2; }
     .status-section, .setup-section, .verify-section { max-width: 600px; }
@@ -26,12 +26,13 @@ import { TwoFactorAuthDto } from '../models/compliance.model';
     ul { margin: 15px 0; padding-left: 20px; }
     li { margin: 8px 0; }
     p { margin: 10px 0; color: #666; }
-  `]
+  `],
+    standalone: false
 })
 export class TwoFactorSetupComponent implements OnInit {
   twoFactorStatus: TwoFactorAuthDto | null = null;
-  setupForm!: FormGroup;
-  verifyForm!: FormGroup;
+  setupForm: FormGroup;
+  verifyForm: FormGroup;
   loading = false;
   error: string | null = null;
   success: string | null = null;
@@ -43,18 +44,15 @@ export class TwoFactorSetupComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private service: ComplianceSecurityService
-  ) {}
-
-  ngOnInit(): void {
-    this.initForms();
-    this.loadStatus();
-  }
-
-  initForms(): void {
+  ) {
     this.setupForm = this.fb.group({});
     this.verifyForm = this.fb.group({
       token: ['', [Validators.required, Validators.minLength(6)]]
     });
+  }
+
+  ngOnInit(): void {
+    this.loadStatus();
   }
 
   loadStatus(): void {

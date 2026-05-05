@@ -4,21 +4,22 @@ import { ProfessionalManagementService } from '../professional-management.servic
 import { TeamDto, DepartmentDto } from '../models/department.model';
 
 @Component({
-  selector: 'app-team-form',
-  templateUrl: './team-form.component.html',
-  styles: [`
+    selector: 'app-team-form',
+    templateUrl: './team-form.component.html',
+    styles: [`
     .full-width { width: 100%; margin-bottom: 15px; }
     .form-actions { display: flex; gap: 10px; margin-top: 20px; }
     form { padding: 10px 0; }
     mat-spinner { margin-right: 8px; }
-  `]
+  `],
+    standalone: false
 })
 export class TeamFormComponent implements OnInit {
   @Input() team: TeamDto | null = null;
   @Output() saved = new EventEmitter<TeamDto>();
   @Output() cancelled = new EventEmitter<void>();
 
-  form!: FormGroup;
+  form: FormGroup;
   loading = false;
   error: string | null = null;
   departments: DepartmentDto[] = [];
@@ -26,14 +27,7 @@ export class TeamFormComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private service: ProfessionalManagementService
-  ) {}
-
-  ngOnInit(): void {
-    this.initForm();
-    this.loadDepartments();
-  }
-
-  initForm(): void {
+  ) {
     this.form = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
       code: ['', [Validators.required, Validators.minLength(2)]],
@@ -41,7 +35,14 @@ export class TeamFormComponent implements OnInit {
       departmentId: [null, Validators.required],
       maxConversationsPerUser: [10, [Validators.required, Validators.min(1)]]
     });
+  }
 
+  ngOnInit(): void {
+    this.initForm();
+    this.loadDepartments();
+  }
+
+  initForm(): void {
     if (this.team) {
       this.form.patchValue(this.team);
     }

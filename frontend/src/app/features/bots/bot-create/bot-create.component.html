@@ -12,9 +12,11 @@
     </button>
   </section>
 
-  <div *ngIf="loadingBot" class="loading-band">
-    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-  </div>
+  @if (loadingBot) {
+    <div class="loading-band">
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    </div>
+  }
 
   <div class="create-layout">
     <form class="create-form" [formGroup]="form" (ngSubmit)="submit()">
@@ -30,21 +32,27 @@
             <mat-form-field appearance="outline" class="field-span-2">
               <mat-label>Nome do bot</mat-label>
               <input matInput formControlName="name" placeholder="Ex: Atendimento Prime" />
-              <mat-error *ngIf="identityGroup.controls.name.hasError('required') && identityGroup.controls.name.touched">
-                Informe o nome do bot.
-              </mat-error>
+              @if (identityGroup.controls.name.hasError('required') && identityGroup.controls.name.touched) {
+                <mat-error>
+                  Informe o nome do bot.
+                </mat-error>
+              }
             </mat-form-field>
 
             <mat-form-field appearance="outline">
               <mat-label>Chave tecnica</mat-label>
               <input matInput formControlName="key" placeholder="atendimento-prime" />
               <mat-hint>Use letras, numeros, "_" ou "-".</mat-hint>
-              <mat-error *ngIf="identityGroup.controls.key.hasError('required') && identityGroup.controls.key.touched">
-                Informe a chave do bot.
-              </mat-error>
-              <mat-error *ngIf="identityGroup.controls.key.hasError('pattern') && identityGroup.controls.key.touched">
-                A chave aceita apenas letras, numeros, "_" ou "-".
-              </mat-error>
+              @if (identityGroup.controls.key.hasError('required') && identityGroup.controls.key.touched) {
+                <mat-error>
+                  Informe a chave do bot.
+                </mat-error>
+              }
+              @if (identityGroup.controls.key.hasError('pattern') && identityGroup.controls.key.touched) {
+                <mat-error>
+                  A chave aceita apenas letras, numeros, "_" ou "-".
+                </mat-error>
+              }
             </mat-form-field>
 
             <div class="toggle-card">
@@ -97,27 +105,33 @@
             <mat-form-field appearance="outline">
               <mat-label>Canal principal</mat-label>
               <mat-select formControlName="primaryChannel">
-                <mat-option *ngFor="let option of channelOptions" [value]="option.value">
-                  {{ option.label }}
-                </mat-option>
+                @for (option of channelOptions; track option) {
+                  <mat-option [value]="option.value">
+                    {{ option.label }}
+                  </mat-option>
+                }
               </mat-select>
             </mat-form-field>
 
             <mat-form-field appearance="outline">
               <mat-label>Tom de atendimento</mat-label>
               <mat-select formControlName="tone">
-                <mat-option *ngFor="let option of toneOptions" [value]="option.value">
-                  {{ option.label }}
-                </mat-option>
+                @for (option of toneOptions; track option) {
+                  <mat-option [value]="option.value">
+                    {{ option.label }}
+                  </mat-option>
+                }
               </mat-select>
             </mat-form-field>
 
             <mat-form-field appearance="outline">
               <mat-label>Profundidade da resposta</mat-label>
               <mat-select formControlName="responseStyle">
-                <mat-option *ngFor="let option of responseStyleOptions" [value]="option.value">
-                  {{ option.label }}
-                </mat-option>
+                @for (option of responseStyleOptions; track option) {
+                  <mat-option [value]="option.value">
+                    {{ option.label }}
+                  </mat-option>
+                }
               </mat-select>
             </mat-form-field>
           </div>
@@ -245,6 +259,26 @@
               <mat-label>Criterios de sucesso</mat-label>
               <textarea matInput rows="4" formControlName="successCriteria"></textarea>
             </mat-form-field>
+
+            <mat-form-field appearance="outline" class="field-span-2">
+              <mat-label>Contexto obrigatorio para triagem</mat-label>
+              <textarea
+                matInput
+                rows="4"
+                formControlName="requiredContext"
+                placeholder="Ex: sistema afetado; impacto; urgencia; identificador do cliente"></textarea>
+              <mat-hint>Separe os itens por ponto e virgula ou por linha.</mat-hint>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="field-span-2">
+              <mat-label>Resumo minimo antes da transferencia</mat-label>
+              <textarea
+                matInput
+                rows="4"
+                formControlName="handoffContext"
+                placeholder="Ex: resumo do caso; impacto atual; prioridade; retorno esperado"></textarea>
+              <mat-hint>O bot usara esses itens para pedir um handoff mais completo.</mat-hint>
+            </mat-form-field>
           </div>
         </mat-card-content>
       </mat-card>
@@ -262,9 +296,11 @@
             <textarea matInput rows="5" formControlName="notes"></textarea>
           </mat-form-field>
 
-          <div *ngIf="error" class="form-error">
-            {{ error }}
-          </div>
+          @if (error) {
+            <div class="form-error">
+              {{ error }}
+            </div>
+          }
 
           <div class="form-actions">
             <button mat-stroked-button type="button" routerLink="/bots">Cancelar</button>
@@ -287,18 +323,19 @@
           </div>
 
           <div class="preset-list">
-            <button
-              mat-stroked-button
-              type="button"
-              class="preset-card"
-              *ngFor="let preset of presets"
-              (click)="applyPreset(preset.id)">
-              <div class="preset-card__header">
-                <strong>{{ preset.label }}</strong>
-                <span>{{ preset.badge }}</span>
-              </div>
-              <p>{{ preset.description }}</p>
-            </button>
+            @for (preset of presets; track preset) {
+              <button
+                mat-stroked-button
+                type="button"
+                class="preset-card"
+                (click)="applyPreset(preset.id)">
+                <div class="preset-card__header">
+                  <strong>{{ preset.label }}</strong>
+                  <span>{{ preset.badge }}</span>
+                </div>
+                <p>{{ preset.description }}</p>
+              </button>
+            }
           </div>
         </mat-card-content>
       </mat-card>
@@ -322,6 +359,12 @@
             <span>{{ profileGroup.controls.department.value || 'Departamento nao informado' }}</span>
           </div>
 
+          <div class="preview-context-card">
+            <span class="preview-context-card__label">Contexto operacional</span>
+            <strong>{{ profileGroup.controls.targetAudience.value || 'Publico nao informado' }}</strong>
+            <p>Idioma {{ profileGroup.controls.language.value || 'padrao' }} via {{ previewSummary.primaryChannelLabel.toLowerCase() }}.</p>
+          </div>
+
           <div class="conversation-preview">
             <div class="message-bubble message-bubble--bot">
               {{ previewConfig.messages.welcome }}
@@ -331,6 +374,25 @@
             </div>
             <div class="message-bubble message-bubble--closing">
               {{ previewConfig.messages.closing }}
+            </div>
+          </div>
+
+          <div class="preview-list-grid">
+            <div class="preview-list-card">
+              <span>Bot vai pedir</span>
+              <ul>
+                @for (item of previewRequiredContextItems; track item) {
+                  <li>{{ item }}</li>
+                }
+              </ul>
+            </div>
+            <div class="preview-list-card">
+              <span>Antes de transferir</span>
+              <ul>
+                @for (item of previewHandoffContextItems; track item) {
+                  <li>{{ item }}</li>
+                }
+              </ul>
             </div>
           </div>
 
