@@ -7,6 +7,7 @@ import com.br.chatbotplatformskeleton.service.intent.IntentStrategy;
 import com.br.chatbotplatformskeleton.service.response.ResponseComposer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -83,7 +84,9 @@ public class BotResponseService {
         }
 
         try {
-            BotConfig parsedConfig = objectMapper.readValue(rawConfig, BotConfig.class);
+            // Defensive: decode HTML entities in case config contains escaped content
+            String decodedConfig = StringEscapeUtils.unescapeHtml4(rawConfig);
+            BotConfig parsedConfig = objectMapper.readValue(decodedConfig, BotConfig.class);
             return enrichDefaults(parsedConfig);
         } catch (JsonProcessingException ignored) {
             return defaultConfig();
@@ -111,6 +114,8 @@ public class BotResponseService {
 
         safeConfig.profile.assistantRole = defaultValue(safeConfig.profile.assistantRole, "assistente virtual");
         safeConfig.profile.department = defaultValue(safeConfig.profile.department, "operacao");
+        safeConfig.profile.targetAudience = defaultValue(safeConfig.profile.targetAudience, "clientes da operacao");
+        safeConfig.profile.language = defaultValue(safeConfig.profile.language, "pt-BR");
         safeConfig.profile.primaryChannel = defaultValue(safeConfig.profile.primaryChannel, "site");
         safeConfig.profile.tone = defaultValue(safeConfig.profile.tone, "profissional");
         safeConfig.profile.responseStyle = defaultValue(safeConfig.profile.responseStyle, "equilibrado");
@@ -166,6 +171,14 @@ public class BotResponseService {
             safeConfig.knowledge.successCriteria,
             "Responder com clareza e definir o proximo passo sem retrabalho."
         );
+        safeConfig.knowledge.requiredContext = defaultValue(
+            safeConfig.knowledge.requiredContext,
+            "objetivo; contexto atual; impacto; urgencia"
+        );
+        safeConfig.knowledge.handoffContext = defaultValue(
+            safeConfig.knowledge.handoffContext,
+            "resumo do caso; impacto atual; proximo passo esperado"
+        );
 
         safeConfig.notes = defaultValue(safeConfig.notes, "");
         return safeConfig;
@@ -184,6 +197,10 @@ public class BotResponseService {
         metadata.put("sentimentScore", analysis.sentimentScore());
         metadata.put("sensitive", analysis.sensitive());
         metadata.put("protocol", protocol);
+        metadata.put("assistantRole", config.profile.assistantRole);
+        metadata.put("department", config.profile.department);
+        metadata.put("targetAudience", config.profile.targetAudience);
+        metadata.put("language", config.profile.language);
         metadata.put("tone", config.profile.tone);
         metadata.put("responseStyle", config.profile.responseStyle);
         metadata.put("channel", config.profile.primaryChannel);
@@ -233,6 +250,8 @@ public class BotResponseService {
     public static class BotProfile {
         public String assistantRole;
         public String department;
+        public String targetAudience;
+        public String language;
         public String primaryChannel;
         public String tone;
         public String responseStyle;
@@ -260,5 +279,7 @@ public class BotResponseService {
         public String scope;
         public String restrictions;
         public String successCriteria;
+        public String requiredContext;
+        public String handoffContext;
     }
 }

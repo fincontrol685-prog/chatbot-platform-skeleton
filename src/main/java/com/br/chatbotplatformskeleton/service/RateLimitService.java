@@ -37,12 +37,12 @@ public class RateLimitService {
      * Check user-based rate limit
      * Returns true if request is allowed, false if limit exceeded
      */
-    public boolean checkUserRateLimit(Long userId) {
+    public boolean checkUserRateLimit(String userKey) {
         if (!properties.isEnabled()) {
             return true;
         }
 
-        String key = "user:" + userId;
+        String key = "user:" + userKey;
         Bucket bucket = userBuckets.computeIfAbsent(
             key,
             k -> RateLimitingConfiguration.createUserBucket(properties)
@@ -51,11 +51,11 @@ public class RateLimitService {
         ConsumptionProbe probe = bucket.tryConsumeAndReturnRemaining(1);
         
         if (probe.isConsumed()) {
-            logger.debug("Rate limit check passed for user: {} (remaining: {})", userId, probe.getRemainingTokens());
+            logger.debug("Rate limit check passed for user: {} (remaining: {})", userKey, probe.getRemainingTokens());
             return true;
         }
 
-        logger.warn("Rate limit exceeded for user: {}", userId);
+        logger.warn("Rate limit exceeded for user: {}", userKey);
         return false;
     }
 
@@ -89,12 +89,12 @@ public class RateLimitService {
      * Check analytics endpoint rate limit
      * Uses user-based limiting with different thresholds
      */
-    public boolean checkAnalyticsRateLimit(Long userId) {
+    public boolean checkAnalyticsRateLimit(String userKey) {
         if (!properties.isEnabled()) {
             return true;
         }
 
-        String key = "analytics:user:" + userId;
+        String key = "analytics:user:" + userKey;
         Bucket bucket = userBuckets.computeIfAbsent(
             key,
             k -> RateLimitingConfiguration.createAnalyticsBucket(properties)
@@ -103,19 +103,19 @@ public class RateLimitService {
         ConsumptionProbe probe = bucket.tryConsumeAndReturnRemaining(1);
         
         if (probe.isConsumed()) {
-            logger.debug("Analytics rate limit check passed for user: {} (remaining: {})", userId, probe.getRemainingTokens());
+            logger.debug("Analytics rate limit check passed for user: {} (remaining: {})", userKey, probe.getRemainingTokens());
             return true;
         }
 
-        logger.warn("Analytics rate limit exceeded for user: {}", userId);
+        logger.warn("Analytics rate limit exceeded for user: {}", userKey);
         return false;
     }
 
     /**
      * Get remaining tokens for user
      */
-    public long getRemainingTokensForUser(Long userId) {
-        String key = "user:" + userId;
+    public long getRemainingTokensForUser(String userKey) {
+        String key = "user:" + userKey;
         Bucket bucket = userBuckets.get(key);
         if (bucket != null) {
             return bucket.estimateAbilityToConsume(1).getRemainingTokens();
@@ -135,4 +135,3 @@ public class RateLimitService {
         return properties.getIp().getRequests();
     }
 }
-

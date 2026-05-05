@@ -1,6 +1,7 @@
 package com.br.chatbotplatformskeleton.controller;
 
 import com.br.chatbotplatformskeleton.dto.ConversationDto;
+import com.br.chatbotplatformskeleton.domain.UserAccount;
 import com.br.chatbotplatformskeleton.service.CurrentUserService;
 import com.br.chatbotplatformskeleton.service.ConversationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -56,14 +57,15 @@ public class ConversationController {
             @ApiResponse(responseCode = "404", description = "Conversa não encontrada"),
             @ApiResponse(responseCode = "403", description = "Acesso negado")
     })
-    public ResponseEntity<ConversationDto> getConversation(@PathVariable Long id) {
-        return conversationService.findById(id)
+    public ResponseEntity<ConversationDto> getConversation(@PathVariable Long id, Authentication authentication) {
+        UserAccount currentUser = currentUserService.requireCurrentUser(authentication);
+        return conversationService.findById(id, currentUser)
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/bot/{botId}")
-    @PreAuthorize("hasAnyRole('ADMIN','GESTOR','USUARIO')")
+    @PreAuthorize("hasAnyRole('ADMIN','GESTOR')")
     @Operation(summary = "Listar Conversas por Bot", description = "Retorna todas as conversas de um bot específico")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista de conversas obtida com sucesso"),
@@ -80,12 +82,13 @@ public class ConversationController {
             @ApiResponse(responseCode = "200", description = "Lista de conversas obtida com sucesso"),
             @ApiResponse(responseCode = "403", description = "Acesso negado")
     })
-    public ResponseEntity<Page<ConversationDto>> listByUser(@PathVariable Long userId, Pageable pageable) {
-        return ResponseEntity.ok(conversationService.findByUserId(userId, pageable));
+    public ResponseEntity<Page<ConversationDto>> listByUser(@PathVariable Long userId, Pageable pageable, Authentication authentication) {
+        UserAccount currentUser = currentUserService.requireCurrentUser(authentication);
+        return ResponseEntity.ok(conversationService.findByUserId(userId, pageable, currentUser));
     }
 
     @GetMapping("/bot/{botId}/active")
-    @PreAuthorize("hasAnyRole('ADMIN','GESTOR','USUARIO')")
+    @PreAuthorize("hasAnyRole('ADMIN','GESTOR')")
     @Operation(summary = "Listar Conversas Ativas por Bot", description = "Retorna todas as conversas ativas de um bot")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista de conversas ativas obtida com sucesso"),
@@ -126,7 +129,7 @@ public class ConversationController {
     }
 
     @GetMapping("/bot/{botId}/count")
-    @PreAuthorize("hasAnyRole('ADMIN','GESTOR','USUARIO')")
+    @PreAuthorize("hasAnyRole('ADMIN','GESTOR')")
     @Operation(summary = "Contar Conversas Ativas", description = "Retorna a quantidade de conversas ativas de um bot")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Contagem obtida com sucesso"),

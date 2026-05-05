@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,17 +28,20 @@ public class ConversationService {
     private final UserRepository userRepository;
     private final AuditService auditService;
     private final ConversationMapper conversationMapper;
+    private final CurrentUserService currentUserService;
 
     public ConversationService(ConversationRepository conversationRepository,
                              BotRepository botRepository,
                              UserRepository userRepository,
                              AuditService auditService,
-                             ConversationMapper conversationMapper) {
+                             ConversationMapper conversationMapper,
+                             CurrentUserService currentUserService) {
         this.conversationRepository = conversationRepository;
         this.botRepository = botRepository;
         this.userRepository = userRepository;
         this.auditService = auditService;
         this.conversationMapper = conversationMapper;
+        this.currentUserService = currentUserService;
     }
 
     @Transactional
@@ -69,9 +73,13 @@ public class ConversationService {
         return conversationMapper.toDto(saved);
     }
 
-    public Optional<ConversationDto> findById(Long id) {
+    public Optional<ConversationDto> findById(Long id, UserAccount requester) {
         log.debug("Finding conversation with id: {}", id);
-        return conversationRepository.findById(id).map(conversationMapper::toDto);
+        return conversationRepository.findById(id)
+            .map(conversation -> {
+                ensureConversationAccess(requester, conversation);
+                return conversationMapper.toDto(conversation);
+            });
     }
 
     public Page<ConversationDto> findByBotId(Long botId, Pageable pageable) {
@@ -79,8 +87,11 @@ public class ConversationService {
         return conversationRepository.findByBotId(botId, pageable).map(conversationMapper::toDto);
     }
 
-    public Page<ConversationDto> findByUserId(Long userId, Pageable pageable) {
+    public Page<ConversationDto> findByUserId(Long userId, Pageable pageable, UserAccount requester) {
         log.debug("Finding conversations for user: {}", userId);
+        if (!isPrivileged(requester) && !userId.equals(requester.getId())) {
+            throw new AccessDeniedException("Acesso negado a conversas de outro usuario");
+        }
         return conversationRepository.findByUserId(userId, pageable).map(conversationMapper::toDto);
     }
 
@@ -142,10 +153,27 @@ public class ConversationService {
         return findByBotId(botId, pageable);
     }
 
+    private void ensureConversationAccess(UserAccount requester, Conversation conversation) {
+        if (conversation == null) {
+            return;
+        }
+
+        if (isPrivileged(requester)) {
+            return;
+        }
+
+        if (requester == null || conversation.getUser() == null || !conversation.getUser().getId().equals(requester.getId())) {
+            throw new AccessDeniedException("Acesso negado a esta conversa");
+        }
+    }
+
+    private boolean isPrivileged(UserAccount requester) {
+        return currentUserService.isPrivileged(requester);
+    }
+
 
     private String toJson(Conversation conversation) {
         return String.format("{\"id\":%d,\"title\":\"%s\",\"status\":\"%s\",\"messageCount\":%d}",
             conversation.getId(), conversation.getTitle(), conversation.getStatus(), conversation.getMessageCount());
     }
 }
-

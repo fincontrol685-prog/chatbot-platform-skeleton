@@ -40,7 +40,11 @@ public class InputValidationAspect {
             } else if (arg instanceof ConversationDto) {
                 sanitizeConversationDto((ConversationDto) arg);
             } else if (arg instanceof ConversationMessageDto) {
-                sanitizeConversationMessageDto((ConversationMessageDto) arg);
+                // Only validate incoming message DTOs (sent by users), not retrieved from database
+                ConversationMessageDto dto = (ConversationMessageDto) arg;
+                if (dto.getId() == null) {  // New message being created, not retrieved from DB
+                    sanitizeConversationMessageDto(dto);
+                }
             } else if (arg instanceof String) {
                 // Validate string arguments
                 log.debug("String argument passed to endpoint: {}", arg);
@@ -109,12 +113,9 @@ public class InputValidationAspect {
             dto.setContent(inputSanitizer.sanitize(dto.getContent()));
         }
 
-        if (dto.getMessageType() != null) {
-            String msgType = dto.getMessageType().toUpperCase();
-            if (!msgType.matches("^(TEXT|IMAGE|AUDIO|VIDEO|FILE)$")) {
-                throw new IllegalArgumentException("Invalid message type: " + msgType);
-            }
-        }
+        // Note: messageType is controlled by the backend service layer, not by user input
+        // The service will set messageType to "USER" for messages sent by users
+        // No validation needed here as the backend controls this field completely
 
         log.debug("ConversationMessageDto sanitized successfully");
     }

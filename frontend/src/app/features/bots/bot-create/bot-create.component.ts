@@ -27,6 +27,7 @@ import {
   BotTone,
   buildBotConfigSummary,
   parseBotConfig,
+  splitConfigChecklist,
   stringifyBotConfig
 } from '../bot-config.util';
 
@@ -104,7 +105,9 @@ export class BotCreateComponent implements OnInit {
     knowledge: this.fb.nonNullable.group({
       scope: [DEFAULT_BOT_CONFIG.knowledge.scope, [Validators.maxLength(800)]],
       restrictions: [DEFAULT_BOT_CONFIG.knowledge.restrictions, [Validators.maxLength(800)]],
-      successCriteria: [DEFAULT_BOT_CONFIG.knowledge.successCriteria, [Validators.maxLength(800)]]
+      successCriteria: [DEFAULT_BOT_CONFIG.knowledge.successCriteria, [Validators.maxLength(800)]],
+      requiredContext: [DEFAULT_BOT_CONFIG.knowledge.requiredContext, [Validators.maxLength(1200)]],
+      handoffContext: [DEFAULT_BOT_CONFIG.knowledge.handoffContext, [Validators.maxLength(1200)]]
     }),
     notes: ['']
   });
@@ -160,6 +163,14 @@ export class BotCreateComponent implements OnInit {
 
   get previewConfig(): BotProfessionalConfig {
     return this.buildConfigModel();
+  }
+
+  get previewRequiredContextItems(): string[] {
+    return splitConfigChecklist(this.previewConfig.knowledge.requiredContext);
+  }
+
+  get previewHandoffContextItems(): string[] {
+    return splitConfigChecklist(this.previewConfig.knowledge.handoffContext);
   }
 
   ngOnInit(): void {
@@ -293,24 +304,24 @@ export class BotCreateComponent implements OnInit {
 
     return {
       profile: {
-        assistantRole: rawValue.profile.assistantRole.trim(),
-        department: rawValue.profile.department.trim(),
-        targetAudience: rawValue.profile.targetAudience.trim(),
-        language: rawValue.profile.language.trim(),
+        assistantRole: (rawValue.profile.assistantRole ?? '').trim(),
+        department: (rawValue.profile.department ?? '').trim(),
+        targetAudience: (rawValue.profile.targetAudience ?? '').trim(),
+        language: (rawValue.profile.language ?? '').trim(),
         primaryChannel: rawValue.profile.primaryChannel,
         tone: rawValue.profile.tone,
         responseStyle: rawValue.profile.responseStyle
       },
       messages: {
-        welcome: rawValue.messages.welcome.trim(),
-        fallback: rawValue.messages.fallback.trim(),
-        escalation: rawValue.messages.escalation.trim(),
-        closing: rawValue.messages.closing.trim(),
-        offline: rawValue.messages.offline.trim(),
-        signature: rawValue.messages.signature.trim()
+        welcome: (rawValue.messages.welcome ?? '').trim(),
+        fallback: (rawValue.messages.fallback ?? '').trim(),
+        escalation: (rawValue.messages.escalation ?? '').trim(),
+        closing: (rawValue.messages.closing ?? '').trim(),
+        offline: (rawValue.messages.offline ?? '').trim(),
+        signature: (rawValue.messages.signature ?? '').trim()
       },
       guidelines: {
-        businessHours: rawValue.guidelines.businessHours.trim(),
+        businessHours: (rawValue.guidelines.businessHours ?? '').trim(),
         firstResponseSlaMinutes: Number(rawValue.guidelines.firstResponseSlaMinutes || 0),
         collectLead: rawValue.guidelines.collectLead,
         requestProtocol: rawValue.guidelines.requestProtocol,
@@ -318,9 +329,11 @@ export class BotCreateComponent implements OnInit {
         allowEmoji: rawValue.guidelines.allowEmoji
       },
       knowledge: {
-        scope: rawValue.knowledge.scope.trim(),
-        restrictions: rawValue.knowledge.restrictions.trim(),
-        successCriteria: rawValue.knowledge.successCriteria.trim()
+        scope: (rawValue.knowledge.scope ?? '').trim(),
+        restrictions: (rawValue.knowledge.restrictions ?? '').trim(),
+        successCriteria: (rawValue.knowledge.successCriteria ?? '').trim(),
+        requiredContext: (rawValue.knowledge.requiredContext ?? '').trim(),
+        handoffContext: (rawValue.knowledge.handoffContext ?? '').trim()
       },
       notes: rawValue.notes?.trim() ?? ''
     };

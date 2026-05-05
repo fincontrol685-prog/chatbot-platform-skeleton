@@ -259,6 +259,26 @@
               <mat-label>Criterios de sucesso</mat-label>
               <textarea matInput rows="4" formControlName="successCriteria"></textarea>
             </mat-form-field>
+
+            <mat-form-field appearance="outline" class="field-span-2">
+              <mat-label>Contexto obrigatorio para triagem</mat-label>
+              <textarea
+                matInput
+                rows="4"
+                formControlName="requiredContext"
+                placeholder="Ex: sistema afetado; impacto; urgencia; identificador do cliente"></textarea>
+              <mat-hint>Separe os itens por ponto e virgula ou por linha.</mat-hint>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="field-span-2">
+              <mat-label>Resumo minimo antes da transferencia</mat-label>
+              <textarea
+                matInput
+                rows="4"
+                formControlName="handoffContext"
+                placeholder="Ex: resumo do caso; impacto atual; prioridade; retorno esperado"></textarea>
+              <mat-hint>O bot usara esses itens para pedir um handoff mais completo.</mat-hint>
+            </mat-form-field>
           </div>
         </mat-card-content>
       </mat-card>
@@ -339,6 +359,12 @@
             <span>{{ profileGroup.controls.department.value || 'Departamento nao informado' }}</span>
           </div>
 
+          <div class="preview-context-card">
+            <span class="preview-context-card__label">Contexto operacional</span>
+            <strong>{{ profileGroup.controls.targetAudience.value || 'Publico nao informado' }}</strong>
+            <p>Idioma {{ profileGroup.controls.language.value || 'padrao' }} via {{ previewSummary.primaryChannelLabel.toLowerCase() }}.</p>
+          </div>
+
           <div class="conversation-preview">
             <div class="message-bubble message-bubble--bot">
               {{ previewConfig.messages.welcome }}
@@ -348,6 +374,25 @@
             </div>
             <div class="message-bubble message-bubble--closing">
               {{ previewConfig.messages.closing }}
+            </div>
+          </div>
+
+          <div class="preview-list-grid">
+            <div class="preview-list-card">
+              <span>Bot vai pedir</span>
+              <ul>
+                @for (item of previewRequiredContextItems; track item) {
+                  <li>{{ item }}</li>
+                }
+              </ul>
+            </div>
+            <div class="preview-list-card">
+              <span>Antes de transferir</span>
+              <ul>
+                @for (item of previewHandoffContextItems; track item) {
+                  <li>{{ item }}</li>
+                }
+              </ul>
             </div>
           </div>
 

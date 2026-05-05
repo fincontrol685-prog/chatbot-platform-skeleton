@@ -97,22 +97,22 @@ public class RateLimitingFilter extends OncePerRequestFilter {
      */
     private boolean enforceUserRateLimit(HttpServletRequest request, HttpServletResponse response,
                                         boolean isMessageExchange, boolean isAnalytics) throws IOException {
-        Long userId = extractUserId();
+        String userKey = extractUserKey();
 
-        if (userId == null) {
+        if (userKey == null) {
             // No authenticated user, allow the request
             return true;
         }
 
         boolean allowed;
         if (isAnalytics) {
-            allowed = rateLimitService.checkAnalyticsRateLimit(userId);
+            allowed = rateLimitService.checkAnalyticsRateLimit(userKey);
         } else {
-            allowed = rateLimitService.checkUserRateLimit(userId);
+            allowed = rateLimitService.checkUserRateLimit(userKey);
         }
 
         if (!allowed) {
-            logger.warn("Rate limit exceeded for user: {}", userId);
+            logger.warn("Rate limit exceeded for user: {}", userKey);
             response.setStatus(429); // TOO_MANY_REQUESTS
             response.setContentType("application/json");
             response.setHeader(RATE_LIMIT_HEADER, "0");
@@ -125,7 +125,7 @@ public class RateLimitingFilter extends OncePerRequestFilter {
             return false;
         }
 
-        response.setHeader(RATE_LIMIT_HEADER, String.valueOf(rateLimitService.getRemainingTokensForUser(userId)));
+        response.setHeader(RATE_LIMIT_HEADER, String.valueOf(rateLimitService.getRemainingTokensForUser(userKey)));
         return true;
     }
 
@@ -158,22 +158,19 @@ public class RateLimitingFilter extends OncePerRequestFilter {
     /**
      * Extract user ID from authentication context
      */
-    private Long extractUserId() {
+    private String extractUserKey() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication != null && authentication.isAuthenticated()) {
             Object principal = authentication.getPrincipal();
 
             if (principal instanceof UserDetails) {
-                // Try to extract userId from custom UserDetails if available
-                try {
-                    // This assumes the username is the userId as String
-                    String username = ((UserDetails) principal).getUsername();
-                    return Long.valueOf(username);
-                } catch (NumberFormatException e) {
-                    logger.debug("Could not extract userId from username: {}", principal);
-                    return null;
-                }
+                return ((UserDetails) principal).getUsername();
+            }
+
+            if (principal instanceof String principalValue && !principalValue.isBlank() &&
+                !"anonymousUser".equalsIgnoreCase(principalValue)) {
+                return principalValue;
             }
         }
 
@@ -209,4 +206,3 @@ public class RateLimitingFilter extends OncePerRequestFilter {
                path.endsWith(".js");
     }
 }
-

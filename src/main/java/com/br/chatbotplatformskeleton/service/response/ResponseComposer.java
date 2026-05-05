@@ -38,6 +38,10 @@ public class ResponseComposer {
         List<String> sections = new ArrayList<>();
         String intent = analysis.intent();
 
+        if (firstInteraction && shouldPresentOperatingContext(intent)) {
+            sections.add(buildOperatingContext(config));
+        }
+
         switch (intent) {
             case "SAUDACAO" -> composeSaudacao(sections, config);
             case "SUPORTE" -> composeSuporte(sections, config, protocol);
@@ -77,10 +81,15 @@ public class ResponseComposer {
         if (protocol != null) {
             sections.add("Referencia inicial do atendimento: " + protocol + ".");
         }
-        sections.add("Para eu responder com mais assertividade, preciso de:\n" +
-            bullet("o que aconteceu e em qual fluxo ou sistema") +
-            bullet("quando o problema comecou e se ele e recorrente") +
-            bullet("qual impacto isso gerou na operacao ou no usuario"));
+        sections.add(buildChecklistSection(
+            "Para eu responder com mais assertividade, preciso de:",
+            config.knowledge.requiredContext,
+            List.of(
+                "o que aconteceu e em qual fluxo ou sistema",
+                "quando o problema comecou e se ele e recorrente",
+                "qual impacto isso gerou na operacao ou no usuario"
+            )
+        ));
         appendScopeAndRestrictions(sections, config, true);
     }
 
@@ -89,10 +98,15 @@ public class ResponseComposer {
         if (protocol != null) {
             sections.add("Referencia inicial do atendimento: " + protocol + ".");
         }
-        sections.add("Me informe:\n" +
-            bullet("qual usuario, email ou perfil esta envolvido") +
-            bullet("qual sistema ou ambiente precisa de acesso") +
-            bullet("se o bloqueio e total, parcial ou por permissao especifica"));
+        sections.add(buildChecklistSection(
+            "Me informe:",
+            config.knowledge.requiredContext,
+            List.of(
+                "qual usuario, email ou perfil esta envolvido",
+                "qual sistema ou ambiente precisa de acesso",
+                "se o bloqueio e total, parcial ou por permissao especifica"
+            )
+        ));
         appendScopeAndRestrictions(sections, config, true);
     }
 
@@ -111,10 +125,15 @@ public class ResponseComposer {
 
     private void composeComercial(List<String> sections, BotResponseService.BotConfig config) {
         sections.add(openingLine(config, "Consigo qualificar sua necessidade para direcionar a proposta certa."));
-        sections.add("Para seguir sem retrabalho, me envie:\n" +
-            bullet("objetivo principal da conversa ou da contratacao") +
-            bullet("porte da operacao, equipe ou volume esperado") +
-            bullet("prazo desejado para avaliacao ou implantacao"));
+        sections.add(buildChecklistSection(
+            "Para seguir sem retrabalho, me envie:",
+            config.knowledge.requiredContext,
+            List.of(
+                "objetivo principal da conversa ou da contratacao",
+                "porte da operacao, equipe ou volume esperado",
+                "prazo desejado para avaliacao ou implantacao"
+            )
+        ));
         if (Boolean.TRUE.equals(config.guidelines.collectLead)) {
             sections.add("Se fizer sentido, inclua nome, empresa e melhor canal de retorno para acelerar a continuidade.");
         }
@@ -127,8 +146,16 @@ public class ResponseComposer {
 
     private void composeEscalacao(List<String> sections, BotResponseService.BotConfig config) {
         sections.add(config.messages.escalation);
-        sections.add("Antes da transferencia, descreva em uma frase o fato principal, o impacto atual e o nivel de urgencia " +
-            "para evitar perda de contexto.");
+        sections.add(buildChecklistSection(
+            "Antes da transferencia, deixe este resumo pronto:",
+            config.knowledge.handoffContext,
+            List.of(
+                "fato principal do caso",
+                "impacto atual",
+                "nivel de urgencia",
+                "proximo passo esperado"
+            )
+        ));
         appendScopeAndRestrictions(sections, config, false);
     }
 
@@ -141,7 +168,15 @@ public class ResponseComposer {
             sections.add(config.messages.welcome);
         }
         sections.add(config.messages.fallback);
-        sections.add("Se puder, detalhe assunto, contexto atual e resultado esperado para eu te conduzir de forma objetiva.");
+        sections.add(buildChecklistSection(
+            "Se puder, detalhe estes pontos para eu te conduzir de forma objetiva:",
+            config.knowledge.requiredContext,
+            List.of(
+                "assunto principal",
+                "contexto atual",
+                "resultado esperado"
+            )
+        ));
     }
 
     private void appendScopeAndRestrictions(List<String> sections, BotResponseService.BotConfig config, boolean includeSuccessCriteria) {
@@ -161,6 +196,42 @@ public class ResponseComposer {
         };
     }
 
+    private boolean shouldPresentOperatingContext(String intent) {
+        return !"ENCERRAMENTO".equals(intent);
+    }
+
+    private String buildOperatingContext(BotResponseService.BotConfig config) {
+        return "Contexto deste atendimento: " + config.profile.assistantRole +
+            " do " + config.profile.department +
+            ", com foco em " + config.profile.targetAudience +
+            " pelo canal " + config.profile.primaryChannel + ".";
+    }
+
+    private String buildChecklistSection(String title, String configuredContext, List<String> fallbackItems) {
+        List<String> items = parseChecklistItems(configuredContext);
+        if (items.isEmpty()) {
+            items = fallbackItems;
+        }
+
+        StringBuilder builder = new StringBuilder(title).append("\n");
+        for (String item : items) {
+            builder.append(bullet(item));
+        }
+        return builder.toString().trim();
+    }
+
+    private List<String> parseChecklistItems(String rawValue) {
+        if (rawValue == null || rawValue.isBlank()) {
+            return List.of();
+        }
+
+        return Pattern.compile("\\r?\\n|;")
+            .splitAsStream(rawValue)
+            .map(String::trim)
+            .filter(value -> !value.isBlank())
+            .toList();
+    }
+
     private String extractReference(String content) {
         Matcher matcher = REFERENCE_PATTERN.matcher(content);
         return matcher.find() ? matcher.group(1) : null;
@@ -170,4 +241,3 @@ public class ResponseComposer {
         return "- " + value + "\n";
     }
 }
-

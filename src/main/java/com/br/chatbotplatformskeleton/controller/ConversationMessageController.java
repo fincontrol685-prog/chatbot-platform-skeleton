@@ -2,6 +2,7 @@ package com.br.chatbotplatformskeleton.controller;
 
 import com.br.chatbotplatformskeleton.dto.ConversationExchangeDto;
 import com.br.chatbotplatformskeleton.dto.ConversationMessageDto;
+import com.br.chatbotplatformskeleton.domain.UserAccount;
 import com.br.chatbotplatformskeleton.service.CurrentUserService;
 import com.br.chatbotplatformskeleton.service.ConversationMessageService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -49,8 +50,8 @@ public class ConversationMessageController {
             @PathVariable Long conversationId,
             @RequestBody ConversationMessageDto dto,
             Authentication authentication) {
-        Long senderId = currentUserService.requireCurrentUserId(authentication);
-        ConversationMessageDto created = messageService.addMessage(dto, conversationId, senderId);
+        UserAccount currentUser = currentUserService.requireCurrentUser(authentication);
+        ConversationMessageDto created = messageService.addMessage(dto, conversationId, currentUser);
         return ResponseEntity.created(URI.create("/api/messages/" + created.getId())).body(created);
     }
 
@@ -68,8 +69,8 @@ public class ConversationMessageController {
         @RequestBody ConversationMessageDto dto,
         Authentication authentication
     ) {
-        Long senderId = currentUserService.requireCurrentUserId(authentication);
-        ConversationExchangeDto exchange = messageService.processUserMessage(dto, conversationId, senderId);
+        UserAccount currentUser = currentUserService.requireCurrentUser(authentication);
+        ConversationExchangeDto exchange = messageService.processUserMessage(dto, conversationId, currentUser);
         return ResponseEntity.created(URI.create("/api/messages/conversation/" + conversationId + "/exchange")).body(exchange);
     }
 
@@ -81,8 +82,9 @@ public class ConversationMessageController {
             @ApiResponse(responseCode = "404", description = "Mensagem não encontrada"),
             @ApiResponse(responseCode = "403", description = "Acesso negado")
     })
-    public ResponseEntity<ConversationMessageDto> getMessage(@PathVariable Long id) {
-        return messageService.findById(id)
+    public ResponseEntity<ConversationMessageDto> getMessage(@PathVariable Long id, Authentication authentication) {
+        UserAccount currentUser = currentUserService.requireCurrentUser(authentication);
+        return messageService.findById(id, currentUser)
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
     }
@@ -96,8 +98,10 @@ public class ConversationMessageController {
     })
     public ResponseEntity<Page<ConversationMessageDto>> listByConversation(
             @PathVariable Long conversationId,
-            Pageable pageable) {
-        return ResponseEntity.ok(messageService.findByConversationId(conversationId, pageable));
+            Pageable pageable,
+            Authentication authentication) {
+        UserAccount currentUser = currentUserService.requireCurrentUser(authentication);
+        return ResponseEntity.ok(messageService.findByConversationId(conversationId, pageable, currentUser));
     }
 
     @GetMapping("/conversation/{conversationId}/history")
@@ -107,8 +111,9 @@ public class ConversationMessageController {
             @ApiResponse(responseCode = "200", description = "Histórico obtido com sucesso"),
             @ApiResponse(responseCode = "403", description = "Acesso negado")
     })
-    public ResponseEntity<List<ConversationMessageDto>> getConversationHistory(@PathVariable Long conversationId) {
-        return ResponseEntity.ok(messageService.getConversationHistory(conversationId));
+    public ResponseEntity<List<ConversationMessageDto>> getConversationHistory(@PathVariable Long conversationId, Authentication authentication) {
+        UserAccount currentUser = currentUserService.requireCurrentUser(authentication);
+        return ResponseEntity.ok(messageService.getConversationHistory(conversationId, currentUser));
     }
 
     @PatchMapping("/{id}/flag")
@@ -142,7 +147,7 @@ public class ConversationMessageController {
     }
 
     @GetMapping("/bot/{botId}/stats/avg-response-time")
-    @PreAuthorize("hasAnyRole('ADMIN','GESTOR','USUARIO')")
+    @PreAuthorize("hasAnyRole('ADMIN','GESTOR')")
     @Operation(summary = "Tempo Médio de Resposta", description = "Retorna o tempo médio de resposta do bot")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Estatística obtida com sucesso"),
@@ -153,7 +158,7 @@ public class ConversationMessageController {
     }
 
     @GetMapping("/bot/{botId}/stats/avg-sentiment")
-    @PreAuthorize("hasAnyRole('ADMIN','GESTOR','USUARIO')")
+    @PreAuthorize("hasAnyRole('ADMIN','GESTOR')")
     @Operation(summary = "Sentimento Médio", description = "Retorna o sentimento médio das conversas do bot")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Estatística obtida com sucesso"),

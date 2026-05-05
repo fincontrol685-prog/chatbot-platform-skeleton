@@ -1,0 +1,1 @@
+function a(o,s){let e=o,r=e?.error;if(typeof r=="string"&&r.trim())return r;if(r&&typeof r=="object"){let i=Array.isArray(r.validationErrors)?r.validationErrors.map(t=>t?.message?.trim()).filter(t=>!!t):[];if(i.length>0)return i.join(" ");if(r.message?.trim())return r.message;if(r.error?.trim())return r.error}return e?.message?.trim()?e.message:s}export{a};

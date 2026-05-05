@@ -17,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -43,6 +44,9 @@ class ConversationServiceTest {
 
     @Mock
     private ConversationMapper conversationMapper;
+
+    @Mock
+    private CurrentUserService currentUserService;
 
     @InjectMocks
     private ConversationService conversationService;
@@ -78,6 +82,8 @@ class ConversationServiceTest {
         testConversationDto.setTitle("Test Conversation");
         testConversationDto.setStatus("ACTIVE");
         testConversationDto.setMessageCount(0L);
+
+        lenient().when(currentUserService.isPrivileged(any(UserAccount.class))).thenReturn(false);
     }
 
     @Test
@@ -162,7 +168,7 @@ class ConversationServiceTest {
         when(conversationMapper.toDto(testConversation)).thenReturn(testConversationDto);
 
         // Act
-        Optional<ConversationDto> result = conversationService.findById(1L);
+        Optional<ConversationDto> result = conversationService.findById(1L, testUser);
 
         // Assert
         assertTrue(result.isPresent());
@@ -176,7 +182,7 @@ class ConversationServiceTest {
         when(conversationRepository.findById(999L)).thenReturn(Optional.empty());
 
         // Act
-        Optional<ConversationDto> result = conversationService.findById(999L);
+        Optional<ConversationDto> result = conversationService.findById(999L, testUser);
 
         // Assert
         assertFalse(result.isPresent());
@@ -206,7 +212,7 @@ class ConversationServiceTest {
         when(conversationMapper.toDto(testConversation)).thenReturn(testConversationDto);
 
         // Act
-        Page<ConversationDto> result = conversationService.findByUserId(1L, PageRequest.of(0, 10));
+        Page<ConversationDto> result = conversationService.findByUserId(1L, PageRequest.of(0, 10), testUser);
 
         // Assert
         assertNotNull(result);
@@ -241,6 +247,18 @@ class ConversationServiceTest {
         // Assert
         assertFalse(result.isPresent());
         verify(conversationRepository, never()).save(any(Conversation.class));
+    }
+
+    @Test
+    void testFindByIdShouldRejectConversationFromAnotherUser() {
+        UserAccount anotherUser = new UserAccount();
+        anotherUser.setId(99L);
+        anotherUser.setUsername("another-user");
+
+        when(conversationRepository.findById(1L)).thenReturn(Optional.of(testConversation));
+
+        assertThrows(AccessDeniedException.class, () -> conversationService.findById(1L, anotherUser));
+        verify(conversationMapper, never()).toDto(any(Conversation.class));
     }
 
     @Test
@@ -301,4 +319,3 @@ class ConversationServiceTest {
         assertEquals(1, result.getTotalElements());
     }
 }
-

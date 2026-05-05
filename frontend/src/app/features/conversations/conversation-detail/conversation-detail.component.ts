@@ -13,7 +13,13 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { BotDto } from '../../bots/bot.service';
-import { BotConfigSummary, buildBotConfigSummary } from '../../bots/bot-config.util';
+import {
+  BotConfigSummary,
+  BotProfessionalConfig,
+  buildBotConfigSummary,
+  parseBotConfig,
+  splitConfigChecklist
+} from '../../bots/bot-config.util';
 import { BotService } from '../../bots/bot.service';
 import { ConversationService, Conversation, ConversationMessage } from '../conversation.service';
 import { getApiErrorMessage } from '../../../core/api-error.util';
@@ -45,6 +51,7 @@ export class ConversationDetailComponent implements OnInit {
   conversation: Conversation | null = null;
   bot: BotDto | null = null;
   botSummary: BotConfigSummary | null = null;
+  botConfig: BotProfessionalConfig | null = null;
   messages: ConversationMessage[] = [];
   messageForm: FormGroup;
   loading = false;
@@ -190,11 +197,29 @@ export class ConversationDetailComponent implements OnInit {
     return `${((total / messagesWithConfidence.length) * 100).toFixed(0)}%`;
   }
 
+  get botRequiredContextItems(): string[] {
+    return splitConfigChecklist(this.botConfig?.knowledge.requiredContext);
+  }
+
+  get botHandoffContextItems(): string[] {
+    return splitConfigChecklist(this.botConfig?.knowledge.handoffContext);
+  }
+
+  get composerPlaceholder(): string {
+    const requiredItems = this.botRequiredContextItems;
+    if (requiredItems.length === 0) {
+      return 'Descreva a solicitacao, contexto e resultado esperado...';
+    }
+
+    return `Inclua: ${requiredItems.slice(0, 4).join('; ')}...`;
+  }
+
   private loadBot(botId: number): void {
     this.botService.get(botId).subscribe({
       next: bot => {
         this.bot = bot;
         this.botSummary = buildBotConfigSummary(bot.config);
+        this.botConfig = parseBotConfig(bot.config);
       },
       error: err => {
         console.error('Erro ao carregar bot da conversa', err);

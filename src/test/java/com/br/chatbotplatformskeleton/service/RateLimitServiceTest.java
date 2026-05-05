@@ -47,7 +47,7 @@ class RateLimitServiceTest {
     @Test
     @DisplayName("Should allow requests within user rate limit")
     void testUserRateLimitAllowed() {
-        Long userId = 1L;
+        String userId = "user-1";
 
         // First 5 requests should be allowed
         for (int i = 0; i < 5; i++) {
@@ -59,7 +59,7 @@ class RateLimitServiceTest {
     @Test
     @DisplayName("Should reject requests exceeding user rate limit")
     void testUserRateLimitExceeded() {
-        Long userId = 1L;
+        String userId = "user-1";
 
         // Consume all 5 tokens
         for (int i = 0; i < 5; i++) {
@@ -101,8 +101,8 @@ class RateLimitServiceTest {
     @Test
     @DisplayName("Should isolate rate limits between different users")
     void testUserIsolation() {
-        Long user1 = 1L;
-        Long user2 = 2L;
+        String user1 = "user-1";
+        String user2 = "user-2";
 
         // Consume all tokens for user 1
         for (int i = 0; i < 5; i++) {
@@ -137,7 +137,7 @@ class RateLimitServiceTest {
     @Test
     @DisplayName("Should support analytics rate limiting")
     void testAnalyticsRateLimit() {
-        Long userId = 1L;
+        String userId = "user-1";
 
         // First 10 requests should be allowed
         for (int i = 0; i < 10; i++) {
@@ -153,7 +153,7 @@ class RateLimitServiceTest {
     @Test
     @DisplayName("Should return correct remaining tokens")
     void testRemainingTokens() {
-        Long userId = 1L;
+        String userId = "user-1";
 
         // Initially should have 5 tokens
         assertEquals(5, rateLimitService.getRemainingTokensForUser(userId));
@@ -170,7 +170,7 @@ class RateLimitServiceTest {
     @DisplayName("Should disable rate limiting when disabled")
     void testRateLimitingDisabled() {
         properties.setEnabled(false);
-        Long userId = 1L;
+        String userId = "user-1";
 
         // Should allow unlimited requests
         for (int i = 0; i < 100; i++) {
@@ -178,4 +178,3 @@ class RateLimitServiceTest {
         }
     }
 }
-

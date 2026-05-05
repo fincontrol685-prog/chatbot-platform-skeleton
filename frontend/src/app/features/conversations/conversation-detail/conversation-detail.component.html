@@ -116,7 +116,7 @@
                   matInput
                   formControlName="content"
                   rows="4"
-                  placeholder="Descreva a solicitacao, contexto e resultado esperado..."
+                  [placeholder]="composerPlaceholder"
                   [disabled]="conversation.status !== 'ACTIVE' || loading">
                 </textarea>
               </mat-form-field>
@@ -155,6 +155,14 @@
               </div>
               <div class="detail-list">
                 <article>
+                  <span>Publico</span>
+                  <strong>{{ botConfig?.profile?.targetAudience || '--' }}</strong>
+                </article>
+                <article>
+                  <span>Idioma</span>
+                  <strong>{{ botConfig?.profile?.language || '--' }}</strong>
+                </article>
+                <article>
                   <span>Horario</span>
                   <strong>{{ botSummary.businessHours }}</strong>
                 </article>
@@ -167,6 +175,33 @@
                   <strong>{{ botSummary.signature }}</strong>
                 </article>
               </div>
+            </mat-card-content>
+          </mat-card>
+        }
+        @if (botRequiredContextItems.length) {
+          <mat-card class="insight-panel">
+            <mat-card-content>
+              <div class="panel-heading">
+                <div>
+                  <span class="panel-label">Triagem esperada</span>
+                  <h2>Contexto minimo</h2>
+                </div>
+              </div>
+              <ul class="context-list">
+                @for (item of botRequiredContextItems; track item) {
+                  <li>{{ item }}</li>
+                }
+              </ul>
+              @if (botHandoffContextItems.length) {
+                <div class="context-block">
+                  <span class="panel-label">Handoff</span>
+                  <ul class="context-list">
+                    @for (item of botHandoffContextItems; track item) {
+                      <li>{{ item }}</li>
+                    }
+                  </ul>
+                </div>
+              }
             </mat-card-content>
           </mat-card>
         }
