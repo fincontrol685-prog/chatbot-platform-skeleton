@@ -138,6 +138,9 @@
             <version>2.1.0</version>
         </dependency>
 
+        <!-- Flyway removed - using Hibernate DDL auto instead -->
+        <!-- Users must manage database schema manually if not using ddl-auto -->
+
         <!-- MySQL Driver (Production) -->
         <dependency>
             <groupId>com.mysql</groupId>

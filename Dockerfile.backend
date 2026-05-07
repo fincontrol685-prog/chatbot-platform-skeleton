@@ -1,0 +1,58 @@
+# Multi-stage build for efficient Docker image
+FROM maven:3.9-eclipse-temurin-17 AS builder
+
+WORKDIR /build
+
+# Copy pom.xml and download dependencies
+COPY pom.xml .
+RUN mvn dependency:go-offline -q
+
+# Copy source code and build
+COPY src ./src
+RUN mvn clean package -DskipTests -q
+
+# Final stage - minimal runtime image
+FROM eclipse-temurin:17-jdk-alpine
+
+LABEL maintainer="Chatbot Platform Team"
+LABEL version="1.0"
+LABEL description="Chatbot Platform Backend - Production Ready"
+
+# Install curl and netcat for health checks and wait-for-mysql
+RUN apk add --no-cache curl netcat-openbsd bash
+
+# Create app user for security (don't run as root)
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+WORKDIR /app
+
+# Copy wait-for-mysql script
+COPY wait-for-mysql.sh /app/wait-for-mysql.sh
+RUN chmod +x /app/wait-for-mysql.sh && chown appuser:appgroup /app/wait-for-mysql.sh
+
+# Copy JAR from builder
+COPY --from=builder /build/target/chatbot-platform-skeleton-*.jar app.jar
+
+# Change ownership to appuser
+RUN chown -R appuser:appgroup /app
+
+# Switch to non-root user
+USER appuser
+
+# Expose port
+EXPOSE 8080
+
+# Health check - mais tolerante no startup
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=5 \
+    CMD curl -f http://localhost:8080/actuator/health/liveness || exit 1
+
+# Set environment variables with retry capability
+ENV SPRING_PROFILES_ACTIVE=prod
+ENV JAVA_OPTS="-Xmx512m -Xms256m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+ExitOnOutOfMemoryError"
+ENV DB_HOST=mysql
+ENV DB_PORT=3306
+
+# Run application with MySQL wait-for script
+ENTRYPOINT ["sh", "-c", "/app/wait-for-mysql.sh && exec java $JAVA_OPTS -jar /app/app.jar"]
+
+

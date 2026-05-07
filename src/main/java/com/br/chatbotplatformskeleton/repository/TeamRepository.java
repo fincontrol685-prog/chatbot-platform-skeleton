@@ -24,16 +24,16 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
     @Query("SELECT DISTINCT t FROM Team t WHERE t.teamLeadId = :teamLeadId AND t.isActive = true")
     List<Team> findByTeamLeadIdAndIsActiveTrue(@Param("teamLeadId") Long teamLeadId);
 
-    @Query("SELECT DISTINCT t FROM Team t LEFT JOIN FETCH t.department WHERE t.isActive = true AND (LOWER(t.name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(t.code) LIKE LOWER(CONCAT('%', :search, '%')))")
+    @Query("SELECT DISTINCT t FROM Team t LEFT JOIN FETCH t.department WHERE t.isActive = true AND (LOWER(t.name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(t.code) LIKE LOWER(CONCAT('%', :search, '%'))) ORDER BY t.createdAt DESC")
     Page<Team> searchByNameOrCode(@Param("search") String search, Pageable pageable);
 
-    @Query("SELECT DISTINCT t FROM Team t LEFT JOIN FETCH t.department WHERE t.department.id = :departmentId AND t.isActive = true")
+    @Query("SELECT DISTINCT t FROM Team t LEFT JOIN FETCH t.department WHERE t.department.id = :departmentId AND t.isActive = true ORDER BY t.createdAt DESC")
     Page<Team> findByDepartmentIdAndIsActiveTrue(@Param("departmentId") Long departmentId, Pageable pageable);
 
     @Query("SELECT DISTINCT t FROM Team t LEFT JOIN FETCH t.members u LEFT JOIN FETCH t.department WHERE u.id = :userId AND t.isActive = true")
     List<Team> findTeamsByMemberId(@Param("userId") Long userId);
 
-    @Query("SELECT DISTINCT t FROM Team t LEFT JOIN FETCH t.department WHERE t.isActive = true")
+    @Query("SELECT DISTINCT t FROM Team t LEFT JOIN FETCH t.department WHERE t.isActive = true ORDER BY t.createdAt DESC")
     Page<Team> findAllActive(Pageable pageable);
 }
 
