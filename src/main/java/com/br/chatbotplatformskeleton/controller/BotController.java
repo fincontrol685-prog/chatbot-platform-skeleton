@@ -1,7 +1,9 @@
 package com.br.chatbotplatformskeleton.controller;
 
+import com.br.chatbotplatformskeleton.application.bot.usecase.BotManagementUseCase;
+import com.br.chatbotplatformskeleton.application.bot.usecase.BotView;
+import com.br.chatbotplatformskeleton.application.bot.usecase.UpsertBotCommand;
 import com.br.chatbotplatformskeleton.dto.BotDto;
-import com.br.chatbotplatformskeleton.service.BotService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -21,10 +23,10 @@ import java.util.List;
 @SecurityRequirement(name = "Bearer Authentication")
 public class BotController {
 
-    private final BotService botService;
+    private final BotManagementUseCase botManagementUseCase;
 
-    public BotController(BotService botService) {
-        this.botService = botService;
+    public BotController(BotManagementUseCase botManagementUseCase) {
+        this.botManagementUseCase = botManagementUseCase;
     }
 
     @GetMapping
@@ -35,7 +37,7 @@ public class BotController {
             @ApiResponse(responseCode = "403", description = "Acesso negado")
     })
     public ResponseEntity<List<BotDto>> list() {
-        return ResponseEntity.ok(botService.listAll());
+        return ResponseEntity.ok(botManagementUseCase.listAll().stream().map(this::toDto).toList());
     }
 
     @PostMapping
@@ -47,7 +49,7 @@ public class BotController {
             @ApiResponse(responseCode = "403", description = "Acesso negado")
     })
     public ResponseEntity<BotDto> create(@Valid @RequestBody BotDto dto) {
-        BotDto created = botService.create(dto);
+        BotDto created = toDto(botManagementUseCase.create(toCommand(dto)));
         return ResponseEntity.created(URI.create("/api/bots/" + created.getId())).body(created);
     }
 
@@ -60,7 +62,10 @@ public class BotController {
             @ApiResponse(responseCode = "403", description = "Acesso negado")
     })
     public ResponseEntity<BotDto> get(@PathVariable Long id) {
-        return botService.findById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+        return botManagementUseCase.findById(id)
+            .map(this::toDto)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
@@ -73,7 +78,10 @@ public class BotController {
             @ApiResponse(responseCode = "403", description = "Acesso negado")
     })
     public ResponseEntity<BotDto> update(@PathVariable Long id, @Valid @RequestBody BotDto dto) {
-        return botService.update(id, dto).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+        return botManagementUseCase.update(id, toCommand(dto))
+            .map(this::toDto)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
     }
 
     @PatchMapping("/{id}/activate")
@@ -85,6 +93,23 @@ public class BotController {
             @ApiResponse(responseCode = "403", description = "Acesso negado")
     })
     public ResponseEntity<BotDto> activate(@PathVariable Long id, @RequestParam(value = "active", defaultValue = "true") boolean active) {
-        return botService.activate(id, active).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+        return botManagementUseCase.activate(id, active)
+            .map(this::toDto)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
+    }
+
+    private UpsertBotCommand toCommand(BotDto dto) {
+        return new UpsertBotCommand(dto.getName(), dto.getKey(), dto.getEnabled(), dto.getConfig());
+    }
+
+    private BotDto toDto(BotView bot) {
+        BotDto dto = new BotDto();
+        dto.setId(bot.id());
+        dto.setName(bot.name());
+        dto.setKey(bot.key());
+        dto.setEnabled(bot.enabled());
+        dto.setConfig(bot.config());
+        return dto;
     }
 }

@@ -10,7 +10,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -91,8 +90,8 @@ class AuthServiceTest {
         // Assert
         assertNotNull(response);
         assertEquals("jwt-token", response.getAccessToken());
-        assertEquals("jwt-token", response.getToken());
-        assertTrue(response.getExpirationTime() > 0);
+        assertEquals("Bearer", response.getTokenType());
+        assertTrue(response.getExpiresIn() > 0);
         verify(authenticationManager, times(1)).authenticate(any());
     }
 
@@ -143,7 +142,7 @@ class AuthServiceTest {
         // Assert
         assertNotNull(response);
         assertEquals("jwt-token", response.getAccessToken());
-        assertEquals("jwt-token", response.getToken());
+        assertEquals("Bearer", response.getTokenType());
         verify(userRepository, times(1)).save(any(UserAccount.class));
     }
 
@@ -264,4 +263,3 @@ class AuthServiceTest {
                 () -> authService.resetPassword("valid-token", "weak"));
     }
 }
-
