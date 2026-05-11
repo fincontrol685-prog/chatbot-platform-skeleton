@@ -469,10 +469,10 @@ Inclua:
 
 ## 📚 Recursos Úteis
 
-- [Arquitetura do Projeto](docs/architecture.md)
-- [Setup Local](README.md#instalação--setup)
-- [API Documentation](docs/API_ENDPOINTS_COMPLETO.md)
-- [Database Schema](docs/er-diagram.txt)
+- [Arquitetura do Projeto](architecture.md)
+- [Setup Local](../README.md#instalação--setup)
+- [API Documentation](API_ENDPOINTS_COMPLETO.md)
+- [Database Schema](er-diagram.txt)
 - [Spring Boot Docs](https://spring.io/projects/spring-boot)
 - [Angular Docs](https://angular.io/docs)
 
